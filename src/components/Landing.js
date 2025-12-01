@@ -56,7 +56,7 @@ const Footer = styled.footer`
   opacity: 0.8;
 `;
 
-const Landing = () => {
+const Landing = ({ onNavigate }) => {
   const activities = [
     {
       id: 1,
@@ -133,7 +133,13 @@ const Landing = () => {
               title={activity.title}
               description={activity.description}
               color={activity.color}
-              onClick={() => handleActivityClick(activity)}
+              onClick={() => {
+                if (activity.id === 3) {
+                  onNavigate('multiplication-selector');
+                } else {
+                  handleActivityClick(activity);
+                }
+              }}
             />
           ))}
         </CardsGrid>

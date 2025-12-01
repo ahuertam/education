@@ -25,29 +25,13 @@ const CardContainer = styled.div`
   
   // O simplificar el hover
   &:hover {
-    transform: translateY(-5px) translateZ(0); // Sin scale
-  }
+    transform: translateY(-5px) translateZ(0);
     box-shadow: 
       25px 25px 80px rgba(190, 190, 190, 0.4),
       -25px -25px 80px rgba(255, 255, 255, 0.8);
   }
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0);
-    will-change: transform;
-  }
 
-  &:hover::before {
-    transform: translateX(200%);
-  }
 `;
 
 const IconContainer = styled.div`
