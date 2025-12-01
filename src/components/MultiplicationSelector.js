@@ -51,20 +51,35 @@ const Grid = styled.div`
   gap: 2rem;
 `;
 
-const MultiplicationSelector = ({ onNavigate, onBack }) => {
+const MultiplicationSelector = ({ onNavigate, onBack, operation }) => {
+  const getOperationInfo = () => {
+    switch(operation) {
+      case 'addition':
+        return { title: 'Juegos de Sumar', action: 'sumando' };
+      case 'subtraction':
+        return { title: 'Juegos de Restar', action: 'restando' };
+      case 'division':
+        return { title: 'Juegos de Dividir', action: 'dividiendo' };
+      default:
+        return { title: 'Juegos de Multiplicar', action: 'multiplicando' };
+    }
+  };
+
+  const info = getOperationInfo();
+
   const games = [
     {
       id: 'memory',
       icon: <FaGamepad />,
       title: "Memorama Matemático",
-      description: "Encuentra las parejas de operaciones y resultados.",
+      description: `Encuentra las parejas de operaciones y resultados ${info.action}.`,
       color: "#4CAF50"
     },
     {
       id: 'space',
       icon: <FaRocket />,
       title: "Defensor Espacial",
-      description: "Destruye asteroides resolviendo multiplicaciones.",
+      description: `Destruye asteroides resolviendo operaciones ${info.action}.`,
       color: "#FF5722"
     }
   ];
@@ -75,7 +90,7 @@ const MultiplicationSelector = ({ onNavigate, onBack }) => {
         <BackButton onClick={onBack}>
           <FaArrowLeft /> Volver
         </BackButton>
-        <Title>Juegos de Multiplicar</Title>
+        <Title>{info.title}</Title>
         <div style={{ width: 100 }} /> {/* Spacer for centering */}
       </Header>
       
@@ -87,7 +102,7 @@ const MultiplicationSelector = ({ onNavigate, onBack }) => {
             title={game.title}
             description={game.description}
             color={game.color}
-            onClick={() => onNavigate(game.id)}
+            onClick={() => onNavigate(game.id, operation)}
           />
         ))}
       </Grid>

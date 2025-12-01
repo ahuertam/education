@@ -41,6 +41,7 @@ const Header = styled.header`
   display: flex;
   justify-content: space-between;
   z-index: 10;
+  pointer-events: none; /* Allow clicks to pass through */
 `;
 
 const Button = styled.button`
@@ -54,6 +55,7 @@ const Button = styled.button`
   align-items: center;
   gap: 0.5rem;
   font-size: 1rem;
+  pointer-events: auto; /* Re-enable clicks for buttons */
   
   &:hover {
     background: rgba(255, 255, 255, 0.3);
@@ -182,11 +184,36 @@ const Particle = styled.div`
   }
 `;
 
-const SpaceDefenderGame = ({ onBack }) => {
+const DifficultyMenu = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.9);
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  z-index: 20;
+  border: 2px solid #00ff00;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+`;
+
+const DifficultyButton = styled(OptionButton)`
+  display: block;
+  width: 100%;
+  margin: 1rem 0;
+  background: ${props => props.color || '#2196F3'};
+  &:hover {
+    filter: brightness(1.1);
+  }
+`;
+
+const SpaceDefenderGame = ({ onBack, operation = 'multiplication' }) => {
   const [score, setScore] = useState(0);
   const [asteroids, setAsteroids] = useState([]);
   const [currentProblem, setCurrentProblem] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
+  const [gamePhase, setGamePhase] = useState('menu'); // menu, playing, gameover
+  const [difficulty, setDifficulty] = useState('easy');
   const [laser, setLaser] = useState(null);
   const [explosions, setExplosions] = useState([]);
   const [shipAngle, setShipAngle] = useState(0);
@@ -194,19 +221,75 @@ const SpaceDefenderGame = ({ onBack }) => {
   const [mouseY, setMouseY] = useState(0);
   const gameLoopRef = useRef();
   const shootSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
+  const errorSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const explosionSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/explosion.mp3`));
   const bgmRef = useRef(new Audio(`${process.env.PUBLIC_URL}/stars.mp3`));
 
+  useEffect(() => {
+    // Pre-configure error sound
+    errorSoundRef.current.playbackRate = 0.5;
+    errorSoundRef.current.volume = 0.3;
+  }, []);
+
   const generateProblem = () => {
-    const a = Math.floor(Math.random() * 9) + 1;
-    const b = Math.floor(Math.random() * 9) + 1;
-    const answer = a * b;
+    let a, b, answer, operator;
+    let min, max, speedMin, speedMax;
+
+    // Set difficulty ranges
+    switch(difficulty) {
+      case 'hard':
+        min = 10; max = 20; // For multiplication/division factors
+        if (operation === 'addition' || operation === 'subtraction') { min = 20; max = 100; }
+        speedMin = 0.5; speedMax = 0.8;
+        break;
+      case 'medium':
+        min = 5; max = 12;
+        if (operation === 'addition' || operation === 'subtraction') { min = 10; max = 50; }
+        speedMin = 0.3; speedMax = 0.6;
+        break;
+      case 'easy':
+      default:
+        min = 1; max = 9;
+        if (operation === 'addition' || operation === 'subtraction') { min = 1; max = 20; }
+        speedMin = 0.1; speedMax = 0.4;
+        break;
+    }
+
+    // Generate numbers based on operation
+    switch(operation) {
+      case 'addition':
+        a = Math.floor(Math.random() * (max - min + 1)) + min;
+        b = Math.floor(Math.random() * (max - min + 1)) + min;
+        answer = a + b;
+        operator = '+';
+        break;
+      case 'subtraction':
+        a = Math.floor(Math.random() * (max - min + 1)) + min;
+        b = Math.floor(Math.random() * (a - min + 1)) + min; // Ensure positive result
+        answer = a - b;
+        operator = '-';
+        break;
+      case 'division':
+        b = Math.floor(Math.random() * (max - min + 1)) + min; // Divisor
+        answer = Math.floor(Math.random() * (max - min + 1)) + min; // Quotient
+        a = b * answer; // Dividend
+        operator = '÷';
+        break;
+      case 'multiplication':
+      default:
+        a = Math.floor(Math.random() * (max - min + 1)) + min;
+        b = Math.floor(Math.random() * (max - min + 1)) + min;
+        answer = a * b;
+        operator = '×';
+        break;
+    }
     
     // Generate 4 numbers: 1 correct + 3 distractors
     const numbers = new Set([answer]);
     while(numbers.size < 4) {
-      const distractor = answer + Math.floor(Math.random() * 20) - 10;
-      if (distractor > 0) numbers.add(distractor);
+      const range = difficulty === 'easy' ? 5 : (difficulty === 'medium' ? 10 : 20);
+      const distractor = answer + Math.floor(Math.random() * (range * 2)) - range;
+      if (distractor >= 0 && distractor !== answer) numbers.add(distractor);
     }
     
     const numbersArray = Array.from(numbers).sort(() => Math.random() - 0.5);
@@ -226,13 +309,13 @@ const SpaceDefenderGame = ({ onBack }) => {
         left: 15 + (index * 23), // Spread them out: 15%, 38%, 61%, 84%
         borderRadius,
         rotation: Math.random() * 360,
-        speed: 0.3 + Math.random() * 0.4, // Random speed between 0.3 and 0.7
-        rotationSpeed: (Math.random() - 0.5) * 2 // Random rotation speed
+        speed: speedMin + Math.random() * (speedMax - speedMin),
+        rotationSpeed: (Math.random() - 0.5) * 2
       };
     });
     
     return {
-      operation: `${a} × ${b}`,
+      operation: `${a} ${operator} ${b}`,
       answer,
       asteroids: newAsteroids
     };
@@ -240,11 +323,16 @@ const SpaceDefenderGame = ({ onBack }) => {
 
   const startGame = () => {
     setScore(0);
-    setGameOver(false);
+    setGamePhase('playing');
     const problem = generateProblem();
     setCurrentProblem(problem);
     setAsteroids(problem.asteroids);
     setExplosions([]);
+  };
+
+  const handleDifficultySelect = (diff) => {
+    setDifficulty(diff);
+    startGame();
   };
 
   // BGM lifecycle management
@@ -285,16 +373,8 @@ const SpaceDefenderGame = ({ onBack }) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  // Ship angle calculation (separate from game loop)
   useEffect(() => {
-    if (gameOver) return;
-    if (asteroids.length === 0) {
-      if (!laser && explosions.length === 0) {
-        startGame();
-      }
-      return;
-    }
-
-    // Calculate ship angle to point at mouse
     const shipX = window.innerWidth / 2;
     const shipY = window.innerHeight - 120;
     const targetX = mouseX;
@@ -305,12 +385,27 @@ const SpaceDefenderGame = ({ onBack }) => {
     
     const angleRad = Math.atan2(deltaX, deltaY);
     setShipAngle((angleRad * 180) / Math.PI);
+  }, [mouseX, mouseY]);
+
+  // Game loop (asteroids movement)
+  useEffect(() => {
+    if (gamePhase !== 'playing') return;
+    
+    if (asteroids.length === 0) {
+      if (!laser && explosions.length === 0) {
+        // Generate new problem immediately if no asteroids
+        const problem = generateProblem();
+        setCurrentProblem(problem);
+        setAsteroids(problem.asteroids);
+      }
+      return;
+    }
 
     const loop = setInterval(() => {
       setAsteroids(prev => {
         const updated = prev.map(ast => {
           if (ast.top > 85) {
-            setGameOver(true);
+            setGamePhase('gameover');
             return ast;
           }
           return { 
@@ -325,7 +420,7 @@ const SpaceDefenderGame = ({ onBack }) => {
 
     gameLoopRef.current = loop;
     return () => clearInterval(loop);
-  }, [asteroids, gameOver, laser, explosions, mouseX, mouseY]);
+  }, [asteroids, laser, explosions, gamePhase]);
 
   const createExplosion = (x, y) => {
     const particles = [];
@@ -395,6 +490,12 @@ const SpaceDefenderGame = ({ onBack }) => {
       }, 200);
 
     } else {
+      // Play error sound immediately
+      if (errorSoundRef.current) {
+        errorSoundRef.current.currentTime = 0;
+        errorSoundRef.current.play().catch(e => console.log('Audio play failed', e));
+      }
+
       setScore(s => Math.max(0, s - 5));
     }
   };
@@ -408,7 +509,7 @@ const SpaceDefenderGame = ({ onBack }) => {
       </Header>
 
       <PlayArea>
-        {asteroids.map(ast => (
+        {gamePhase === 'playing' && asteroids.map(ast => (
           <Asteroid 
             key={ast.id}
             top={ast.top} 
@@ -435,7 +536,22 @@ const SpaceDefenderGame = ({ onBack }) => {
         <Ship angle={shipAngle}><FaRocket /></Ship>
       </PlayArea>
 
-      {gameOver ? (
+      {gamePhase === 'menu' && (
+        <DifficultyMenu>
+          <h2>Selecciona Dificultad</h2>
+          <DifficultyButton color="#4CAF50" onClick={() => handleDifficultySelect('easy')}>
+            Fácil (1-10)
+          </DifficultyButton>
+          <DifficultyButton color="#FF9800" onClick={() => handleDifficultySelect('medium')}>
+            Medio (1-50)
+          </DifficultyButton>
+          <DifficultyButton color="#F44336" onClick={() => handleDifficultySelect('hard')}>
+            Difícil (1-100)
+          </DifficultyButton>
+        </DifficultyMenu>
+      )}
+
+      {gamePhase === 'gameover' && (
         <div style={{
           position: 'absolute',
           top: '50%',
@@ -449,24 +565,24 @@ const SpaceDefenderGame = ({ onBack }) => {
         }}>
           <h2>¡Juego Terminado!</h2>
           <p>Puntuación final: {score}</p>
-          <OptionButton onClick={startGame}>Jugar de nuevo</OptionButton>
+          <OptionButton onClick={() => setGamePhase('menu')}>Jugar de nuevo</OptionButton>
         </div>
-      ) : (
-        currentProblem && (
-          <div style={{
-            position: 'absolute',
-            bottom: '30px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            fontSize: '3rem',
-            fontWeight: 'bold',
-            color: 'white',
-            textShadow: '0 0 20px rgba(0,255,0,0.8)',
-            zIndex: 10
-          }}>
-            {currentProblem.operation} = ?
-          </div>
-        )
+      )}
+
+      {gamePhase === 'playing' && currentProblem && (
+        <div style={{
+          position: 'absolute',
+          bottom: '30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          fontSize: '3rem',
+          fontWeight: 'bold',
+          color: 'white',
+          textShadow: '0 0 20px rgba(0,255,0,0.8)',
+          zIndex: 10
+        }}>
+          {currentProblem.operation} = ?
+        </div>
       )}
     </GameContainer>
   );

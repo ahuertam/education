@@ -134,8 +134,15 @@ const Landing = ({ onNavigate }) => {
               description={activity.description}
               color={activity.color}
               onClick={() => {
-                if (activity.id === 3) {
-                  onNavigate('multiplication-selector');
+                const operations = {
+                  1: 'addition',
+                  2: 'subtraction',
+                  3: 'multiplication',
+                  4: 'division'
+                };
+                
+                if (operations[activity.id]) {
+                  onNavigate('multiplication-selector', operations[activity.id]);
                 } else {
                   handleActivityClick(activity);
                 }

@@ -8,19 +8,35 @@ import SpaceDefenderGame from './components/SpaceDefenderGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
+  const [selectedOperation, setSelectedOperation] = useState(null);
+
+  const handleNavigate = (view, operation = null) => {
+    if (operation) setSelectedOperation(operation);
+    setCurrentView(view);
+  };
 
   const renderView = () => {
     switch(currentView) {
       case 'landing':
-        return <Landing onNavigate={setCurrentView} />;
+        return <Landing onNavigate={handleNavigate} />;
       case 'multiplication-selector':
-        return <MultiplicationSelector onNavigate={setCurrentView} onBack={() => setCurrentView('landing')} />;
+        return <MultiplicationSelector 
+          onNavigate={handleNavigate} 
+          onBack={() => setCurrentView('landing')} 
+          operation={selectedOperation}
+        />;
       case 'memory':
-        return <MemoryGame onBack={() => setCurrentView('multiplication-selector')} />;
+        return <MemoryGame 
+          onBack={() => setCurrentView('multiplication-selector')} 
+          operation={selectedOperation}
+        />;
       case 'space':
-        return <SpaceDefenderGame onBack={() => setCurrentView('multiplication-selector')} />;
+        return <SpaceDefenderGame 
+          onBack={() => setCurrentView('multiplication-selector')} 
+          operation={selectedOperation}
+        />;
       default:
-        return <Landing onNavigate={setCurrentView} />;
+        return <Landing onNavigate={handleNavigate} />;
     }
   };
 
