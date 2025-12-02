@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
-import { FaGamepad, FaRocket, FaArrowLeft } from 'react-icons/fa';
+import { FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle } from 'react-icons/fa';
 
 const SelectorContainer = styled.div`
   min-height: 100vh;
@@ -81,6 +81,20 @@ const MultiplicationSelector = ({ onNavigate, onBack, operation }) => {
       title: "Defensor Espacial",
       description: `Destruye asteroides resolviendo operaciones ${info.action}.`,
       color: "#FF5722"
+    },
+    {
+      id: 'frog',
+      icon: <FaFrog />,
+      title: "El Salto de la Rana",
+      description: `Ayuda a la rana a cruzar el estanque ${info.action}.`,
+      color: "#8BC34A"
+    },
+    {
+      id: 'bubbles',
+      icon: <FaRegCircle />,
+      title: "Pop de Burbujas",
+      description: `Explota las burbujas correctas mientras estás ${info.action}.`,
+      color: "#00BCD4"
     }
   ];
 
