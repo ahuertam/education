@@ -2,11 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
 
-const floatAnimation = keyframes`
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
-`;
+
 
 const popAnimation = keyframes`
   0% { transform: scale(1); opacity: 1; }
@@ -77,7 +73,12 @@ const ProblemContainer = styled.div`
   border: 2px solid rgba(255, 255, 255, 0.2);
 `;
 
-const Bubble = styled.div`
+const Bubble = styled.div.attrs(props => ({
+  style: {
+    left: `${props.$left}%`,
+    bottom: `${props.$bottom}%`,
+  }
+}))`
   position: absolute;
   width: 80px;
   height: 80px;
@@ -88,8 +89,6 @@ const Bubble = styled.div`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  left: ${props => props.left}%;
-  bottom: ${props => props.bottom}%;
   transition: transform 0.1s;
   
   &::after {
@@ -117,10 +116,13 @@ const BubbleNumber = styled.span`
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 `;
 
-const PopEffect = styled.div`
+const PopEffect = styled.div.attrs(props => ({
+  style: {
+    left: `${props.$left}%`,
+    bottom: `${props.$bottom}%`,
+  }
+}))`
   position: absolute;
-  left: ${props => props.left}%;
-  bottom: ${props => props.bottom}%;
   width: 100px;
   height: 100px;
   background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
@@ -254,7 +256,7 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
       number,
       left: Math.random() * 90 + 5,
       bottom: -10,
-      speed: difficulty === 'easy' ? 0.2 : (difficulty === 'medium' ? 0.4 : 0.6) + Math.random() * 0.2,
+      speed: difficulty === 'easy' ? 0.5 : (difficulty === 'medium' ? 0.8 : 1.2),
       wobbleOffset: Math.random() * 100
     };
   };
@@ -278,8 +280,8 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
 
     const loop = setInterval(() => {
       setBubbles(prev => {
-        // Spawn new bubbles
-        if (prev.length < 8 && Math.random() < 0.05) {
+        // Spawn new bubbles more frequently
+        if (prev.length < 8 && Math.random() < 0.15) {
           return [...prev, spawnBubble(currentProblem)];
         }
 
@@ -356,8 +358,8 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
           {bubbles.map(bubble => (
             <Bubble 
               key={bubble.id}
-              left={bubble.left}
-              bottom={bubble.bottom}
+              $left={bubble.left}
+              $bottom={bubble.bottom}
               onClick={() => handleBubbleClick(bubble)}
             >
               <BubbleNumber>{bubble.number}</BubbleNumber>
@@ -365,7 +367,7 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
           ))}
 
           {pops.map(pop => (
-            <PopEffect key={pop.id} left={pop.left} bottom={pop.bottom} />
+            <PopEffect key={pop.id} $left={pop.left} $bottom={pop.bottom} />
           ))}
         </>
       )}
