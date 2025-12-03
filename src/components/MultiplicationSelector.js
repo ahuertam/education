@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
-import { FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle } from 'react-icons/fa';
+import { FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle, FaMeteor } from 'react-icons/fa';
 
 const SelectorContainer = styled.div`
   min-height: 100vh;
@@ -102,6 +102,13 @@ const MultiplicationSelector = ({ onNavigate, onBack, operation }) => {
       title: "Math Lander",
       description: `Aterriza en la respuesta correcta ${info.action}.`,
       color: "#FFFFFF" // White for space/vector theme
+    },
+    {
+      id: 'mathsteroids',
+      icon: <FaMeteor />,
+      title: "Mathsteroids",
+      description: `Destruye asteroides con la respuesta correcta ${info.action}.`,
+      color: "#9C27B0" // Purple
     }
   ];
 
