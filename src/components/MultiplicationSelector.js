@@ -95,6 +95,13 @@ const MultiplicationSelector = ({ onNavigate, onBack, operation }) => {
       title: "Pop de Burbujas",
       description: `Explota las burbujas correctas mientras estás ${info.action}.`,
       color: "#00BCD4"
+    },
+    {
+      id: 'mathlander',
+      icon: <FaRocket />,
+      title: "Math Lander",
+      description: `Aterriza en la respuesta correcta ${info.action}.`,
+      color: "#FFFFFF" // White for space/vector theme
     }
   ];
 

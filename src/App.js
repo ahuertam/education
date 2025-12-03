@@ -7,6 +7,7 @@ import MemoryGame from './components/MemoryGame';
 import SpaceDefenderGame from './components/SpaceDefenderGame';
 import FrogJumpGame from './components/FrogJumpGame';
 import BubblePopGame from './components/BubblePopGame';
+import MathLanderGame from './components/MathLanderGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -44,6 +45,11 @@ function App() {
         />;
       case 'bubbles':
         return <BubblePopGame 
+          onBack={() => setCurrentView('multiplication-selector')} 
+          operation={selectedOperation}
+        />;
+      case 'mathlander':
+        return <MathLanderGame 
           onBack={() => setCurrentView('multiplication-selector')} 
           operation={selectedOperation}
         />;
