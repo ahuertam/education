@@ -1,0 +1,646 @@
+{
+    "animals": [
+        {
+            "q": "¿Dónde viven los pingüinos?",
+            "a": [
+                "Antártida",
+                "Desierto",
+                "Selva"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué animal es el rey de la selva?",
+            "a": [
+                "León",
+                "Tigre",
+                "Elefante"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántas patas tiene una araña?",
+            "a": [
+                "8",
+                "6",
+                "10"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué animal tiene trompa?",
+            "a": [
+                "Elefante",
+                "Jirafa",
+                "Rinoceronte"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuál es el animal más rápido?",
+            "a": [
+                "Guepardo",
+                "León",
+                "Caballo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué animal pone huevos?",
+            "a": [
+                "Gallina",
+                "Vaca",
+                "Perro"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Dónde viven los peces?",
+            "a": [
+                "Agua",
+                "Tierra",
+                "Aire"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué animal hace miel?",
+            "a": [
+                "Abeja",
+                "Mariposa",
+                "Hormiga"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuál es el animal más grande?",
+            "a": [
+                "Ballena azul",
+                "Elefante",
+                "Jirafa"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué animal rebuzna?",
+            "a": [
+                "Burro",
+                "Caballo",
+                "Vaca"
+            ],
+            "correct": 0
+        }
+    ],
+    "geography": [
+        {
+            "q": "¿Cuál es la capital de España?",
+            "a": [
+                "Madrid",
+                "Barcelona",
+                "Sevilla"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué continente está África?",
+            "a": [
+                "África",
+                "Europa",
+                "Asia"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué océano está al oeste de Europa?",
+            "a": [
+                "Atlántico",
+                "Pacífico",
+                "Índico"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuál es el río más largo?",
+            "a": [
+                "Nilo",
+                "Amazonas",
+                "Misisipi"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Dónde está la Torre Eiffel?",
+            "a": [
+                "París",
+                "Londres",
+                "Roma"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántos continentes hay?",
+            "a": [
+                "7",
+                "5",
+                "6"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué país tiene forma de bota?",
+            "a": [
+                "Italia",
+                "España",
+                "Grecia"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuál es el país más grande?",
+            "a": [
+                "Rusia",
+                "China",
+                "Canadá"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué continente está Brasil?",
+            "a": [
+                "América",
+                "África",
+                "Asia"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Dónde están las pirámides?",
+            "a": [
+                "Egipto",
+                "México",
+                "China"
+            ],
+            "correct": 0
+        }
+    ],
+    "science": [
+        {
+            "q": "¿Cuántos planetas hay en el sistema solar?",
+            "a": [
+                "8",
+                "9",
+                "7"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué planeta es el más grande?",
+            "a": [
+                "Júpiter",
+                "Saturno",
+                "Tierra"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué gas respiramos?",
+            "a": [
+                "Oxígeno",
+                "Nitrógeno",
+                "Hidrógeno"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántos estados tiene el agua?",
+            "a": [
+                "3",
+                "2",
+                "4"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué órgano bombea la sangre?",
+            "a": [
+                "Corazón",
+                "Pulmón",
+                "Hígado"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿De qué color es el sol?",
+            "a": [
+                "Amarillo",
+                "Rojo",
+                "Blanco"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántos huesos tiene un adulto?",
+            "a": [
+                "206",
+                "150",
+                "300"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué atrae un imán?",
+            "a": [
+                "Metal",
+                "Plástico",
+                "Madera"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué produce electricidad?",
+            "a": [
+                "Generador",
+                "Motor",
+                "Batería"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuál es el planeta rojo?",
+            "a": [
+                "Marte",
+                "Júpiter",
+                "Venus"
+            ],
+            "correct": 0
+        }
+    ],
+    "nature": [
+        {
+            "q": "¿Qué necesitan las plantas para crecer?",
+            "a": [
+                "Agua y luz",
+                "Solo agua",
+                "Solo luz"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿De qué color son las hojas?",
+            "a": [
+                "Verde",
+                "Rojo",
+                "Azul"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué produce oxígeno?",
+            "a": [
+                "Plantas",
+                "Animales",
+                "Rocas"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué estación caen las hojas?",
+            "a": [
+                "Otoño",
+                "Primavera",
+                "Verano"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué es una semilla?",
+            "a": [
+                "Origen planta",
+                "Fruta",
+                "Hoja"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Dónde viven los árboles?",
+            "a": [
+                "Bosque",
+                "Desierto",
+                "Mar"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué flor es amarilla y gira?",
+            "a": [
+                "Girasol",
+                "Rosa",
+                "Tulipán"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué fruto crece en palmeras?",
+            "a": [
+                "Coco",
+                "Manzana",
+                "Pera"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del árbol está bajo tierra?",
+            "a": [
+                "Raíz",
+                "Tronco",
+                "Hoja"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué estación florecen las flores?",
+            "a": [
+                "Primavera",
+                "Invierno",
+                "Otoño"
+            ],
+            "correct": 0
+        }
+    ],
+    "professions": [
+        {
+            "q": "¿Quién apaga incendios?",
+            "a": [
+                "Bombero",
+                "Policía",
+                "Doctor"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién cura a los enfermos?",
+            "a": [
+                "Doctor",
+                "Maestro",
+                "Cocinero"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién enseña en la escuela?",
+            "a": [
+                "Maestro",
+                "Doctor",
+                "Policía"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién cocina en restaurantes?",
+            "a": [
+                "Chef",
+                "Mesero",
+                "Doctor"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién construye casas?",
+            "a": [
+                "Albañil",
+                "Pintor",
+                "Electricista"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién pilota aviones?",
+            "a": [
+                "Piloto",
+                "Azafata",
+                "Mecánico"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién cuida los dientes?",
+            "a": [
+                "Dentista",
+                "Doctor",
+                "Enfermera"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién reparte el correo?",
+            "a": [
+                "Cartero",
+                "Policía",
+                "Maestro"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién corta el pelo?",
+            "a": [
+                "Peluquero",
+                "Doctor",
+                "Maestro"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién maneja el autobús?",
+            "a": [
+                "Conductor",
+                "Policía",
+                "Mecánico"
+            ],
+            "correct": 0
+        }
+    ],
+    "culture": [
+        {
+            "q": "¿Qué instrumento tiene teclas blancas y negras?",
+            "a": [
+                "Piano",
+                "Guitarra",
+                "Flauta"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántas cuerdas tiene una guitarra?",
+            "a": [
+                "6",
+                "4",
+                "8"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué usas para pintar?",
+            "a": [
+                "Pincel",
+                "Lápiz",
+                "Borrador"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién escribió Don Quijote?",
+            "a": [
+                "Cervantes",
+                "Shakespeare",
+                "García"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué son los colores primarios?",
+            "a": [
+                "Rojo, azul, amarillo",
+                "Verde, naranja, morado",
+                "Negro, blanco, gris"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántas notas musicales hay?",
+            "a": [
+                "7",
+                "5",
+                "10"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué día se celebra Navidad?",
+            "a": [
+                "25 diciembre",
+                "1 enero",
+                "31 diciembre"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuál es el día de Reyes?",
+            "a": [
+                "6 enero",
+                "25 diciembre",
+                "1 enero"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué baile es español y usa castañuelas?",
+            "a": [
+                "Flamenco",
+                "Salsa",
+                "Tango"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué museo está la Mona Lisa?",
+            "a": [
+                "Louvre",
+                "Prado",
+                "MOMA"
+            ],
+            "correct": 0
+        }
+    ],
+    "daily": [
+        {
+            "q": "¿Cuántos meses tiene un año?",
+            "a": [
+                "12",
+                "10",
+                "14"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántos días tiene una semana?",
+            "a": [
+                "7",
+                "5",
+                "6"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántas horas tiene un día?",
+            "a": [
+                "24",
+                "12",
+                "48"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué comida es la primera del día?",
+            "a": [
+                "Desayuno",
+                "Comida",
+                "Cena"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué usas para cepillar los dientes?",
+            "a": [
+                "Cepillo",
+                "Peine",
+                "Esponja"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué te lavas las manos?",
+            "a": [
+                "Lavabo",
+                "Bañera",
+                "Ducha"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cuántas estaciones hay en el año?",
+            "a": [
+                "4",
+                "2",
+                "6"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué bebes por la mañana?",
+            "a": [
+                "Leche o zumo",
+                "Refresco",
+                "Cerveza"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Dónde duermes?",
+            "a": [
+                "Cama",
+                "Sofá",
+                "Silla"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Con qué te secas después del baño?",
+            "a": [
+                "Toalla",
+                "Sábana",
+                "Alfombra"
+            ],
+            "correct": 0
+        }
+    ]
+}

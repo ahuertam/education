@@ -2,13 +2,19 @@ import React, { useState } from 'react';
 import { GlobalStyle } from './GlobalStyles';
 import './App.css';
 import Landing from './components/Landing';
-import MultiplicationSelector from './components/MultiplicationSelector';
+import GameSelector from './components/GameSelector';
 import MemoryGame from './components/MemoryGame';
 import SpaceDefenderGame from './components/SpaceDefenderGame';
 import FrogJumpGame from './components/FrogJumpGame';
 import BubblePopGame from './components/BubblePopGame';
 import MathLanderGame from './components/MathLanderGame';
 import MathsteroidsGame from './components/MathsteroidsGame';
+import MonsterFeederGame from './components/MonsterFeederGame';
+import CarRacingGame from './components/CarRacingGame';
+import AccentHunterGame from './components/AccentHunterGame';
+import KnowledgeTowerGame from './components/KnowledgeTowerGame';
+import ShapeGoalkeeperGame from './components/ShapeGoalkeeperGame';
+import KitchenGame from './components/KitchenGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -23,41 +29,67 @@ function App() {
     switch(currentView) {
       case 'landing':
         return <Landing onNavigate={handleNavigate} />;
-      case 'multiplication-selector':
-        return <MultiplicationSelector 
+      case 'game-selector':
+        return <GameSelector 
           onNavigate={handleNavigate} 
           onBack={() => setCurrentView('landing')} 
-          operation={selectedOperation}
+          category={selectedOperation} // We reuse selectedOperation state for category
         />;
       case 'memory':
         return <MemoryGame 
-          onBack={() => setCurrentView('multiplication-selector')} 
+          onBack={() => setCurrentView('game-selector')} 
           operation={selectedOperation}
         />;
       case 'space':
         return <SpaceDefenderGame 
-          onBack={() => setCurrentView('multiplication-selector')} 
+          onBack={() => setCurrentView('game-selector')} 
           operation={selectedOperation}
         />;
       case 'frog':
         return <FrogJumpGame 
-          onBack={() => setCurrentView('multiplication-selector')} 
+          onBack={() => setCurrentView('game-selector')} 
           operation={selectedOperation}
         />;
       case 'bubbles':
         return <BubblePopGame 
-          onBack={() => setCurrentView('multiplication-selector')} 
+          onBack={() => setCurrentView('game-selector')} 
           operation={selectedOperation}
         />;
       case 'mathlander':
         return <MathLanderGame 
-          onBack={() => setCurrentView('multiplication-selector')} 
+          onBack={() => setCurrentView('game-selector')} 
           operation={selectedOperation}
         />;
       case 'mathsteroids':
         return <MathsteroidsGame 
-          onBack={() => setCurrentView('multiplication-selector')} 
+          onBack={() => setCurrentView('game-selector')} 
           operation={selectedOperation}
+        />;
+      case 'monsterfeeder':
+        return <MonsterFeederGame 
+          onBack={() => setCurrentView('game-selector')} 
+          operation={selectedOperation}
+        />;
+      case 'carracing':
+        return <CarRacingGame 
+          onBack={() => setCurrentView('game-selector')} 
+          operation={selectedOperation}
+        />;
+      case 'accenthunter':
+        return <AccentHunterGame 
+          onBack={() => setCurrentView('game-selector')} 
+        />;
+      case 'knowledgetower':
+        return <KnowledgeTowerGame 
+          onBack={() => setCurrentView('game-selector')} 
+        />;
+      case 'shapegoalkeeper':
+        return <ShapeGoalkeeperGame 
+          onBack={() => setCurrentView('game-selector')} 
+        />;
+      case 'kitchen':
+        return <KitchenGame 
+          onBack={() => setCurrentView('game-selector')} 
         />;
       default:
         return <Landing onNavigate={handleNavigate} />;

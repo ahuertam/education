@@ -120,33 +120,58 @@ const Landing = ({ onNavigate }) => {
     alert(`¡Próximamente disponible: ${activity.title}!`);
   };
 
+  const onSelectActivity = (activityId) => {
+    const categories = {
+      1: 'addition',
+      2: 'subtraction',
+      3: 'multiplication',
+      4: 'division',
+      5: 'knowledge',
+      6: 'vocabulary',
+      7: 'shapes',
+      8: 'mixed_math'
+    };
+
+    if (categories[activityId]) {
+      onNavigate('game-selector', categories[activityId]);
+    } else {
+      // Find the activity by ID to get its title for the alert
+      const activity = activities.find(act => act.id === activityId);
+      handleActivityClick(activity || { title: "esta actividad" });
+    }
+  };
+
+
   return (
     <LandingContainer>
       <Header />
       <ActivitiesSection>
         <SectionTitle>🎯 Elige tu Actividad</SectionTitle>
+        {/* Original CardsGrid for basic math and general knowledge */}
         <CardsGrid>
-          {activities.map(activity => (
+          {activities.slice(0, 6).map(activity => ( // Display first 6 activities in the original grid
             <ActivityCard
               key={activity.id}
               icon={activity.icon}
               title={activity.title}
               description={activity.description}
               color={activity.color}
-              onClick={() => {
-                const operations = {
-                  1: 'addition',
-                  2: 'subtraction',
-                  3: 'multiplication',
-                  4: 'division'
-                };
-                
-                if (operations[activity.id]) {
-                  onNavigate('multiplication-selector', operations[activity.id]);
-                } else {
-                  handleActivityClick(activity);
-                }
-              }}
+              onClick={() => onSelectActivity(activity.id)}
+            />
+          ))}
+        </CardsGrid>
+      </ActivitiesSection>
+
+      <ActivitiesSection>
+        <CardsGrid>
+          {activities.slice(6, 8).map(activity => (
+            <ActivityCard
+              key={activity.id}
+              icon={activity.icon}
+              title={activity.title}
+              description={activity.description}
+              color={activity.color}
+              onClick={() => onSelectActivity(activity.id)}
             />
           ))}
         </CardsGrid>
