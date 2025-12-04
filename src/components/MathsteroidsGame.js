@@ -446,24 +446,31 @@ const MathsteroidsGame = ({ onBack, operation = 'multiplication' }) => {
             y: ship.y + Math.sin(ship.angle) * 20,
             vx: Math.cos(ship.angle) * BULLET_SPEED,
             vy: Math.sin(ship.angle) * BULLET_SPEED,
-            life: BULLET_LIFETIME
+            life: 0 // Start life at 0
           });
           ship.cooldown = 15;
         }
 
-        // Bullets
-        for (let i = bullets.length - 1; i >= 0; i--) {
-          const b = bullets[i];
-          b.x += b.vx;
-          b.y += b.vy;
-          b.life--;
+        // Update bullets
+        const nextBullets = bullets.map(b => ({
+          ...b,
+          x: b.x + b.vx,
+          y: b.y + b.vy,
+          life: (b.life || 0) + 1 // Increment life
+        })).filter(b => b.life < 100); // Remove after 100 frames (approx 1.6s)
 
-          if (b.life <= 0 || b.x < 0 || b.x > width || b.y < 0 || b.y > height) {
-            bullets.splice(i, 1);
-            continue;
-          }
+        // Wrap bullets
+        nextBullets.forEach(b => {
+          if (b.x < 0) b.x += width;
+          if (b.x > width) b.x -= width;
+          if (b.y < 0) b.y += height;
+          if (b.y > height) b.y -= height;
+        });
+        stateRef.current.bullets = nextBullets;
 
-          // Check collision with asteroids
+        // Check collision with asteroids
+        for (let i = stateRef.current.bullets.length - 1; i >= 0; i--) {
+          const b = stateRef.current.bullets[i];
           for (let j = asteroids.length - 1; j >= 0; j--) {
             const a = asteroids[j];
             const dx = b.x - a.x;

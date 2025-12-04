@@ -251,12 +251,15 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
       if (number < 0 || number === problem.answer) number = problem.answer + 1;
     }
 
+    const baseSpeed = difficulty === 'easy' ? 0.2 : difficulty === 'medium' ? 1.5 : 2.5;
+    const speed = baseSpeed + Math.random() * (difficulty === 'easy' ? 0.3 : 1.5);
+
     return {
       id: Date.now() + Math.random(),
       number,
       left: Math.random() * 90 + 5,
       bottom: -10,
-      speed: difficulty === 'easy' ? 0.5 : (difficulty === 'medium' ? 0.8 : 1.2),
+      speed: speed,
       wobbleOffset: Math.random() * 100
     };
   };

@@ -6,4 +6,11 @@ export const CATEGORIES = [
   { id: 'professions', name: '👨‍⚕️ Profesiones', color: '#FF9800' },
   { id: 'culture', name: '🎵 Cultura', color: '#E91E63' },
   { id: 'daily', name: '💧 Vida Cotidiana', color: '#FFC107' },
+  {
+    id: 'mixed',
+    name: 'Mixto',
+    icon: '🎲',
+    color: '#95A5A6',
+    description: '¡Preguntas de todas las categorías!'
+  }
 ];

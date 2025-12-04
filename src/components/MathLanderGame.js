@@ -303,12 +303,20 @@ const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
     };
   }, []);
 
+  // Handle keyboard controls
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Start game on any key if in menu or gameover
+      if ((gameState === 'start' || gameState === 'gameover' || gameState === 'won' || gameState === 'lost' || gameState === 'crashed') && e.key.length === 1) {
+        startGame();
+        return;
+      }
+
       if (gameState !== 'playing') return;
-      switch(e.code) {
+      
+      switch(e.key) {
         case 'ArrowUp':
-        case 'Space':
+        case ' ':
           stateRef.current.ship.thrusting = true;
           break;
         case 'ArrowLeft':
@@ -317,13 +325,15 @@ const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
         case 'ArrowRight':
           stateRef.current.ship.rotatingRight = true;
           break;
+        default:
+          break;
       }
     };
 
     const handleKeyUp = (e) => {
-      switch(e.code) {
+      switch(e.key) {
         case 'ArrowUp':
-        case 'Space':
+        case ' ':
           stateRef.current.ship.thrusting = false;
           break;
         case 'ArrowLeft':

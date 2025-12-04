@@ -54,11 +54,30 @@ const KnowledgeTowerGame = ({ onBack }) => {
   }, []);
 
   const categoryData = selectedCategory ? CATEGORIES.find(c => c.id === selectedCategory) : null;
-  const questions = selectedCategory ? QUESTIONS[selectedCategory] : [];
+  const [questions, setQuestions] = useState([]);
   const currentQuestion = questions[currentQuestionIndex];
 
   const startGame = (categoryId) => {
     setSelectedCategory(categoryId);
+    
+    // Prepare questions
+    let gameQuestions = [];
+    if (categoryId === 'mixed') {
+      // Combine all questions
+      Object.values(QUESTIONS).forEach(catQuestions => {
+        gameQuestions = [...gameQuestions, ...catQuestions];
+      });
+    } else {
+      gameQuestions = [...QUESTIONS[categoryId]];
+    }
+    
+    // Shuffle questions (Fisher-Yates)
+    for (let i = gameQuestions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [gameQuestions[i], gameQuestions[j]] = [gameQuestions[j], gameQuestions[i]];
+    }
+    
+    setQuestions(gameQuestions);
     setCurrentQuestionIndex(0);
     setScore(0);
     setBlocksStacked(0);

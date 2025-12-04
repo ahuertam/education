@@ -84,38 +84,81 @@ const CardBack = styled(CardFace)`
   border: 4px solid #a777e3;
 `;
 
-const MemoryGame = ({ onBack }) => {
+const MemoryGame = ({ onBack, level = 1, operation = 'multiplication' }) => {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [solved, setSolved] = useState([]);
   const [disabled, setDisabled] = useState(false);
 
-  const initializeGame = () => {
-    const multiplications = [
-      { q: '2 x 3', a: '6' },
-      { q: '4 x 2', a: '8' },
-      { q: '3 x 3', a: '9' },
-      { q: '5 x 2', a: '10' },
-      { q: '2 x 2', a: '4' },
-      { q: '3 x 4', a: '12' },
-    ];
+  const generateCards = (currentLevel, currentOperation) => {
+    const pairsCount = currentLevel + 2; // Level 1: 3 pairs, Level 2: 4 pairs, etc.
+    const newCards = [];
+    
+    for (let i = 0; i < pairsCount; i++) {
+      let problem, result;
+      
+      // Generate problem based on operation
+      switch(currentOperation) {
+        case 'addition':
+          const a1 = Math.floor(Math.random() * (10 * currentLevel)) + 1;
+          const b1 = Math.floor(Math.random() * (10 * currentLevel)) + 1;
+          problem = `${a1} + ${b1}`;
+          result = a1 + b1;
+          break;
+        case 'subtraction':
+          const a2 = Math.floor(Math.random() * (10 * currentLevel)) + currentLevel + 5;
+          const b2 = Math.floor(Math.random() * a2); // Ensure positive result
+          problem = `${a2} - ${b2}`;
+          result = a2 - b2;
+          break;
+        case 'division':
+          const b3 = Math.floor(Math.random() * (5 * currentLevel)) + 2;
+          const a3 = b3 * (Math.floor(Math.random() * 10) + 1); // Ensure clean division
+          problem = `${a3} ÷ ${b3}`;
+          result = a3 / b3;
+          break;
+        case 'multiplication':
+        default:
+          const a4 = Math.floor(Math.random() * (currentLevel + 2)) + 2;
+          const b4 = Math.floor(Math.random() * 9) + 2;
+          problem = `${a4} × ${b4}`;
+          result = a4 * b4;
+          break;
+      }
 
-    const deck = [];
-    multiplications.forEach((item, index) => {
-      deck.push({ id: index * 2, content: item.q, type: 'q', pairId: index });
-      deck.push({ id: index * 2 + 1, content: item.a, type: 'a', pairId: index });
-    });
+      const id = i;
+      newCards.push({
+        id: `p-${id}`,
+        content: problem,
+        type: 'problem',
+        pairId: id,
+        isFlipped: false,
+        isMatched: false
+      });
+      newCards.push({
+        id: `r-${id}`,
+        content: result.toString(),
+        type: 'result',
+        pairId: id,
+        isFlipped: false,
+        isMatched: false
+      });
+    }
+    
+    return newCards.sort(() => Math.random() - 0.5);
+  };
 
-    // Shuffle
-    deck.sort(() => Math.random() - 0.5);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [currentLevel, setCurrentLevel] = useState(1);
+
+  const startGame = (selectedLevel) => {
+    setCurrentLevel(selectedLevel);
+    const deck = generateCards(selectedLevel, operation);
     setCards(deck);
     setFlipped([]);
     setSolved([]);
+    setGameStarted(true);
   };
-
-  useEffect(() => {
-    initializeGame();
-  }, []);
 
   const handleClick = (id) => {
     if (disabled || flipped.includes(id) || solved.includes(id)) return;
@@ -149,24 +192,43 @@ const MemoryGame = ({ onBack }) => {
         <Button onClick={onBack}>
           <FaArrowLeft /> Salir
         </Button>
-        <h2>Memorama</h2>
-        <Button onClick={initializeGame}>
-          <FaRedo /> Reiniciar
-        </Button>
+        <h2>Memorama - {operation === 'addition' ? 'Sumas' : operation === 'subtraction' ? 'Restas' : operation === 'division' ? 'Divisiones' : 'Multiplicaciones'}</h2>
+        {gameStarted && (
+          <Button onClick={() => startGame(currentLevel)}>
+            <FaRedo /> Reiniciar
+          </Button>
+        )}
       </Header>
 
-      <Grid>
-        {cards.map(card => (
-          <Card 
-            key={card.id} 
-            flipped={flipped.includes(card.id) || solved.includes(card.id)}
-            onClick={() => handleClick(card.id)}
-          >
-            <CardFront>?</CardFront>
-            <CardBack>{card.content}</CardBack>
-          </Card>
-        ))}
-      </Grid>
+      {!gameStarted ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem', marginTop: '4rem' }}>
+          <h1 style={{ color: 'white', fontSize: '3rem' }}>Selecciona la Dificultad</h1>
+          <div style={{ display: 'flex', gap: '2rem' }}>
+            <Button onClick={() => startGame(1)} style={{ fontSize: '1.5rem', padding: '1.5rem 3rem', background: '#4CAF50' }}>
+              Fácil
+            </Button>
+            <Button onClick={() => startGame(2)} style={{ fontSize: '1.5rem', padding: '1.5rem 3rem', background: '#FF9800' }}>
+              Medio
+            </Button>
+            <Button onClick={() => startGame(3)} style={{ fontSize: '1.5rem', padding: '1.5rem 3rem', background: '#F44336' }}>
+              Difícil
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Grid>
+          {cards.map(card => (
+            <Card 
+              key={card.id} 
+              flipped={flipped.includes(card.id) || solved.includes(card.id)}
+              onClick={() => handleClick(card.id)}
+            >
+              <CardFront>?</CardFront>
+              <CardBack>{card.content}</CardBack>
+            </Card>
+          ))}
+        </Grid>
+      )}
     </GameContainer>
   );
 };
