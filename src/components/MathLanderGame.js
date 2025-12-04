@@ -82,6 +82,40 @@ const BackButton = styled(Button)`
   gap: 10px;
 `;
 
+const TouchControls = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 15;
+  pointer-events: auto;
+`;
+
+const TouchButton = styled.button`
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  backdrop-filter: blur(5px);
+
+  &:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0.95);
+  }
+`;
+
 const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
   const canvasRef = useRef(null);
   const [gameState, setGameState] = useState('start'); // start, playing, landed, crashed, gameover
@@ -90,6 +124,7 @@ const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
   const fuelRef = useRef(1000); // Ref for physics loop to avoid re-renders
   const [message, setMessage] = useState('');
   const [currentProblem, setCurrentProblem] = useState(null);
+  const [isMobile] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0);
   const explosionSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/explosion.mp3`));
   const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/stars.mp3`));
   
@@ -629,6 +664,29 @@ const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
           <p>{message}</p>
           <Button onClick={startGame}>SIGUIENTE MISIÓN</Button>
         </MessageOverlay>
+      )}
+
+      {isMobile && gameState === 'playing' && (
+        <TouchControls>
+          <TouchButton
+            onTouchStart={() => stateRef.current.ship.rotatingLeft = true}
+            onTouchEnd={() => stateRef.current.ship.rotatingLeft = false}
+          >
+            ←
+          </TouchButton>
+          <TouchButton
+            onTouchStart={() => stateRef.current.ship.thrusting = true}
+            onTouchEnd={() => stateRef.current.ship.thrusting = false}
+          >
+            ↑
+          </TouchButton>
+          <TouchButton
+            onTouchStart={() => stateRef.current.ship.rotatingRight = true}
+            onTouchEnd={() => stateRef.current.ship.rotatingRight = false}
+          >
+            →
+          </TouchButton>
+        </TouchControls>
       )}
     </GameContainer>
   );
