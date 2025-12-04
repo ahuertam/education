@@ -242,6 +242,7 @@ const ShapeGoalkeeperGame = ({ onBack }) => {
   const nextObjectId = useRef(0);
   const spawnIntervalRef = useRef(null);
   const animationFrameRef = useRef(null);
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
   
   // Refs for game loop access to avoid stale closures
   const goalkeeperYRef = useRef(300);
@@ -275,6 +276,19 @@ const ShapeGoalkeeperGame = ({ onBack }) => {
     setInstructionColor(randomColor.value);
     
   }, [currentWave]);
+
+  // Background Music
+  useEffect(() => {
+    const bgMusic = bgMusicRef.current;
+    bgMusic.loop = true;
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(e => console.log("Audio play failed", e));
+
+    return () => {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    };
+  }, []);
 
   const startGame = () => {
     setScore(0);

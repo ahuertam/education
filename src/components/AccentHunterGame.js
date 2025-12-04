@@ -302,6 +302,21 @@ const AccentHunterGame = ({ onBack }) => {
   const [selectedBalloon, setSelectedBalloon] = useState(null);
   const [feedback, setFeedback] = useState({ show: false, isCorrect: false, message: '' });
   
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
+
+  // Background Music
+  useEffect(() => {
+    const bgMusic = bgMusicRef.current;
+    bgMusic.loop = true;
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(e => console.log("Audio play failed", e));
+
+    return () => {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    };
+  }, []);
+  
   const nextId = useRef(0);
   const spawnInterval = useRef(null);
 

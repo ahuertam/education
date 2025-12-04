@@ -299,6 +299,21 @@ const KitchenGame = ({ onBack }) => {
   const [hookPosition, setHookPosition] = useState({ x: 50, height: 50 }); // x in %, height in px
   const [sliderValue, setSliderValue] = useState(0);
   const [score, setScore] = useState(0);
+  
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab1.mp3`));
+
+  // Background Music
+  useEffect(() => {
+    const bgMusic = bgMusicRef.current;
+    bgMusic.loop = true;
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(e => console.log("Audio play failed", e));
+
+    return () => {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    };
+  }, []);
 
   // Generate a new recipe
   const generateRecipe = () => {

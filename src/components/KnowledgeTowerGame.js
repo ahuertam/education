@@ -35,7 +35,23 @@ const KnowledgeTowerGame = ({ onBack }) => {
   const renderRef = useRef(null);
   const groundRef = useRef(null);
   const blocksRef = useRef([]);
+
   const nextBlockY = useRef(500);
+  
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
+
+  // Background Music
+  useEffect(() => {
+    const bgMusic = bgMusicRef.current;
+    bgMusic.loop = true;
+    bgMusic.volume = 0.5;
+    bgMusic.play().catch(e => console.log("Audio play failed", e));
+
+    return () => {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    };
+  }, []);
 
   const categoryData = selectedCategory ? CATEGORIES.find(c => c.id === selectedCategory) : null;
   const questions = selectedCategory ? QUESTIONS[selectedCategory] : [];
