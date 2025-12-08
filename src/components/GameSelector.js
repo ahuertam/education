@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import { 
   FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle, 
-  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask 
+  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe 
 } from 'react-icons/fa';
 
 const SelectorContainer = styled.div`
@@ -73,6 +73,8 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         return { title: 'Colores y Formas', action: 'observando' };
       case 'mixed_math':
         return { title: 'Matemáticas Mixtas', action: 'calculando' };
+      case 'english':
+        return { title: 'Aprende Inglés', action: 'traduciendo' };
       default:
         return { title: 'Selecciona un Juego', action: 'jugando' };
     }
@@ -186,6 +188,16 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       description: "Prepara el antídoto mezclando ingredientes con fracciones y decimales.",
       color: "#607D8B",
       categories: ['mixed_math']
+    },
+
+    // English Games
+    {
+      id: 'dragontragon',
+      icon: <FaDragon />,
+      title: "Dragón Tragón",
+      description: "Cóme las palabras correctas para formar la frase en inglés.",
+      color: "#E67E22",
+      categories: ['english']
     }
   ];
 

@@ -15,6 +15,7 @@ import AccentHunterGame from './components/AccentHunterGame';
 import KnowledgeTowerGame from './components/KnowledgeTowerGame';
 import ShapeGoalkeeperGame from './components/ShapeGoalkeeperGame';
 import KitchenGame from './components/KitchenGame';
+import DragonTragonGame from './components/DragonTragonGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -89,6 +90,10 @@ function App() {
         />;
       case 'kitchen':
         return <KitchenGame 
+          onBack={() => setCurrentView('game-selector')} 
+        />;
+      case 'dragontragon':
+        return <DragonTragonGame 
           onBack={() => setCurrentView('game-selector')} 
         />;
       default:

@@ -10,7 +10,8 @@ import {
   FaBook, 
   FaPalette,
   FaDivide,
-  FaCalculator
+  FaCalculator,
+  FaGlobe
 } from 'react-icons/fa';
 
 const LandingContainer = styled.div`
@@ -113,6 +114,13 @@ const Landing = ({ onNavigate }) => {
       title: "Matemáticas Mixtas",
       description: "Combina todas las operaciones matemáticas en desafíos emocionantes.",
       color: "#607D8B"
+    },
+    {
+      id: 9,
+      icon: <FaGlobe />,
+      title: "Inglés",
+      description: "Aprende inglés formando frases y vocabulario con el Dragón Tragón.",
+      color: "#E67E22"
     }
   ];
 
@@ -129,7 +137,8 @@ const Landing = ({ onNavigate }) => {
       5: 'knowledge',
       6: 'vocabulary',
       7: 'shapes',
-      8: 'mixed_math'
+      8: 'mixed_math',
+      9: 'english'
     };
 
     if (categories[activityId]) {
@@ -164,7 +173,7 @@ const Landing = ({ onNavigate }) => {
 
       <ActivitiesSection>
         <CardsGrid>
-          {activities.slice(6, 8).map(activity => (
+          {activities.slice(6, 9).map(activity => (
             <ActivityCard
               key={activity.id}
               icon={activity.icon}
