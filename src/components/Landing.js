@@ -121,6 +121,13 @@ const Landing = ({ onNavigate }) => {
       title: "Inglés",
       description: "Aprende inglés formando frases y vocabulario con el Dragón Tragón.",
       color: "#E67E22"
+    },
+    {
+      id: 10,
+      icon: <FaBrain />,
+      title: "Avanzado",
+      description: "Retos de lógica y matemáticas para subir de nivel con puzzles más difíciles.",
+      color: "#16A085"
     }
   ];
 
@@ -138,7 +145,8 @@ const Landing = ({ onNavigate }) => {
       6: 'vocabulary',
       7: 'shapes',
       8: 'mixed_math',
-      9: 'english'
+      9: 'english',
+      10: 'advanced'
     };
 
     if (categories[activityId]) {
@@ -173,7 +181,7 @@ const Landing = ({ onNavigate }) => {
 
       <ActivitiesSection>
         <CardsGrid>
-          {activities.slice(6, 9).map(activity => (
+          {activities.slice(6).map(activity => (
             <ActivityCard
               key={activity.id}
               icon={activity.icon}

@@ -20,12 +20,20 @@ import {
   GameOverOverlay
 } from './styles/KnowledgeTowerStyles';
 
+const LEVELS = [
+  { id: 'level-1', name: 'Nivel 1', blocksToWin: 10, color: '#4A90E2' },
+  { id: 'level-2', name: 'Nivel 2', blocksToWin: 15, color: '#7B61FF' },
+  { id: 'level-3', name: 'Nivel 3', blocksToWin: 20, color: '#2ECC71' }
+];
+
 const KnowledgeTowerGame = ({ onBack }) => {
   const [gameState, setGameState] = useState('menu'); // menu, playing, gameover
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [blocksStacked, setBlocksStacked] = useState(0);
+  const [targetBlocks, setTargetBlocks] = useState(10);
+  const [selectedLevelBlocks, setSelectedLevelBlocks] = useState(10);
   const [feedback, setFeedback] = useState({ show: false, isCorrect: false, message: '' });
   const [showAnswerBlocks, setShowAnswerBlocks] = useState(true);
   const [consecutiveErrors, setConsecutiveErrors] = useState(0); // Track errors for instability
@@ -35,17 +43,32 @@ const KnowledgeTowerGame = ({ onBack }) => {
   const renderRef = useRef(null);
   const groundRef = useRef(null);
   const blocksRef = useRef([]);
+  const blocksStackedRef = useRef(0);
 
   const nextBlockY = useRef(500);
   
   const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
+  const successSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
+  const errorSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
+  const crashSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/explosion.mp3`));
 
   // Background Music
   useEffect(() => {
     const bgMusic = bgMusicRef.current;
     bgMusic.loop = true;
-    bgMusic.volume = 0.5;
+    bgMusic.volume = 0.3;
     bgMusic.play().catch(e => console.log("Audio play failed", e));
+
+    const successSound = successSoundRef.current;
+    successSound.volume = 0.5;
+    successSound.playbackRate = 2.0; // Higher pitch for success
+
+    const errorSound = errorSoundRef.current;
+    errorSound.volume = 0.4;
+    errorSound.playbackRate = 0.5; // Lower pitch for error
+
+    const crashSound = crashSoundRef.current;
+    crashSound.volume = 0.6;
 
     return () => {
       bgMusic.pause();
@@ -53,12 +76,29 @@ const KnowledgeTowerGame = ({ onBack }) => {
     };
   }, []);
 
+  useEffect(() => {
+    blocksStackedRef.current = blocksStacked;
+  }, [blocksStacked]);
+
   const categoryData = selectedCategory ? CATEGORIES.find(c => c.id === selectedCategory) : null;
   const [questions, setQuestions] = useState([]);
   const currentQuestion = questions[currentQuestionIndex];
 
-  const startGame = (categoryId) => {
+  const shuffleInPlace = (arr) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  };
+
+  const startGame = (categoryId, blocksToWin = 10) => {
+    // Try to start background music if it was blocked by browser autoplay policy
+    if (bgMusicRef.current && bgMusicRef.current.paused) {
+      bgMusicRef.current.play().catch(e => console.log("Audio play failed on start", e));
+    }
+
     setSelectedCategory(categoryId);
+    setTargetBlocks(blocksToWin);
     
     // Prepare questions
     let gameQuestions = [];
@@ -72,10 +112,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
     }
     
     // Shuffle questions (Fisher-Yates)
-    for (let i = gameQuestions.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [gameQuestions[i], gameQuestions[j]] = [gameQuestions[j], gameQuestions[i]];
-    }
+    shuffleInPlace(gameQuestions);
     
     setQuestions(gameQuestions);
     setCurrentQuestionIndex(0);
@@ -160,6 +197,10 @@ const KnowledgeTowerGame = ({ onBack }) => {
         if (i > 0 && block.position.y > 365) {
           console.log('Tower fell! Block', i, 'touched ground at y:', block.position.y);
           gameEnded = true;
+          if (crashSoundRef.current) {
+            crashSoundRef.current.currentTime = 0;
+            crashSoundRef.current.play().catch(e => console.log("Sound play failed", e));
+          }
           endGame(false);
           return;
         }
@@ -168,6 +209,10 @@ const KnowledgeTowerGame = ({ onBack }) => {
         if (block.position.y > 450 || block.position.x < -50 || block.position.x > 650) {
           console.log('Block fell off screen');
           gameEnded = true;
+          if (crashSoundRef.current) {
+            crashSoundRef.current.currentTime = 0;
+            crashSoundRef.current.play().catch(e => console.log("Sound play failed", e));
+          }
           endGame(false);
           return;
         }
@@ -185,6 +230,10 @@ const KnowledgeTowerGame = ({ onBack }) => {
     setShowAnswerBlocks(false);
 
     if (isCorrect) {
+      if (successSoundRef.current) {
+        successSoundRef.current.currentTime = 0;
+        successSoundRef.current.play().catch(e => console.log("Sound play failed", e));
+      }
       setFeedback({ show: true, isCorrect: true, message: '✅ ¡Correcto!' });
       setTimeout(() => setFeedback({ show: false, isCorrect: false, message: '' }), 2000);
       
@@ -194,13 +243,23 @@ const KnowledgeTowerGame = ({ onBack }) => {
       setConsecutiveErrors(0); // Reset error counter on correct answer
 
       setTimeout(() => {
-        if (blocksStacked + 1 >= 10) {
+        if (blocksStackedRef.current >= targetBlocks) {
+          if (successSoundRef.current) {
+            // Play victory sound (just multiple beeps or something, or use successSound again)
+            successSoundRef.current.currentTime = 0;
+            successSoundRef.current.playbackRate = 1.0;
+            successSoundRef.current.play().catch(e => console.log(e));
+          }
           endGame(true);
         } else {
           nextQuestion();
         }
       }, 1500);
     } else {
+      if (errorSoundRef.current) {
+        errorSoundRef.current.currentTime = 0;
+        errorSoundRef.current.play().catch(e => console.log("Sound play failed", e));
+      }
       const correctAnswer = currentQuestion.a[currentQuestion.correct];
       setFeedback({ show: true, isCorrect: false, message: `❌ Era: ${correctAnswer}` });
       setTimeout(() => {
@@ -288,8 +347,17 @@ const KnowledgeTowerGame = ({ onBack }) => {
   };
 
   const nextQuestion = () => {
-    setCurrentQuestionIndex(i => i + 1);
     setShowAnswerBlocks(true);
+
+    setCurrentQuestionIndex(i => {
+      const next = i + 1;
+      if (next < questions.length) return next;
+      if (questions.length === 0) return 0;
+      const reshuffled = [...questions];
+      shuffleInPlace(reshuffled);
+      setQuestions(reshuffled);
+      return 0;
+    });
   };
 
   const endGame = (won) => {
@@ -360,7 +428,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
     <GameContainer>
       <Header>
         <Button onClick={onBack}><FaArrowLeft /> Salir</Button>
-        <Score>🏗️ {blocksStacked}/10 | ⭐ {score}</Score>
+        <Score>🏗️ {blocksStacked}/{targetBlocks} | ⭐ {score}</Score>
       </Header>
 
       <FeedbackPanel $show={feedback.show} $isCorrect={feedback.isCorrect}>
@@ -373,12 +441,32 @@ const KnowledgeTowerGame = ({ onBack }) => {
           <p style={{ fontSize: '1.2rem', color: '#555' }}>
             Apila bloques respondiendo correctamente. ¡No dejes que se caiga la torre!
           </p>
+          <p style={{ fontSize: '1.1rem', color: '#555', marginTop: '1.5rem' }}>
+            Elige un nivel
+          </p>
+          <CategoriesGrid>
+            {LEVELS.map(level => {
+              const isSelected = selectedLevelBlocks === level.blocksToWin;
+              return (
+                <CategoryCard
+                  key={level.id}
+                  color={isSelected ? level.color : '#B0BEC5'}
+                  onClick={() => setSelectedLevelBlocks(level.blocksToWin)}
+                >
+                  {level.name} ({level.blocksToWin})
+                </CategoryCard>
+              );
+            })}
+          </CategoriesGrid>
+          <p style={{ fontSize: '1.1rem', color: '#555', marginTop: '2rem' }}>
+            Elige una categoría
+          </p>
           <CategoriesGrid>
             {CATEGORIES.map(cat => (
               <CategoryCard
                 key={cat.id}
                 color={cat.color}
-                onClick={() => startGame(cat.id)}
+                onClick={() => startGame(cat.id, selectedLevelBlocks)}
               >
                 {cat.name}
               </CategoryCard>
@@ -388,12 +476,12 @@ const KnowledgeTowerGame = ({ onBack }) => {
       )}
 
       {gameState === 'gameover' && (
-        <GameOverOverlay $won={blocksStacked >= 10}>
-          <h1 style={{ color: blocksStacked >= 10 ? '#2ECC71' : '#E74C3C', fontSize: '3rem' }}>
-            {blocksStacked >= 10 ? '🎉 ¡Victoria!' : '💥 Torre Caída'}
+        <GameOverOverlay $won={blocksStacked >= targetBlocks}>
+          <h1 style={{ color: blocksStacked >= targetBlocks ? '#2ECC71' : '#E74C3C', fontSize: '3rem' }}>
+            {blocksStacked >= targetBlocks ? '🎉 ¡Victoria!' : '💥 Torre Caída'}
           </h1>
           <p style={{ fontSize: '1.5rem', margin: '1rem 0' }}>
-            Bloques apilados: {blocksStacked}/10
+            Bloques apilados: {blocksStacked}/{targetBlocks}
           </p>
           <p style={{ fontSize: '1.3rem', margin: '1rem 0' }}>
             Puntuación: {score}

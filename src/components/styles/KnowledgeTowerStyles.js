@@ -139,7 +139,7 @@ export const FeedbackPanel = styled.div`
 
 export const MenuOverlay = styled.div`
   position: absolute;
-  top: 50%;
+  top: 52%;
   left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(255, 255, 255, 0.98);
@@ -151,6 +151,8 @@ export const MenuOverlay = styled.div`
   border: 5px solid #4A90E2;
   max-width: 800px;
   width: 90%;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
 `;
 
 export const CategoriesGrid = styled.div`

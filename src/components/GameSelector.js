@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import { 
   FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle, 
-  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe 
+  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe, FaShieldAlt, FaTh 
 } from 'react-icons/fa';
 
 const SelectorContainer = styled.div`
@@ -75,6 +75,8 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         return { title: 'Matemáticas Mixtas', action: 'calculando' };
       case 'english':
         return { title: 'Aprende Inglés', action: 'traduciendo' };
+      case 'advanced':
+        return { title: 'Avanzado', action: 'desafiando' };
       default:
         return { title: 'Selecciona un Juego', action: 'jugando' };
     }
@@ -159,6 +161,22 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       color: "#2196F3",
       categories: ['knowledge']
     },
+    {
+      id: 'inmnunodefender',
+      icon: <FaShieldAlt />,
+      title: "InmnunoDefender",
+      description: "Sé un glóbulo blanco y elimina virus y bacterias. Entre oleadas, responde preguntas pisando la respuesta correcta.",
+      color: "#1abc9c",
+      categories: ['knowledge']
+    },
+    {
+      id: 'sudokumath',
+      icon: <FaTh />,
+      title: "Sudoku Math",
+      description: "Puzzle tipo sudoku: usa cada número una sola vez y completa los huecos para que las operaciones sean correctas.",
+      color: "#16A085",
+      categories: ['advanced']
+    },
 
     // Vocabulary Games
     {
@@ -187,6 +205,14 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       title: "La Cocina",
       description: "Prepara el antídoto mezclando ingredientes con fracciones y decimales.",
       color: "#607D8B",
+      categories: ['mixed_math']
+    },
+    {
+      id: 'hanoikitchen',
+      icon: <FaFlask />,
+      title: "Hanoi Kitchen",
+      description: "Resuelve el puzzle tipo Torre de Hanoi con gancho y vierte la cantidad exacta al caldero.",
+      color: "#16A085",
       categories: ['mixed_math']
     },
 

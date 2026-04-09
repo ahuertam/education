@@ -642,5 +642,665 @@
             ],
             "correct": 0
         }
+    ],
+    "history": [
+        {
+            "q": "¿Quién descubrió América en 1492?",
+            "a": [
+                "Cristóbal Colón",
+                "Isaac Newton",
+                "Miguel de Cervantes"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llamaban las grandes construcciones triangulares de Egipto?",
+            "a": [
+                "Pirámides",
+                "Castillos",
+                "Puentes"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué invento usamos para ver la hora?",
+            "a": [
+                "Reloj",
+                "Teléfono",
+                "Cuchara"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué era un caballero en la Edad Media?",
+            "a": [
+                "Un guerrero con armadura",
+                "Un astronauta",
+                "Un cocinero"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué construían los romanos para llevar agua a las ciudades?",
+            "a": [
+                "Acueductos",
+                "Volcanes",
+                "Semáforos"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama el período en el que aparecieron los dinosaurios?",
+            "a": [
+                "Jurásico",
+                "Moderno",
+                "Futuro"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué país construyó la Gran Muralla?",
+            "a": [
+                "China",
+                "España",
+                "Argentina"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué usaban los antiguos para escribir en libros antiguos?",
+            "a": [
+                "Pluma",
+                "Destornillador",
+                "Martillo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué nombre tiene el barco de los piratas?",
+            "a": [
+                "Galeón",
+                "Tren",
+                "Globo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién fue un famoso faraón de Egipto?",
+            "a": [
+                "Tutankamón",
+                "Napoleón",
+                "Einstein"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama el lugar donde se guardan objetos del pasado?",
+            "a": [
+                "Museo",
+                "Gimnasio",
+                "Piscina"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué invento permitió imprimir muchos libros rápidamente?",
+            "a": [
+                "Imprenta",
+                "Televisor",
+                "Refrigerador"
+            ],
+            "correct": 0
+        }
+    ],
+    "space": [
+        {
+            "q": "¿Cómo se llama nuestra estrella?",
+            "a": [
+                "Sol",
+                "Luna",
+                "Marte"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama el planeta donde vivimos?",
+            "a": [
+                "Tierra",
+                "Júpiter",
+                "Venus"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué gira alrededor de la Tierra?",
+            "a": [
+                "La Luna",
+                "El Sol",
+                "Un océano"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama un viaje al espacio?",
+            "a": [
+                "Misión espacial",
+                "Viaje submarino",
+                "Safari"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Quién viaja en una nave espacial?",
+            "a": [
+                "Astronauta",
+                "Panadero",
+                "Jugador"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué es un cometa?",
+            "a": [
+                "Una bola de hielo y polvo",
+                "Una montaña",
+                "Una nube de lluvia"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué planeta es conocido por sus anillos?",
+            "a": [
+                "Saturno",
+                "Mercurio",
+                "Tierra"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama el conjunto de muchas estrellas?",
+            "a": [
+                "Galaxia",
+                "Río",
+                "Bosque"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué usamos para observar estrellas muy lejanas?",
+            "a": [
+                "Telescopio",
+                "Microondas",
+                "Pala"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama un cuerpo que cae del espacio y puede llegar a la Tierra?",
+            "a": [
+                "Meteorito",
+                "Semilla",
+                "Pétalo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué planeta es el más cercano al Sol?",
+            "a": [
+                "Mercurio",
+                "Neptuno",
+                "Marte"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama nuestro sistema de planetas y el Sol?",
+            "a": [
+                "Sistema solar",
+                "Sistema acuático",
+                "Sistema musical"
+            ],
+            "correct": 0
+        }
+    ],
+    "sports": [
+        {
+            "q": "¿En qué deporte se usa una pelota y se marca gol con los pies?",
+            "a": [
+                "Fútbol",
+                "Tenis",
+                "Natación"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué deporte se encesta en una canasta?",
+            "a": [
+                "Baloncesto",
+                "Ciclismo",
+                "Ajedrez"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué deporte se practica en una piscina?",
+            "a": [
+                "Natación",
+                "Atletismo",
+                "Esgrima"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué deporte se juega con raqueta y pelota amarilla?",
+            "a": [
+                "Tenis",
+                "Balonmano",
+                "Boxeo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué deporte se corre en una pista?",
+            "a": [
+                "Atletismo",
+                "Surf",
+                "Golf"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llaman los juegos deportivos más famosos del mundo?",
+            "a": [
+                "Juegos Olímpicos",
+                "Juegos de mesa",
+                "Juegos de cartas"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué deporte se usan guantes y se golpea con los puños?",
+            "a": [
+                "Boxeo",
+                "Voleibol",
+                "Hockey"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué deporte se juega con una red y se golpea la pelota con las manos?",
+            "a": [
+                "Voleibol",
+                "Béisbol",
+                "Patinaje"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué deporte usa una bicicleta?",
+            "a": [
+                "Ciclismo",
+                "Judo",
+                "Gimnasia"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿En qué deporte se patina sobre hielo?",
+            "a": [
+                "Patinaje",
+                "Rugby",
+                "Escalada"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué deporte se juega con un bate y una pelota pequeña?",
+            "a": [
+                "Béisbol",
+                "Baloncesto",
+                "Esgrima"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué deporte se practica en el mar con una tabla?",
+            "a": [
+                "Surf",
+                "Balonmano",
+                "Ajedrez"
+            ],
+            "correct": 0
+        }
+    ],
+    "art": [
+        {
+            "q": "¿Qué usas para dibujar en un papel?",
+            "a": [
+                "Lápiz",
+                "Martillo",
+                "Llave"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué objeto sirve para borrar un dibujo a lápiz?",
+            "a": [
+                "Goma",
+                "Taza",
+                "Peine"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué colores forman el naranja?",
+            "a": [
+                "Rojo y amarillo",
+                "Azul y verde",
+                "Negro y blanco"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué colores forman el verde?",
+            "a": [
+                "Azul y amarillo",
+                "Rojo y azul",
+                "Amarillo y negro"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama una persona que pinta cuadros?",
+            "a": [
+                "Pintor",
+                "Cartero",
+                "Panadero"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama una obra de arte hecha con barro o piedra?",
+            "a": [
+                "Escultura",
+                "Canción",
+                "Planeta"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama la técnica de cortar y pegar papeles para crear una imagen?",
+            "a": [
+                "Collage",
+                "Carrera",
+                "Cosecha"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué herramienta se usa para mezclar pinturas en una paleta?",
+            "a": [
+                "Pincel",
+                "Cuchillo",
+                "Serrucho"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué es un museo?",
+            "a": [
+                "Un lugar con obras y objetos para ver",
+                "Un lugar para dormir",
+                "Un lugar para nadar"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué pintura famosa muestra a una mujer sonriendo?",
+            "a": [
+                "La Mona Lisa",
+                "Las Meninas",
+                "El Grito"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama el arte de doblar papel para hacer figuras?",
+            "a": [
+                "Origami",
+                "Buceo",
+                "Pastoreo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué se usa para pintar con agua y colores suaves?",
+            "a": [
+                "Acuarela",
+                "Tiza",
+                "Carbón"
+            ],
+            "correct": 0
+        }
+    ],
+    "technology": [
+        {
+            "q": "¿Qué aparato usas para llamar por teléfono?",
+            "a": [
+                "Móvil",
+                "Plancha",
+                "Cepillo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué aparato sirve para escribir y navegar por internet?",
+            "a": [
+                "Ordenador",
+                "Tostadora",
+                "Linterna"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama la red que conecta ordenadores en todo el mundo?",
+            "a": [
+                "Internet",
+                "Montaña",
+                "Bosque"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué se usa para hacer clic y mover el cursor?",
+            "a": [
+                "Ratón",
+                "Regla",
+                "Vaso"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del ordenador tiene teclas?",
+            "a": [
+                "Teclado",
+                "Altavoz",
+                "Imán"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué aparato sirve para ver programas y películas en casa?",
+            "a": [
+                "Televisión",
+                "Reloj",
+                "Batidora"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué sirve para hacer fotos con el móvil?",
+            "a": [
+                "Cámara",
+                "Tenedor",
+                "Goma"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llama el mensaje que envías por internet?",
+            "a": [
+                "Correo electrónico",
+                "Semilla",
+                "Patinete"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué aparato se usa para escuchar música sin cables a veces?",
+            "a": [
+                "Auriculares",
+                "Calcetines",
+                "Lápices"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué se usa para cargar un móvil?",
+            "a": [
+                "Cargador",
+                "Paraguas",
+                "Guante"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué es una aplicación (app)?",
+            "a": [
+                "Un programa que se usa en el móvil u ordenador",
+                "Un animal pequeño",
+                "Una planta"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué dispositivo guarda información en un ordenador?",
+            "a": [
+                "Disco",
+                "Cucharón",
+                "Pelota"
+            ],
+            "correct": 0
+        }
+    ],
+    "body": [
+        {
+            "q": "¿Qué órgano bombea la sangre?",
+            "a": [
+                "Corazón",
+                "Estómago",
+                "Oreja"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del cuerpo usamos para ver?",
+            "a": [
+                "Ojos",
+                "Rodillas",
+                "Hombros"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del cuerpo usamos para oír?",
+            "a": [
+                "Oídos",
+                "Codos",
+                "Tobillos"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué órgano usamos para respirar?",
+            "a": [
+                "Pulmones",
+                "Riñones",
+                "Huesos"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llaman los huesos que protegen el cerebro?",
+            "a": [
+                "Cráneo",
+                "Costillas",
+                "Dientes"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del cuerpo usamos para saborear?",
+            "a": [
+                "Lengua",
+                "Mano",
+                "Pie"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué órgano ayuda a digerir la comida?",
+            "a": [
+                "Estómago",
+                "Ojo",
+                "Uña"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del cuerpo tiene huellas dactilares?",
+            "a": [
+                "Dedos",
+                "Cabello",
+                "Nariz"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del cuerpo usamos para caminar?",
+            "a": [
+                "Pies",
+                "Ojos",
+                "Orejas"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué protege al corazón y a los pulmones?",
+            "a": [
+                "Costillas",
+                "Dientes",
+                "Pelo"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Cómo se llaman las articulaciones que doblan el brazo?",
+            "a": [
+                "Codos",
+                "Tobillos",
+                "Cintura"
+            ],
+            "correct": 0
+        },
+        {
+            "q": "¿Qué parte del cuerpo sirve para oler?",
+            "a": [
+                "Nariz",
+                "Espalda",
+                "Rodilla"
+            ],
+            "correct": 0
+        }
     ]
 }

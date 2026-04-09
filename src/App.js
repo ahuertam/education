@@ -15,7 +15,10 @@ import AccentHunterGame from './components/AccentHunterGame';
 import KnowledgeTowerGame from './components/KnowledgeTowerGame';
 import ShapeGoalkeeperGame from './components/ShapeGoalkeeperGame';
 import KitchenGame from './components/KitchenGame';
+import HanoiKitchenGame from './components/HanoiKitchenGame';
 import DragonTragonGame from './components/DragonTragonGame';
+import InmnunoDefenderGame from './components/InmnunoDefenderGame';
+import SudokuMathGame from './components/SudokuMathGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -84,6 +87,10 @@ function App() {
         return <KnowledgeTowerGame 
           onBack={() => setCurrentView('game-selector')} 
         />;
+      case 'inmnunodefender':
+        return <InmnunoDefenderGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
       case 'shapegoalkeeper':
         return <ShapeGoalkeeperGame 
           onBack={() => setCurrentView('game-selector')} 
@@ -92,9 +99,17 @@ function App() {
         return <KitchenGame 
           onBack={() => setCurrentView('game-selector')} 
         />;
+      case 'hanoikitchen':
+        return <HanoiKitchenGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
       case 'dragontragon':
         return <DragonTragonGame 
           onBack={() => setCurrentView('game-selector')} 
+        />;
+      case 'sudokumath':
+        return <SudokuMathGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       default:
         return <Landing onNavigate={handleNavigate} />;

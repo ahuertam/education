@@ -196,6 +196,59 @@ const RecipeBook = styled.div`
   transform: rotate(-2deg);
 `;
 
+const InstructionsCard = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 320px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 2px solid rgba(0, 255, 0, 0.4);
+  color: #fff;
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  font-family: inherit;
+  z-index: 6;
+`;
+
+const ModeRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+`;
+
+const ModeButton = styled.button`
+  flex: 1;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border: 2px solid ${props => props.$active ? '#00ff00' : 'rgba(255,255,255,0.25)'};
+  background: ${props => props.$active ? 'rgba(0,255,0,0.18)' : 'rgba(255,255,255,0.08)'};
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+`;
+
+const InstructionTitle = styled.h3`
+  margin: 0 0 0.6rem 0;
+  color: #00ff00;
+  text-shadow: 0 0 6px rgba(0, 255, 0, 0.5);
+`;
+
+const InstructionList = styled.ol`
+  margin: 0.5rem 0 0 1.2rem;
+  padding: 0;
+  line-height: 1.35;
+  font-size: 0.95rem;
+`;
+
+const HintLine = styled.div`
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  font-size: 0.95rem;
+  color: #e0e0e0;
+`;
+
 const RecipeTitle = styled.h3`
   text-align: center;
   border-bottom: 2px solid #333;
@@ -207,6 +260,32 @@ const RecipeItem = styled.div`
   font-size: 1.1rem;
   display: flex;
   justify-content: space-between;
+`;
+
+const MixPanelTitle = styled.h4`
+  margin: 0.9rem 0 0.5rem 0;
+  border-top: 2px dashed rgba(0,0,0,0.25);
+  padding-top: 0.7rem;
+  font-size: 1.05rem;
+`;
+
+const MixRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+`;
+
+const Pill = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.12);
+  font-size: 0.9rem;
 `;
 
 const Cauldron = styled.div`
@@ -283,6 +362,22 @@ const Explosion = styled.div`
   z-index: 20;
 `;
 
+const StatusBanner = styled.div`
+  position: absolute;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: ${props => props.$type === 'success' ? 'rgba(0, 255, 0, 0.18)' : props.$type === 'error' ? 'rgba(255, 0, 0, 0.18)' : 'rgba(0,0,0,0.35)'};
+  border: 2px solid ${props => props.$type === 'success' ? 'rgba(0, 255, 0, 0.55)' : props.$type === 'error' ? 'rgba(255, 0, 0, 0.55)' : 'rgba(255,255,255,0.25)'};
+  padding: 0.7rem 1.1rem;
+  border-radius: 12px;
+  font-weight: bold;
+  text-align: center;
+  z-index: 21;
+  width: min(620px, calc(100% - 2rem));
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+`;
+
 // --- Game Logic & Data ---
 
 const INGREDIENTS = [
@@ -299,8 +394,31 @@ const KitchenGame = ({ onBack }) => {
   const [hookPosition, setHookPosition] = useState({ x: 50, height: 50 }); // x in %, height in px
   const [sliderValue, setSliderValue] = useState(0);
   const [score, setScore] = useState(0);
+  const [touched, setTouched] = useState({ A: false, B: false, C: false });
+  const [statusMessage, setStatusMessage] = useState('');
+  const [gameMode, setGameMode] = useState('easy');
   
   const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab1.mp3`));
+  const timeoutsRef = useRef([]);
+  const hookBusyRef = useRef(false);
+  const currentMixRef = useRef(currentMix);
+  const labAreaRef = useRef(null);
+  const jarRefs = useRef({});
+
+  useEffect(() => {
+    currentMixRef.current = currentMix;
+  }, [currentMix]);
+
+  const addTimeout = (fn, delay) => {
+    const id = setTimeout(fn, delay);
+    timeoutsRef.current.push(id);
+    return id;
+  };
+
+  const clearAllTimeouts = () => {
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  };
 
   // Background Music
   useEffect(() => {
@@ -317,38 +435,72 @@ const KitchenGame = ({ onBack }) => {
 
   // Generate a new recipe
   const generateRecipe = () => {
-    // Simple logic for now: random values between 10 and 100
-    const newRecipe = INGREDIENTS.map(ing => ({
+    clearAllTimeouts();
+    const targets = [
+      { ml: 20, label: '1/5' },
+      { ml: 25, label: '1/4' },
+      { ml: 33, label: '1/3' },
+      { ml: 40, label: '2/5' },
+      { ml: 50, label: '1/2' },
+      { ml: 60, label: '3/5' },
+      { ml: 67, label: '2/3' },
+      { ml: 75, label: '3/4' },
+      { ml: 80, label: '4/5' }
+    ];
+    const shuffled = [...targets].sort(() => Math.random() - 0.5);
+    const chosen = shuffled.slice(0, INGREDIENTS.length);
+    const newRecipe = INGREDIENTS.map((ing, i) => ({
       ...ing,
-      target: Math.floor(Math.random() * 9 + 1) * 10 // 10, 20, ... 90
+      targetMl: chosen[i].ml,
+      targetLabel: chosen[i].label
     }));
     setRecipe(newRecipe);
     setCurrentMix({ A: 0, B: 0, C: 0 });
+    setSelectedIngredient(null);
+    setSliderValue(0);
+    setTouched({ A: false, B: false, C: false });
+    setStatusMessage('');
+    hookBusyRef.current = false;
     setGameState('playing');
   };
 
   useEffect(() => {
     generateRecipe();
+    return () => {
+      clearAllTimeouts();
+    };
   }, []);
 
-  const handleJarClick = (ingredient, index) => {
-    if (gameState !== 'playing') return;
-    
-    // Calculate hook position based on jar index (simplified)
-    // Assuming 3 jars centered: 30%, 50%, 70%
-    const positions = [35, 50, 65];
-    const targetX = positions[index];
+  const handleJarClick = (ingredient) => {
+    if (gameState !== 'playing' || hookBusyRef.current) return;
+    hookBusyRef.current = true;
+    if (bgMusicRef.current && bgMusicRef.current.paused) {
+      bgMusicRef.current.play().catch(e => console.log("Audio play failed", e));
+    }
+
+    const jarNode = jarRefs.current[ingredient.id];
+    const labNode = labAreaRef.current;
+    let targetX = 50;
+
+    if (jarNode && labNode) {
+      const jarRect = jarNode.getBoundingClientRect();
+      const labRect = labNode.getBoundingClientRect();
+      const center = jarRect.left + (jarRect.width / 2);
+      targetX = ((center - labRect.left) / labRect.width) * 100;
+      targetX = Math.max(8, Math.min(92, targetX));
+    }
     
     // Animate hook
     setHookPosition({ x: targetX, height: 50 }); // Move horizontally
     
-    setTimeout(() => {
+    addTimeout(() => {
       setHookPosition({ x: targetX, height: 200 }); // Drop down
       
-      setTimeout(() => {
+      addTimeout(() => {
         setHookPosition({ x: targetX, height: 50 }); // Pull up
         setSelectedIngredient(ingredient);
-        setSliderValue(currentMix[ingredient.id] || 0);
+        setSliderValue(currentMixRef.current[ingredient.id] || 0);
+        hookBusyRef.current = false;
       }, 500);
     }, 500);
   };
@@ -361,27 +513,55 @@ const KitchenGame = ({ onBack }) => {
       ...prev,
       [selectedIngredient.id]: val
     }));
+    setTouched(prev => ({ ...prev, [selectedIngredient.id]: true }));
   };
 
+  const allTouched = touched.A && touched.B && touched.C;
+
+  const getTargetForSelected = () => {
+    if (!selectedIngredient) return null;
+    return recipe.find(r => r.id === selectedIngredient.id) || null;
+  };
+
+  const selectedTarget = getTargetForSelected();
+
   const handleMix = () => {
+    if (recipe.length === 0 || gameState !== 'playing') return;
+    if (!allTouched) {
+      setStatusMessage('Ajusta los 3 ingredientes antes de mezclar.');
+      addTimeout(() => setStatusMessage(''), 1600);
+      return;
+    }
     // Check if mix matches recipe
     const isCorrect = recipe.every(item => {
       const current = currentMix[item.id];
-      return Math.abs(current - item.target) < 5; // Allow small tolerance
+      return Math.abs(current - item.targetMl) < 5; // Allow small tolerance
     });
 
     if (isCorrect) {
       setGameState('success');
+      setStatusMessage('✅ ¡Antídoto perfecto! Nueva receta en 2 segundos...');
       setScore(s => s + 100);
-      setTimeout(generateRecipe, 2000);
+      addTimeout(generateRecipe, 2000);
     } else {
       setGameState('exploded');
+      setStatusMessage('💥 ¡Explosión! Revisa la receta y vuelve a intentarlo.');
       setScore(s => Math.max(0, s - 50));
-      setTimeout(() => {
+      addTimeout(() => {
         setGameState('playing');
         setCurrentMix({ A: 0, B: 0, C: 0 });
+        setSelectedIngredient(null);
+        setSliderValue(0);
+        setTouched({ A: false, B: false, C: false });
+        hookBusyRef.current = false;
+        setStatusMessage('');
       }, 2000);
     }
+  };
+
+  const handleBack = () => {
+    clearAllTimeouts();
+    onBack();
   };
 
   return (
@@ -389,13 +569,19 @@ const KitchenGame = ({ onBack }) => {
       {gameState === 'exploded' && <Explosion />}
       
       <Header>
-        <BackButton onClick={onBack}>
+        <BackButton onClick={handleBack}>
           <FaArrowLeft /> Salir
         </BackButton>
         <ScoreDisplay>Puntos: {score}</ScoreDisplay>
       </Header>
 
-      <LabArea>
+      <LabArea ref={labAreaRef}>
+        {(statusMessage || gameState !== 'playing') && (
+          <StatusBanner $type={gameState === 'success' ? 'success' : gameState === 'exploded' ? 'error' : 'info'}>
+            {statusMessage}
+          </StatusBanner>
+        )}
+
         <HookContainer style={{ left: `${hookPosition.x}%`, height: `${hookPosition.height}px` }}>
           <HookLine />
           <Claw />
@@ -407,7 +593,8 @@ const KitchenGame = ({ onBack }) => {
               <JarLabel>{ing.name}</JarLabel>
               <Jar 
                 $color={ing.color} 
-                onClick={() => handleJarClick(ing, index)}
+                ref={(el) => { jarRefs.current[ing.id] = el; }}
+                onClick={() => handleJarClick(ing)}
               >
                 {/* Visual fill level could go here */}
               </Jar>
@@ -420,11 +607,56 @@ const KitchenGame = ({ onBack }) => {
           {recipe.map(item => (
             <RecipeItem key={item.id}>
               <span>{item.name}:</span>
-              {/* Display as fraction or decimal later */}
-              <span>{item.target} ml</span>
+              <span>{gameMode === 'easy' ? `${item.targetLabel} (${item.targetMl} ml)` : item.targetLabel}</span>
             </RecipeItem>
           ))}
+          <MixPanelTitle>Tu mezcla</MixPanelTitle>
+          {recipe.map(item => {
+            const current = currentMix[item.id] || 0;
+            const ok = Math.abs(current - item.targetMl) < 5 && touched[item.id];
+            const missing = !touched[item.id];
+            return (
+              <MixRow key={`${item.id}-mix`}>
+                <span>{item.name}</span>
+                <Pill>
+                  {missing ? '—' : `${current} ml`}
+                  {ok ? <FaCheck /> : <FaTimes />}
+                </Pill>
+              </MixRow>
+            );
+          })}
         </RecipeBook>
+
+        <InstructionsCard>
+          <InstructionTitle>Cómo jugar</InstructionTitle>
+          <ModeRow>
+            <ModeButton $active={gameMode === 'easy'} onClick={() => setGameMode('easy')}>
+              Fácil
+            </ModeButton>
+            <ModeButton $active={gameMode === 'hard'} onClick={() => setGameMode('hard')}>
+              Difícil
+            </ModeButton>
+          </ModeRow>
+          <InstructionList>
+            <li>Haz clic en un frasco para seleccionarlo.</li>
+            <li>Ajusta la cantidad con la barra (ml).</li>
+            <li>Repite con los 3 ingredientes.</li>
+            <li>Pulsa MEZCLAR para comprobar el antídoto.</li>
+          </InstructionList>
+          <HintLine>
+            {selectedIngredient && selectedTarget ? (
+              <>
+                Objetivo de <strong>{selectedIngredient.name}</strong>: <strong>{selectedTarget.targetLabel}</strong>{gameMode === 'easy' ? <> ({selectedTarget.targetMl} ml)</> : null}. Ahora llevas <strong>{currentMix[selectedIngredient.id] || 0} ml</strong>.
+              </>
+            ) : (
+              <>
+                {gameMode === 'easy'
+                  ? 'Pista: en modo fácil ves fracción y su equivalente en ml.'
+                  : 'Modo difícil: solo ves fracciones. Convierte mentalmente a ml para ajustar.'}
+              </>
+            )}
+          </HintLine>
+        </InstructionsCard>
 
         <PrepArea>
           <Controls>
@@ -442,7 +674,7 @@ const KitchenGame = ({ onBack }) => {
               />
               <span>{sliderValue} ml</span>
             </div>
-            <ActionButton onClick={handleMix} disabled={gameState !== 'playing'}>
+            <ActionButton onClick={handleMix} disabled={gameState !== 'playing' || recipe.length === 0 || !allTouched}>
               MEZCLAR
             </ActionButton>
           </Controls>

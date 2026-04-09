@@ -1,0 +1,30 @@
+{
+  "ciencias": [
+    { "q": "¿Cuál es la función principal de los glóbulos blancos?", "a": ["Transportar oxígeno", "Defender el cuerpo", "Formar huesos", "Digerir alimentos"], "correct": 1 },
+    { "q": "¿Qué es un virus?", "a": ["Una célula completa", "Un ser vivo que se alimenta", "Un agente infeccioso que necesita células para replicarse", "Un tipo de bacteria"], "correct": 2 },
+    { "q": "¿Qué es una bacteria?", "a": ["Una célula microscópica", "Un tipo de roca", "Un órgano", "Una molécula de azúcar"], "correct": 0 },
+    { "q": "¿Qué órgano filtra la sangre y ayuda al sistema inmune?", "a": ["Estómago", "Bazo", "Pulmón", "Hígado"], "correct": 1 },
+    { "q": "¿Cómo se llama la parte del cuerpo por donde circula la sangre?", "a": ["Nervios", "Venas y arterias", "Huesos", "Músculos"], "correct": 1 }
+  ],
+  "mates": [
+    { "q": "¿Cuánto es 7 + 5?", "a": ["10", "11", "12", "13"], "correct": 2 },
+    { "q": "¿Cuánto es 9 × 3?", "a": ["18", "27", "21", "24"], "correct": 1 },
+    { "q": "¿Cuánto es 20 ÷ 4?", "a": ["4", "5", "6", "8"], "correct": 1 },
+    { "q": "¿Cuánto es 15 - 6?", "a": ["7", "8", "9", "10"], "correct": 2 },
+    { "q": "¿Cuál es el doble de 8?", "a": ["14", "15", "16", "18"], "correct": 2 }
+  ],
+  "lengua": [
+    { "q": "¿Cuál de estas palabras es un sustantivo?", "a": ["Correr", "Bonito", "Mesa", "Rápidamente"], "correct": 2 },
+    { "q": "¿Cuál es el sinónimo de “feliz”?", "a": ["Triste", "Contento", "Enojado", "Cansado"], "correct": 1 },
+    { "q": "¿Qué signo se usa al final de una pregunta en español?", "a": ["!", "¿ ?", ".", ","], "correct": 1 },
+    { "q": "¿Cuál palabra está bien escrita?", "a": ["Aver", "Haber", "Habér", "A ber"], "correct": 1 },
+    { "q": "¿Qué es un adjetivo?", "a": ["Una palabra que nombra acciones", "Una palabra que describe", "Una palabra que une frases", "Una palabra que nombra lugares"], "correct": 1 }
+  ],
+  "historia": [
+    { "q": "¿Qué es un mapa?", "a": ["Una canción", "Una representación de un lugar", "Un animal", "Un número"], "correct": 1 },
+    { "q": "¿Qué es un continente?", "a": ["Una ciudad", "Una gran masa de tierra", "Un río", "Un planeta"], "correct": 1 },
+    { "q": "¿Qué invento ayudó a difundir libros?", "a": ["La brújula", "La imprenta", "La rueda", "El termómetro"], "correct": 1 },
+    { "q": "¿Qué es una década?", "a": ["5 años", "10 años", "50 años", "100 años"], "correct": 1 },
+    { "q": "¿Qué es una frontera?", "a": ["El límite entre territorios", "Una montaña", "Un océano", "Una moneda"], "correct": 0 }
+  ]
+}
