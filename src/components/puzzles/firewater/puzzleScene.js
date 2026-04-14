@@ -86,9 +86,19 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
           if (mover.body?.setSize) mover.body.setSize(p.w, p.h, true);
           mover.setData('id', p.id);
           mover.setData('kind', 'moving');
+          const axis = p.axis || (typeof p.vy === 'number' ? 'y' : 'x');
+          mover.setData('axis', axis);
           mover.setData('baseX', p.x);
-          mover.setData('range', p.range ?? 140);
-          mover.setVelocityX(p.vx ?? 90);
+          mover.setData('baseY', p.y);
+          mover.setData('rangeX', p.rangeX ?? p.range ?? 140);
+          mover.setData('rangeY', p.rangeY ?? 140);
+          if (axis === 'y') {
+            mover.setVelocityX(0);
+            mover.setVelocityY(p.vy ?? 90);
+          } else {
+            mover.setVelocityX(p.vx ?? 90);
+            mover.setVelocityY(0);
+          }
           platforms.push(mover);
           movingPlatforms.push(mover);
         } else {
@@ -235,10 +245,18 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
       if (!this.fire?.body || !this.water?.body) return;
 
       for (const mp of this.movingPlatforms || []) {
-        const baseX = mp.getData('baseX');
-        const range = mp.getData('range') ?? 140;
-        if (mp.x < baseX - range) mp.setVelocityX(Math.abs(mp.body.velocity.x));
-        if (mp.x > baseX + range) mp.setVelocityX(-Math.abs(mp.body.velocity.x));
+        const axis = mp.getData('axis') || 'x';
+        if (axis === 'y') {
+          const baseY = mp.getData('baseY');
+          const rangeY = mp.getData('rangeY') ?? 140;
+          if (mp.y < baseY - rangeY) mp.setVelocityY(Math.abs(mp.body.velocity.y));
+          if (mp.y > baseY + rangeY) mp.setVelocityY(-Math.abs(mp.body.velocity.y));
+        } else {
+          const baseX = mp.getData('baseX');
+          const rangeX = mp.getData('rangeX') ?? 140;
+          if (mp.x < baseX - rangeX) mp.setVelocityX(Math.abs(mp.body.velocity.x));
+          if (mp.x > baseX + rangeX) mp.setVelocityX(-Math.abs(mp.body.velocity.x));
+        }
       }
 
       const speed = 220;

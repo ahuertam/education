@@ -26,12 +26,10 @@ function groundTop(groundY, groundH) {
 }
 
 function safeButtonY({ groundY, groundH, buttonH }) {
-  // Keep button slightly embedded in floor so overlap reliably triggers.
   return groundTop(groundY, groundH) + buttonH / 2 - 2;
 }
 
 function safeHazardY({ groundY, groundH, hazardH }) {
-  // Raise hazard to overlap with character feet instead of just touching edge.
   return groundTop(groundY, groundH) - hazardH / 2 + 6;
 }
 
@@ -87,7 +85,7 @@ function buildChunkPoolBridge({
   const bridge = {
     id: makeId('bridge', idx),
     x: poolX,
-    y: groundTop(groundY, groundH) - 96,
+    y: groundTop(groundY, groundH) - rngInt(rng, 90, 180),
     w: poolW + rngInt(rng, 90, 160),
     h: bridgeH,
     kind: 'solid'
@@ -147,7 +145,6 @@ function buildChunkPoolBridge({
       };
 
       if (tryPlace(toRect(btn), occupancy.buttons, 18)) {
-        buttons.push(btn);
         const crate = {
           id: makeId('crate_bridge', idx),
           x: btn.x - 120,
@@ -155,7 +152,14 @@ function buildChunkPoolBridge({
           w: 46,
           h: 46
         };
-        if (tryPlace(toRect(crate), occupancy.crates, 12)) crates.push(crate);
+        if (tryPlace(toRect(crate), occupancy.crates, 12)) {
+          buttons.push(btn);
+          crates.push(crate);
+        } else {
+          occupancy.buttons.pop();
+          occupancy.doors.pop();
+          doors.pop();
+        }
       } else {
         occupancy.doors.pop();
         doors.pop();
@@ -186,28 +190,33 @@ function buildChunkCrateLedge({ rng, cursor, groundY, groundH, idx, occupancy })
   const btnW = 70;
   const btnH = 14;
   const ledgeW = rngInt(rng, 160, 220);
+  const rise = rngInt(rng, 240, 420);
   const ledge = {
     id: makeId('ledge', idx),
     x: cursor + 360,
-    y: groundTop(groundY, groundH) - rngInt(rng, 180, 220),
+    y: groundTop(groundY, groundH) - rise,
     w: ledgeW,
     h: 20,
     kind: 'solid'
   };
 
-  const step1 = {
-    id: makeId('step_a', idx),
-    x: cursor + 240,
-    y: groundTop(groundY, groundH) - 64,
-    w: 120,
-    h: 20,
-    kind: 'solid'
-  };
+  const stepCount = Math.max(3, Math.min(5, Math.round(rise / 95)));
+  const steps = [];
+  for (let i = 0; i < stepCount; i += 1) {
+    steps.push({
+      id: makeId('step', `${idx}_${i}`),
+      x: cursor + 190 + i * 90,
+      y: groundTop(groundY, groundH) - 80 - i * 85,
+      w: 130,
+      h: 20,
+      kind: 'solid'
+    });
+  }
 
   const door = {
     id: makeId('door_gate', idx),
     x: cursor + 520,
-    y: groundTop(groundY, groundH) - 70,
+    y: groundTop(groundY, groundH) - rngInt(rng, 140, 220),
     w: rngInt(rng, 70, 110),
     h: rngInt(rng, 90, 110),
     open: false
@@ -238,8 +247,10 @@ function buildChunkCrateLedge({ rng, cursor, groundY, groundH, idx, occupancy })
     h: 46
   };
 
-  const ok =
-    tryPlace(toRect(step1), occupancy.platforms, 8) &&
+  let ok = true;
+  for (const s of steps) ok = ok && tryPlace(toRect(s), occupancy.platforms, 8);
+  ok =
+    ok &&
     tryPlace(toRect(ledge), occupancy.platforms, 8) &&
     tryPlace(toRect(door), occupancy.doors, 14) &&
     tryPlace(toRect(btn), occupancy.buttons, 14) &&
@@ -248,7 +259,7 @@ function buildChunkCrateLedge({ rng, cursor, groundY, groundH, idx, occupancy })
 
   if (!ok) return { ok: false };
 
-  platforms.push(step1, ledge);
+  platforms.push(...steps, ledge);
   doors.push(door);
   buttons.push(btn);
   crates.push(crateA, crateB);
@@ -274,7 +285,7 @@ function buildChunkMovingGap({ rng, cursor, groundY, groundH, idx, allowAcid, oc
   const startDeck = {
     id: makeId('deck_left', idx),
     x: cursor + 220,
-    y: groundTop(groundY, groundH) - rngInt(rng, 120, 170),
+    y: groundTop(groundY, groundH) - rngInt(rng, 220, 420),
     w: 280,
     h: 20,
     kind: 'solid'
@@ -282,23 +293,29 @@ function buildChunkMovingGap({ rng, cursor, groundY, groundH, idx, allowAcid, oc
   const endDeck = {
     id: makeId('deck_right', idx),
     x: cursor + 680,
-    y: startDeck.y + rngInt(rng, -40, 40),
+    y: startDeck.y + rngInt(rng, -120, 120),
     w: 260,
     h: 20,
     kind: 'solid'
   };
 
-  const moverY = Math.min(startDeck.y, endDeck.y) - rngInt(rng, 40, 70);
+  const axis = rng() < 0.55 ? 'x' : 'y';
   const moving = {
     id: makeId('moving', idx),
     x: cursor + 460,
-    y: moverY,
-    w: 160,
+    y: Math.min(startDeck.y, endDeck.y) - rngInt(rng, 70, 120),
+    w: 170,
     h: 18,
     kind: 'moving',
-    vx: rng() < 0.5 ? 110 : -110,
-    range: rngInt(rng, 120, 180)
+    axis
   };
+  if (axis === 'x') {
+    moving.vx = rng() < 0.5 ? 120 : -120;
+    moving.rangeX = rngInt(rng, 140, 220);
+  } else {
+    moving.vy = rng() < 0.5 ? 120 : -120;
+    moving.rangeY = rngInt(rng, 120, 220);
+  }
 
   const ok =
     tryPlace(toRect(startDeck), occupancy.platforms, 10) &&
@@ -339,9 +356,9 @@ export function generateLevel({ seed, difficulty }) {
   const rng = createRng(`${seed}::${difficulty}`);
   const cfg = difficultyConfig(difficulty);
 
-  const height = 540;
+  const height = 900;
 
-  const groundY = 500;
+  const groundY = height - 40;
   const groundH = 40;
 
   const occupancy = {
@@ -431,15 +448,47 @@ export function generateLevel({ seed, difficulty }) {
     chunkIdx += 1;
   }
 
-  const gateY = groundTop(groundY, groundH) - rngInt(rng, 200, 240);
+  const gateRise = rngInt(rng, 380, 560);
+  const gateY = groundTop(groundY, groundH) - gateRise;
   const gateX = cursor + 240;
 
-  const endPlatforms = [
-    { id: 'stair_1', x: gateX - 260, y: groundTop(groundY, groundH) - 40, w: 140, h: 20, kind: 'solid' },
-    { id: 'stair_2', x: gateX - 190, y: groundTop(groundY, groundH) - 100, w: 140, h: 20, kind: 'solid' },
-    { id: 'stair_3', x: gateX - 120, y: groundTop(groundY, groundH) - 160, w: 160, h: 20, kind: 'solid' },
-    { id: 'gate_path', x: gateX + 240, y: gateY, w: 640, h: 20, kind: 'solid' }
-  ];
+  const stairCount = Math.max(5, Math.min(8, Math.round(gateRise / 85)));
+  const endPlatforms = [];
+  for (let i = 0; i < stairCount; i += 1) {
+    const t = (i + 1) / (stairCount + 1);
+    endPlatforms.push({
+      id: `stair_${i + 1}`,
+      x: gateX - 440 + (i + 1) * 90,
+      y: groundTop(groundY, groundH) - Math.round(gateRise * t),
+      w: 170,
+      h: 20,
+      kind: 'solid'
+    });
+  }
+  endPlatforms.push({ id: 'gate_path', x: gateX + 260, y: gateY, w: 720, h: 20, kind: 'solid' });
+
+  if (rng() < 0.65) {
+    const rangeY = Math.max(110, Math.min(260, Math.round(gateRise / 2)));
+    endPlatforms.push({
+      id: 'lift_end',
+      x: gateX - 260,
+      y: groundTop(groundY, groundH) - Math.round(gateRise * 0.55),
+      w: 160,
+      h: 18,
+      kind: 'moving',
+      axis: 'y',
+      vy: rng() < 0.5 ? 120 : -120,
+      rangeY
+    });
+    endPlatforms.push({
+      id: 'lift_end_mid',
+      x: gateX - 360,
+      y: groundTop(groundY, groundH) - Math.round(gateRise * 0.35),
+      w: 160,
+      h: 20,
+      kind: 'solid'
+    });
+  }
   for (const p of endPlatforms) {
     if (tryPlace(toRect(p), occupancy.platforms, 10)) platforms.push(p);
   }
@@ -457,14 +506,82 @@ export function generateLevel({ seed, difficulty }) {
     const btnH = 14;
     for (let i = 0; i < 16; i += 1) {
       const x = rngInt(rng, 360, gateX - 460);
-      const y = safeButtonY({ groundY, groundH, buttonH: btnH });
-      const btn = { id: `btn_${door.id}_${idx}`, x, y, w: btnW, h: btnH, doorId: door.id };
+      const prevOccPlatforms = occupancy.platforms.length;
+      const prevOccButtons = occupancy.buttons.length;
+      const prevOccCrates = occupancy.crates.length;
+      const prevPlatforms = platforms.length;
+      const prevButtons = buttons.length;
+      const prevCrates = crates.length;
+
+      const shelfMode = rng() < 0.55;
+      let buttonY = safeButtonY({ groundY, groundH, buttonH: btnH });
+      const extraPlatforms = [];
+
+      if (shelfMode) {
+        const rise = rngInt(rng, 200, 460);
+        const shelf = { id: `btn_shelf_${door.id}_${idx}_${i}`, x, y: groundTop(groundY, groundH) - rise, w: 190, h: 20, kind: 'solid' };
+        const stepCount = Math.max(2, Math.min(5, Math.round(rise / 105)));
+        const steps = [];
+        for (let s = 0; s < stepCount; s += 1) {
+          const tt = (s + 1) / (stepCount + 1);
+          steps.push({
+            id: `btn_step_${door.id}_${idx}_${i}_${s}`,
+            x: x - 240 + (s + 1) * 95,
+            y: groundTop(groundY, groundH) - Math.round(rise * tt),
+            w: 150,
+            h: 20,
+            kind: 'solid'
+          });
+        }
+
+        let okPlatforms = tryPlace(toRect(shelf), occupancy.platforms, 10);
+        for (const st of steps) okPlatforms = okPlatforms && tryPlace(toRect(st), occupancy.platforms, 10);
+        if (!okPlatforms) {
+          occupancy.platforms.length = prevOccPlatforms;
+          continue;
+        }
+
+        extraPlatforms.push(...steps, shelf);
+        buttonY = shelf.y - shelf.h / 2 + btnH / 2 - 2;
+      }
+
+      const btn = { id: `btn_${door.id}_${idx}_${i}`, x, y: buttonY, w: btnW, h: btnH, doorId: door.id };
       const overlapsHazard = hazardsList.some(hz => rectsOverlap(toRect(btn), toRect(hz), 18));
-      if (overlapsHazard) continue;
-      if (!tryPlace(toRect(btn), occupancy.buttons, 18)) continue;
+      if (overlapsHazard || !tryPlace(toRect(btn), occupancy.buttons, 18)) {
+        occupancy.platforms.length = prevOccPlatforms;
+        occupancy.buttons.length = prevOccButtons;
+        continue;
+      }
+
+      let cratePlaced = false;
+      for (let cTry = 0; cTry < 10 && !cratePlaced; cTry += 1) {
+        const crate = {
+          id: `crate_${door.id}_${idx}_${i}_${cTry}`,
+          x: btn.x - rngInt(rng, 90, 150),
+          y: groundTop(groundY, groundH) - 140,
+          w: 46,
+          h: 46
+        };
+        const crateOverlapsHazard = hazardsList.some(hz => rectsOverlap(toRect(crate), toRect(hz), 14));
+        if (crateOverlapsHazard) continue;
+        if (tryPlace(toRect(crate), occupancy.crates, 12)) {
+          crates.push(crate);
+          cratePlaced = true;
+        }
+      }
+
+      if (!cratePlaced) {
+        occupancy.platforms.length = prevOccPlatforms;
+        occupancy.buttons.length = prevOccButtons;
+        occupancy.crates.length = prevOccCrates;
+        platforms.length = prevPlatforms;
+        buttons.length = prevButtons;
+        crates.length = prevCrates;
+        continue;
+      }
+
+      platforms.push(...extraPlatforms);
       buttons.push(btn);
-      const crate = { id: `crate_${door.id}_${idx}`, x: btn.x - 120, y: groundTop(groundY, groundH) - 140, w: 46, h: 46 };
-      if (tryPlace(toRect(crate), occupancy.crates, 12)) crates.push(crate);
       return;
     }
   };

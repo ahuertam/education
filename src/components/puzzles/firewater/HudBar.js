@@ -22,6 +22,7 @@ const HudBar = ({ seed, difficultyLabel, onPause, onRestart, onNewSeed }) => {
           <LegendItem><LegendSwatch $color="#3CA8FF" />Agua (agua OK)</LegendItem>
           <LegendItem><LegendSwatch $color="#FF3B5C" />Lava mata Agua</LegendItem>
           <LegendItem><LegendSwatch $color="#2D9CDB" />Agua mata Fuego</LegendItem>
+          <LegendItem><LegendSwatch $color="#24304F" />Plataforma móvil</LegendItem>
           <LegendItem><LegendSwatch $color="#2ED47A" />Botón abre puerta</LegendItem>
           <LegendItem><LegendSwatch $color="#8893B5" />Puerta bloquea</LegendItem>
         </LegendRow>
