@@ -271,6 +271,34 @@ export const HudMeta = styled.div`
   opacity: 0.85;
 `;
 
+export const LegendRow = styled.div`
+  margin-top: 0.35rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+`;
+
+export const LegendItem = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  line-height: 1;
+  opacity: 0.95;
+  padding: 0.22rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+`;
+
+export const LegendSwatch = styled.span`
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: ${p => p.$color || '#fff'};
+  display: inline-block;
+`;
+
 export const GameStage = styled.div`
   min-height: 100vh;
   padding-top: 64px;
@@ -285,4 +313,3 @@ export const CanvasPlaceholder = styled.div`
   background: rgba(255, 255, 255, 0.08);
   color: white;
 `;
-

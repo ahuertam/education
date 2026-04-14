@@ -26,11 +26,13 @@ function groundTop(groundY, groundH) {
 }
 
 function safeButtonY({ groundY, groundH, buttonH }) {
-  return groundTop(groundY, groundH) - buttonH / 2;
+  // Keep button slightly embedded in floor so overlap reliably triggers.
+  return groundTop(groundY, groundH) + buttonH / 2 - 2;
 }
 
 function safeHazardY({ groundY, groundH, hazardH }) {
-  return groundTop(groundY, groundH) + hazardH / 2;
+  // Raise hazard to overlap with character feet instead of just touching edge.
+  return groundTop(groundY, groundH) - hazardH / 2 + 6;
 }
 
 function toRect(centerRect) {
