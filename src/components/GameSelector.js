@@ -77,6 +77,8 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         return { title: 'Aprende Inglés', action: 'traduciendo' };
       case 'advanced':
         return { title: 'Avanzado', action: 'desafiando' };
+      case 'puzzles':
+        return { title: 'Puzzles', action: 'resolviendo' };
       default:
         return { title: 'Selecciona un Juego', action: 'jugando' };
     }
@@ -224,6 +226,15 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       description: "Cóme las palabras correctas para formar la frase en inglés.",
       color: "#E67E22",
       categories: ['english']
+    },
+
+    {
+      id: 'firewaterpuzzles',
+      icon: <FaGlobe />,
+      title: "Fuego & Agua (Procedural)",
+      description: "Clon tipo Fireboy & Watergirl: coop local, puertas, botones y niveles por semilla.",
+      color: "#2D9CDB",
+      categories: ['puzzles']
     }
   ];
 

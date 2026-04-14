@@ -11,7 +11,8 @@ import {
   FaPalette,
   FaDivide,
   FaCalculator,
-  FaGlobe
+  FaGlobe,
+  FaPuzzlePiece
 } from 'react-icons/fa';
 
 const LandingContainer = styled.div`
@@ -128,6 +129,13 @@ const Landing = ({ onNavigate }) => {
       title: "Avanzado",
       description: "Retos de lógica y matemáticas para subir de nivel con puzzles más difíciles.",
       color: "#16A085"
+    },
+    {
+      id: 11,
+      icon: <FaPuzzlePiece />,
+      title: "Puzzles",
+      description: "Puzzles cooperativos tipo Fireboy & Watergirl con niveles procedurales por semilla.",
+      color: "#2D9CDB"
     }
   ];
 
@@ -146,7 +154,8 @@ const Landing = ({ onNavigate }) => {
       7: 'shapes',
       8: 'mixed_math',
       9: 'english',
-      10: 'advanced'
+      10: 'advanced',
+      11: 'puzzles'
     };
 
     if (categories[activityId]) {

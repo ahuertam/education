@@ -19,6 +19,7 @@ import HanoiKitchenGame from './components/HanoiKitchenGame';
 import DragonTragonGame from './components/DragonTragonGame';
 import InmnunoDefenderGame from './components/InmnunoDefenderGame';
 import SudokuMathGame from './components/SudokuMathGame';
+import FireWaterPuzzlesGame from './components/FireWaterPuzzlesGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -109,6 +110,10 @@ function App() {
         />;
       case 'sudokumath':
         return <SudokuMathGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'firewaterpuzzles':
+        return <FireWaterPuzzlesGame
           onBack={() => setCurrentView('game-selector')}
         />;
       default:
