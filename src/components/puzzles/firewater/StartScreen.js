@@ -120,8 +120,8 @@ const StartScreen = ({
           <SectionTitle>Reglas rápidas</SectionTitle>
           <Muted>
             El personaje rojo resiste lava y muere en agua. El personaje azul resiste agua y muere en lava.
-            Para ganar, ambos deben llegar a su salida.
-            Hay puertas y botones: a veces uno abre el camino del otro.
+            Para ganar, ambos deben llegar a su salida y recoger sus gemas.
+            Hay puertas, botones, palancas, espejos y láseres: a veces uno abre el camino del otro.
           </Muted>
         </Card>
       </TwoCol>
@@ -162,6 +162,15 @@ const StartScreen = ({
                   {formatKeyLabel(keymap.fire.jump)}
                 </KeyButton>
               </KeyRow>
+              <KeyRow>
+                <Label>Interactuar</Label>
+                <KeyButton
+                  $capturing={capturing?.player === 'fire' && capturing?.action === 'interact'}
+                  onClick={() => setCapturing({ player: 'fire', action: 'interact' })}
+                >
+                  {formatKeyLabel(keymap.fire.interact)}
+                </KeyButton>
+              </KeyRow>
               {conflicts.fire && (
                 <Muted style={{ color: '#FF3B5C' }}>Hay teclas repetidas en Fuego.</Muted>
               )}
@@ -199,6 +208,15 @@ const StartScreen = ({
                   {formatKeyLabel(keymap.water.jump)}
                 </KeyButton>
               </KeyRow>
+              <KeyRow>
+                <Label>Interactuar</Label>
+                <KeyButton
+                  $capturing={capturing?.player === 'water' && capturing?.action === 'interact'}
+                  onClick={() => setCapturing({ player: 'water', action: 'interact' })}
+                >
+                  {formatKeyLabel(keymap.water.interact)}
+                </KeyButton>
+              </KeyRow>
               {conflicts.water && (
                 <Muted style={{ color: '#FF3B5C' }}>Hay teclas repetidas en Agua.</Muted>
               )}
@@ -214,4 +232,3 @@ const StartScreen = ({
 };
 
 export default StartScreen;
-

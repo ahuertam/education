@@ -21,7 +21,7 @@ const errorStyle = {
   color: 'white'
 };
 
-const GameCanvas = ({ seed, difficulty, keymap, paused, onPause, onRestart, onDeath, onComplete }) => {
+const GameCanvas = ({ seed, difficulty, keymap, paused, onPause, onRestart, onDeath, onComplete, onGemChange }) => {
   const containerRef = useRef(null);
   const gameRef = useRef(null);
   const [error, setError] = useState(null);
@@ -52,7 +52,8 @@ const GameCanvas = ({ seed, difficulty, keymap, paused, onPause, onRestart, onDe
       onPause,
       onRestart,
       onDeath,
-      onComplete
+      onComplete,
+      onGemChange
     });
 
     const game = new Phaser.Game({
@@ -84,7 +85,7 @@ const GameCanvas = ({ seed, difficulty, keymap, paused, onPause, onRestart, onDe
         gameRef.current = null;
       }
     };
-  }, [level, keymap, onPause, onRestart, onDeath, onComplete]);
+  }, [level, keymap, onPause, onRestart, onDeath, onComplete, onGemChange]);
 
   useEffect(() => {
     const game = gameRef.current;

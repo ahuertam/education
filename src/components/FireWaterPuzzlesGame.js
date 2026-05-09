@@ -9,17 +9,25 @@ import { createRandomSeed, normalizeSeed } from './puzzles/firewater/seed';
 
 const FireWaterPuzzlesGame = ({ onBack }) => {
   const savedKeymap = useMemo(() => loadKeymap(), []);
+  const defaultKeymap = {
+    fire: { left: 'a', right: 'd', jump: 'w', interact: 'e' },
+    water: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp', interact: 'l' },
+    system: { pause: 'Escape', restart: 'r', help: 'h' }
+  };
   const [phase, setPhase] = useState('start');
   const [difficulty, setDifficulty] = useState('easy');
   const [seed, setSeed] = useState('');
   const [activeSeed, setActiveSeed] = useState('');
   const [runId, setRunId] = useState(0);
+  const [gems, setGems] = useState({ fire: 0, water: 0, total: { fire: 0, water: 0 } });
   const [keymap, setKeymap] = useState(
-    savedKeymap || {
-      fire: { left: 'a', right: 'd', jump: 'w' },
-      water: { left: 'ArrowLeft', right: 'ArrowRight', jump: 'ArrowUp' },
-      system: { pause: 'Escape', restart: 'r', help: 'h' }
-    }
+    savedKeymap
+      ? {
+          fire: { ...defaultKeymap.fire, ...savedKeymap.fire },
+          water: { ...defaultKeymap.water, ...savedKeymap.water },
+          system: { ...defaultKeymap.system, ...savedKeymap.system }
+        }
+      : defaultKeymap
   );
 
   useEffect(() => {
@@ -31,12 +39,14 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
     const finalSeed = normalized.length > 0 ? normalized : createRandomSeed();
     setActiveSeed(finalSeed);
     setPhase('playing');
+    setGems({ fire: 0, water: 0, total: { fire: 0, water: 0 } });
     setRunId(v => v + 1);
   };
 
   const restartSame = () => {
     if (!activeSeed) return;
     setPhase('playing');
+    setGems({ fire: 0, water: 0, total: { fire: 0, water: 0 } });
     setRunId(v => v + 1);
   };
 
@@ -45,6 +55,7 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
     setSeed(s);
     setActiveSeed(s);
     setPhase('playing');
+    setGems({ fire: 0, water: 0, total: { fire: 0, water: 0 } });
     setRunId(v => v + 1);
   };
 
@@ -80,6 +91,7 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
           <HudBar
             seed={activeSeed}
             difficultyLabel={difficultyLabel}
+            gems={gems}
             onPause={onRequestPause}
             onRestart={restartSame}
             onNewSeed={newSeed}
@@ -95,6 +107,7 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
             onRestart={restartSame}
             onDeath={onDeath}
             onComplete={onComplete}
+            onGemChange={setGems}
           />
         </GameStage>
       )}

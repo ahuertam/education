@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
 import QUESTIONS from './data/inmunoDefenderQuestions.json';
@@ -188,6 +188,15 @@ function dist2(ax, ay, bx, by) {
   const dx = ax - bx;
   const dy = ay - by;
   return dx * dx + dy * dy;
+}
+
+function hashStringTo01(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0) / 4294967295;
 }
 
 const InmnunoDefenderGame = ({ onBack }) => {
@@ -393,6 +402,9 @@ const InmnunoDefenderGame = ({ onBack }) => {
   };
 
   const addHelper = () => {
+    if (stateRef.current.helpers.length >= 8) {
+      return false;
+    }
     const idx = stateRef.current.helpers.length;
     const angle = (idx * Math.PI * 2) / Math.max(1, Math.min(8, idx + 1));
     stateRef.current.helpers.push({
@@ -402,6 +414,14 @@ const InmnunoDefenderGame = ({ onBack }) => {
       cooldownUntil: 0
     });
     setHelpersCount(stateRef.current.helpers.length);
+    return true;
+  };
+
+  const removeHelper = () => {
+    if (stateRef.current.helpers.length === 0) return false;
+    stateRef.current.helpers.pop();
+    setHelpersCount(stateRef.current.helpers.length);
+    return true;
   };
 
   const nextQuestion = (fromIndex) => {
@@ -453,16 +473,25 @@ const InmnunoDefenderGame = ({ onBack }) => {
       playSound(correctSoundRef);
       const rewardHelper = Math.random() < 0.5;
       if (rewardHelper) {
-        addHelper();
-        setMessage({ kind: 'good', text: '¡Correcto! Se une un glóbulo blanco ayudante.' });
+        const added = addHelper();
+        if (added) {
+          setMessage({ kind: 'good', text: '¡Correcto! Se une un glóbulo blanco ayudante.' });
+        } else {
+          setScore(s => s + 120);
+          setMessage({ kind: 'good', text: '¡Correcto! +120 puntos (máximo 8 ayudantes).' });
+        }
       } else {
         setScore(s => s + 120);
         setMessage({ kind: 'good', text: '¡Correcto! +120 puntos.' });
       }
     } else {
       playSound(wrongSoundRef);
-      uiRef.current.difficultyFactor *= 1.18;
-      setMessage({ kind: 'bad', text: 'Ups… La siguiente oleada llega más rápida.' });
+      const removed = removeHelper();
+      uiRef.current.difficultyFactor *= 1.12;
+      setMessage({
+        kind: 'bad',
+        text: removed ? 'Ups… Pierdes 1 ayudante.' : 'Ups… Sin ayudantes que perder.'
+      });
     }
 
     setTimeout(() => {
@@ -616,18 +645,68 @@ const InmnunoDefenderGame = ({ onBack }) => {
     if (phase === 'playing') {
       const enemies = stateRef.current.enemies;
       for (const e of enemies) {
-        const vx = player.x - e.x;
-        const vy = player.y - e.y;
-        const m = Math.hypot(vx, vy) || 1;
-        let dx = vx / m;
-        let dy = vy / m;
-        if (e.behavior === 'flee') { dx = -dx; dy = -dy; }
-        e.x += dx * e.speed * (dt / 16.67) * 3.2;
-        e.y += dy * e.speed * (dt / 16.67) * 3.2;
+        const stepFactor = (dt / 16.67) * 3.2;
+        const dxp = e.x - player.x;
+        const dyp = e.y - player.y;
+        const dist = Math.hypot(dxp, dyp) || 1;
+        let dx = dxp / dist;
+        let dy = dyp / dist;
 
-        if (e.behavior === 'flee') {
-          e.x = clamp(e.x, e.r + 10, w - e.r - 10);
-          e.y = clamp(e.y, e.r + 60, h - e.r - 10);
+        if (e.behavior === 'attack') {
+          dx = -dx;
+          dy = -dy;
+        } else {
+          const minX = e.r + 10;
+          const maxX = w - e.r - 10;
+          const minY = e.r + 60;
+          const maxY = h - e.r - 10;
+
+          const desired = 240;
+          const band = 80;
+          const tId = hashStringTo01(e.id);
+          const spin = tId < 0.5 ? -1 : 1;
+          const perpX = -dy * spin;
+          const perpY = dx * spin;
+
+          let mx = 0;
+          let my = 0;
+
+          if (dist < desired) {
+            const boost = 1 + ((desired - dist) / desired) * 1.8;
+            mx += dx * boost;
+            my += dy * boost;
+          } else if (dist > desired + band) {
+            mx += -dx * 0.35;
+            my += -dy * 0.35;
+          } else {
+            mx += perpX * 0.7 + dx * 0.15;
+            my += perpY * 0.7 + dy * 0.15;
+          }
+
+          const edgeMargin = 84;
+          if (e.x < minX + edgeMargin) mx += ((minX + edgeMargin) - e.x) / edgeMargin;
+          if (e.x > maxX - edgeMargin) mx -= (e.x - (maxX - edgeMargin)) / edgeMargin;
+          if (e.y < minY + edgeMargin) my += ((minY + edgeMargin) - e.y) / edgeMargin;
+          if (e.y > maxY - edgeMargin) my -= (e.y - (maxY - edgeMargin)) / edgeMargin;
+
+          const wobble = Math.sin(t * 1.4 + tId * 12.3) * 0.25;
+          mx += perpX * wobble;
+          my += perpY * wobble;
+
+          const mm = Math.hypot(mx, my) || 1;
+          dx = mx / mm;
+          dy = my / mm;
+
+          e.x += dx * e.speed * stepFactor;
+          e.y += dy * e.speed * stepFactor;
+
+          e.x = clamp(e.x, minX, maxX);
+          e.y = clamp(e.y, minY, maxY);
+        }
+
+        if (e.behavior === 'attack') {
+          e.x += dx * e.speed * stepFactor;
+          e.y += dy * e.speed * stepFactor;
         }
 
         const touchD2 = dist2(player.x, player.y, e.x, e.y);
@@ -670,7 +749,8 @@ const InmnunoDefenderGame = ({ onBack }) => {
 
       if (stateRef.current.enemies.length === 0 && !uiRef.current.waveClearHandled) {
         uiRef.current.waveClearHandled = true;
-        addHelper();
+        const added = addHelper();
+        if (!added) setScore(s => s + 60);
         beginQuiz(wave + 1);
       }
     }

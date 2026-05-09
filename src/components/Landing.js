@@ -12,7 +12,8 @@ import {
   FaDivide,
   FaCalculator,
   FaGlobe,
-  FaPuzzlePiece
+  FaPuzzlePiece,
+  FaProjectDiagram
 } from 'react-icons/fa';
 
 const LandingContainer = styled.div`
@@ -110,6 +111,13 @@ const Landing = ({ onNavigate }) => {
       color: "#E91E63"
     },
     {
+      id: 12,
+      icon: <FaProjectDiagram />,
+      title: "Geometría",
+      description: "Área y perímetro: triángulos, rectángulos, paralelogramos y circunferencias con retos y bonus.",
+      color: "#845EF7"
+    },
+    {
       id: 8,
       icon: <FaCalculator />,
       title: "Matemáticas Mixtas",
@@ -152,6 +160,7 @@ const Landing = ({ onNavigate }) => {
       5: 'knowledge',
       6: 'vocabulary',
       7: 'shapes',
+      12: 'geometria',
       8: 'mixed_math',
       9: 'english',
       10: 'advanced',

@@ -1,9 +1,8 @@
-import React from 'react';
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import { 
   FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle, 
-  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe, FaShieldAlt, FaTh 
+  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe, FaShieldAlt, FaTh, FaMapMarkedAlt, FaClock, FaProjectDiagram, FaHourglassHalf
 } from 'react-icons/fa';
 
 const SelectorContainer = styled.div`
@@ -71,6 +70,8 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         return { title: 'Vocabulario', action: 'leyendo' };
       case 'shapes':
         return { title: 'Colores y Formas', action: 'observando' };
+      case 'geometria':
+        return { title: 'Geometría', action: 'midiendo' };
       case 'mixed_math':
         return { title: 'Matemáticas Mixtas', action: 'calculando' };
       case 'english':
@@ -164,6 +165,22 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       categories: ['knowledge']
     },
     {
+      id: 'spainrivers',
+      icon: <FaMapMarkedAlt />,
+      title: "Ríos de España (Mapa)",
+      description: "Localiza 8 ríos principales en el mapa con clic/tap. Incluye modo Rápido y modo Orden.",
+      color: "#1D4ED8",
+      categories: ['knowledge']
+    },
+    {
+      id: 'ylahora',
+      icon: <FaClock />,
+      title: "¿Y la hora?",
+      description: "Aprende a leer la hora y a sumar/restar 15, 30 y 60 minutos con un reloj grande y rondas rápidas.",
+      color: "#F59E0B",
+      categories: ['knowledge']
+    },
+    {
       id: 'inmnunodefender',
       icon: <FaShieldAlt />,
       title: "InmnunoDefender",
@@ -189,6 +206,30 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       color: "#795548",
       categories: ['vocabulary']
     },
+    {
+      id: 'sintaxis',
+      icon: <FaProjectDiagram />,
+      title: "Sintaxis",
+      description: "Detective sintáctico: encuentra verbo, sujeto, predicado y complementos (CD y CI) en oraciones variadas.",
+      color: "#0EA5E9",
+      categories: ['vocabulary']
+    },
+    {
+      id: 'tiemposverbales',
+      icon: <FaHourglassHalf />,
+      title: "Tiempos Verbales",
+      description: "Reto rápido: elige la forma verbal correcta. Al acertar, se abre un mini “portal” motivador.",
+      color: "#FBBF24",
+      categories: ['vocabulary']
+    },
+    {
+      id: 'tiposverbos',
+      icon: <FaBook />,
+      title: "Tipos de Verbos",
+      description: "Clasifica verbos en regulares, irregulares y defectivos. Si fallas, verás la norma y un ejemplo.",
+      color: "#34D399",
+      categories: ['vocabulary']
+    },
 
     // Shape Games
     {
@@ -198,6 +239,14 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       description: "Detén las formas y colores correctos en la portería.",
       color: "#E91E63",
       categories: ['shapes']
+    },
+    {
+      id: 'geometriaMaster',
+      icon: <FaProjectDiagram />,
+      title: "Geometría Master",
+      description: "Ejercicios de geometría (Canal 1) + bonus tipo Flappy por cada acierto.",
+      color: "#845EF7",
+      categories: ['geometria']
     },
 
     // Mixed Math Games

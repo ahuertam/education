@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { GlobalStyle } from './GlobalStyles';
 import './App.css';
 import Landing from './components/Landing';
@@ -20,6 +20,12 @@ import DragonTragonGame from './components/DragonTragonGame';
 import InmnunoDefenderGame from './components/InmnunoDefenderGame';
 import SudokuMathGame from './components/SudokuMathGame';
 import FireWaterPuzzlesGame from './components/FireWaterPuzzlesGame';
+import SpainRiversLocatorGame from './components/SpainRiversLocatorGame';
+import YLaHoraGame from './components/YLaHoraGame';
+import SintaxisGame from './components/SintaxisGame';
+import TiemposVerbalesGame from './components/TiemposVerbalesGame';
+import TiposDeVerbosGame from './components/TiposDeVerbosGame';
+import GeometriaMasterGame from './components/GeometriaMasterGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -88,6 +94,14 @@ function App() {
         return <KnowledgeTowerGame 
           onBack={() => setCurrentView('game-selector')} 
         />;
+      case 'spainrivers':
+        return <SpainRiversLocatorGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'ylahora':
+        return <YLaHoraGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
       case 'inmnunodefender':
         return <InmnunoDefenderGame
           onBack={() => setCurrentView('game-selector')}
@@ -95,6 +109,10 @@ function App() {
       case 'shapegoalkeeper':
         return <ShapeGoalkeeperGame 
           onBack={() => setCurrentView('game-selector')} 
+        />;
+      case 'geometriaMaster':
+        return <GeometriaMasterGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       case 'kitchen':
         return <KitchenGame 
@@ -114,6 +132,18 @@ function App() {
         />;
       case 'firewaterpuzzles':
         return <FireWaterPuzzlesGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'sintaxis':
+        return <SintaxisGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'tiemposverbales':
+        return <TiemposVerbalesGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'tiposverbos':
+        return <TiposDeVerbosGame
           onBack={() => setCurrentView('game-selector')}
         />;
       default:

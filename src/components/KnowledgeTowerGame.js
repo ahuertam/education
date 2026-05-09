@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { FaArrowLeft } from 'react-icons/fa';
 import Matter from 'matter-js';
 import QUESTIONS from './data/knowledgeTowerQuestions.json';
@@ -91,6 +91,21 @@ const KnowledgeTowerGame = ({ onBack }) => {
     }
   };
 
+  const shuffleAnswersForQuestion = (question) => {
+    if (!question || !Array.isArray(question.a) || typeof question.correct !== 'number') return question;
+    const tagged = question.a.map((text, originalIndex) => ({ text, originalIndex }));
+    shuffleInPlace(tagged);
+    const newAnswers = tagged.map(item => item.text);
+    const newCorrect = tagged.findIndex(item => item.originalIndex === question.correct);
+    return { ...question, a: newAnswers, correct: newCorrect };
+  };
+
+  const buildRandomizedQuestions = (rawQuestions) => {
+    const list = rawQuestions.map(q => shuffleAnswersForQuestion({ ...q, a: [...q.a] }));
+    shuffleInPlace(list);
+    return list;
+  };
+
   const startGame = (categoryId, blocksToWin = 10) => {
     // Try to start background music if it was blocked by browser autoplay policy
     if (bgMusicRef.current && bgMusicRef.current.paused) {
@@ -111,10 +126,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
       gameQuestions = [...QUESTIONS[categoryId]];
     }
     
-    // Shuffle questions (Fisher-Yates)
-    shuffleInPlace(gameQuestions);
-    
-    setQuestions(gameQuestions);
+    setQuestions(buildRandomizedQuestions(gameQuestions));
     setCurrentQuestionIndex(0);
     setScore(0);
     setBlocksStacked(0);
@@ -186,8 +198,6 @@ const KnowledgeTowerGame = ({ onBack }) => {
     Events.on(engine, 'afterUpdate', () => {
       if (gameEnded) return; // Don't check if game already ended
       
-      const bodies = Matter.Composite.allBodies(engine.world);
-      
       // Check each block (not the ground)
       for (let i = 0; i < blocksRef.current.length; i++) {
         const block = blocksRef.current[i];
@@ -201,7 +211,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
             crashSoundRef.current.currentTime = 0;
             crashSoundRef.current.play().catch(e => console.log("Sound play failed", e));
           }
-          endGame(false);
+          endGame();
           return;
         }
         
@@ -213,7 +223,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
             crashSoundRef.current.currentTime = 0;
             crashSoundRef.current.play().catch(e => console.log("Sound play failed", e));
           }
-          endGame(false);
+          endGame();
           return;
         }
       }
@@ -250,7 +260,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
             successSoundRef.current.playbackRate = 1.0;
             successSoundRef.current.play().catch(e => console.log(e));
           }
-          endGame(true);
+          endGame();
         } else {
           nextQuestion();
         }
@@ -353,14 +363,12 @@ const KnowledgeTowerGame = ({ onBack }) => {
       const next = i + 1;
       if (next < questions.length) return next;
       if (questions.length === 0) return 0;
-      const reshuffled = [...questions];
-      shuffleInPlace(reshuffled);
-      setQuestions(reshuffled);
+      setQuestions(buildRandomizedQuestions(questions));
       return 0;
     });
   };
 
-  const endGame = (won) => {
+  const endGame = () => {
     setGameState('gameover');
     setFeedback({ show: false, isCorrect: false, message: '' });
     

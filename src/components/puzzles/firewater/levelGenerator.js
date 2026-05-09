@@ -380,6 +380,11 @@ export function generateLevel({ seed, difficulty }) {
   const doors = [];
   const buttons = [];
   const crates = [];
+  const collectibles = [];
+  const levers = [];
+  const mirrors = [];
+  const laserEmitters = [];
+  const laserSensors = [];
 
   const chunkCount = pickRange(rng, cfg.chunkCount);
   const desiredHazards = pickRange(rng, cfg.hazards);
@@ -493,11 +498,11 @@ export function generateLevel({ seed, difficulty }) {
     if (tryPlace(toRect(p), occupancy.platforms, 10)) platforms.push(p);
   }
 
-  const mainDoor = { id: 'door_main', x: gateX, y: gateY - 10, w: 84, h: 98, open: false };
+  const mainDoor = { id: 'door_main', x: gateX, y: gateY - 10, w: 84, h: 98, open: false, activation: 'button' };
   if (tryPlace(toRect(mainDoor), occupancy.doors, 14)) doors.push(mainDoor);
 
   if (cfg.extraDoor) {
-    const door2 = { id: 'door_side', x: gateX + 180, y: gateY - 10, w: 84, h: 98, open: false };
+    const door2 = { id: 'door_side', x: gateX + 180, y: gateY - 10, w: 84, h: 98, open: false, activation: 'button' };
     if (tryPlace(toRect(door2), occupancy.doors, 14)) doors.push(door2);
   }
 
@@ -593,6 +598,211 @@ export function generateLevel({ seed, difficulty }) {
   const width = Math.max(2400, Math.floor(gateX + 900));
   platforms.unshift({ id: 'ground', x: width / 2, y: groundY, w: width, h: groundH, kind: 'solid' });
 
+  const topY = Math.max(140, groundTop(groundY, groundH) - 620);
+  const midY = Math.max(220, groundTop(groundY, groundH) - 360);
+  const laneYs = [midY, topY];
+
+  let segId = 0;
+  for (const laneY of laneYs) {
+    let x = 260;
+    const maxX = width - 720;
+    while (x < maxX) {
+      const segW = rngInt(rng, 260, 540);
+      const gap = rngInt(rng, 120, 220);
+      const wSeg = Math.min(segW, maxX - x);
+      const material = rng() < 0.28 ? 'ice' : 'stone';
+      const p = { id: `lane_${segId}`, x: x + wSeg / 2, y: laneY, w: wSeg, h: 20, kind: 'solid', material };
+      if (tryPlace(toRect(p), occupancy.platforms, 10)) platforms.push(p);
+
+      if (rng() < 0.25) {
+        const lift = {
+          id: `lift_${segId}`,
+          x: x + wSeg + Math.floor(gap / 2),
+          y: laneY + 120,
+          w: 160,
+          h: 18,
+          kind: 'moving',
+          axis: 'y',
+          vy: rng() < 0.5 ? 120 : -120,
+          rangeY: rngInt(rng, 140, 260)
+        };
+        if (tryPlace(toRect(lift), occupancy.platforms, 14)) platforms.push(lift);
+      }
+
+      if (rng() < 0.22) {
+        const rise = rngInt(rng, 220, 520);
+        const stepCount = Math.max(3, Math.min(7, Math.round(rise / 85)));
+        for (let i = 0; i < stepCount; i += 1) {
+          const t = (i + 1) / (stepCount + 1);
+          const stair = {
+            id: `stair_extra_${segId}_${i}`,
+            x: x + 80 + (i + 1) * 95,
+            y: laneY + Math.round(rise * t),
+            w: 150,
+            h: 20,
+            kind: 'solid'
+          };
+          if (tryPlace(toRect(stair), occupancy.platforms, 10)) platforms.push(stair);
+        }
+      }
+
+      x += wSeg + gap;
+      segId += 1;
+    }
+  }
+
+  const roomBands = [
+    { floor: groundTop(groundY, groundH), ceiling: midY - 130 },
+    { floor: midY, ceiling: topY - 120 }
+  ];
+  for (let i = 0; i < roomBands.length; i += 1) {
+    const band = roomBands[i];
+    let x = 220;
+    while (x < width - 420) {
+      const roomW = rngInt(rng, 320, 560);
+      const wallW = 26;
+      const leftWall = {
+        id: `room_left_${i}_${x}`,
+        x,
+        y: (band.floor + band.ceiling) / 2,
+        w: wallW,
+        h: Math.max(140, band.floor - band.ceiling),
+        kind: 'solid',
+        material: 'stone'
+      };
+      const ceiling = {
+        id: `room_ceiling_${i}_${x}`,
+        x: x + roomW / 2,
+        y: band.ceiling,
+        w: roomW,
+        h: 20,
+        kind: 'solid',
+        material: 'stone'
+      };
+      if (tryPlace(toRect(leftWall), occupancy.platforms, 8)) platforms.push(leftWall);
+      if (tryPlace(toRect(ceiling), occupancy.platforms, 8)) platforms.push(ceiling);
+      x += roomW + rngInt(rng, 160, 260);
+    }
+  }
+
+  const leverDoor = {
+    id: 'door_lever',
+    x: Math.max(920, gateX - 720),
+    y: midY - 42,
+    w: 84,
+    h: 98,
+    open: false,
+    activation: 'lever'
+  };
+  if (tryPlace(toRect(leverDoor), occupancy.doors, 12)) {
+    const lever = {
+      id: 'lever_mid',
+      x: leverDoor.x - 260,
+      y: topY - 14,
+      w: 40,
+      h: 28,
+      doorId: leverDoor.id
+    };
+    const leverShelf = {
+      id: 'lever_shelf',
+      x: lever.x,
+      y: topY,
+      w: 180,
+      h: 20,
+      kind: 'solid',
+      material: 'stone'
+    };
+    if (tryPlace(toRect(leverShelf), occupancy.platforms, 8) && tryPlace(toRect(lever), occupancy.buttons, 8)) {
+      doors.push(leverDoor);
+      platforms.push(leverShelf);
+      levers.push(lever);
+    } else {
+      occupancy.doors.pop();
+    }
+  }
+
+  const laserDoor = {
+    id: 'door_laser',
+    x: Math.max(1180, gateX - 420),
+    y: topY - 42,
+    w: 84,
+    h: 98,
+    open: false,
+    activation: 'laser'
+  };
+  if (tryPlace(toRect(laserDoor), occupancy.doors, 12)) {
+    const emitter = {
+      id: 'laser_emit_0',
+      x: Math.max(520, gateX - 1120),
+      y: topY - 70,
+      direction: 'right'
+    };
+    const mirrorA = {
+      id: 'mirror_a',
+      x: emitter.x + 260,
+      y: topY - 70,
+      orientation: '/'
+    };
+    const mirrorB = {
+      id: 'mirror_b',
+      x: emitter.x + 260,
+      y: midY - 110,
+      orientation: '\\'
+    };
+    const mirrorShelf = {
+      id: 'mirror_shelf',
+      x: emitter.x + 260,
+      y: topY,
+      w: 220,
+      h: 20,
+      kind: 'solid',
+      material: 'stone'
+    };
+    const sensorShelf = {
+      id: 'sensor_shelf',
+      x: laserDoor.x - 120,
+      y: midY,
+      w: 200,
+      h: 20,
+      kind: 'solid',
+      material: 'stone'
+    };
+    const sensor = {
+      id: 'laser_sensor_0',
+      x: laserDoor.x - 120,
+      y: midY - 22,
+      w: 40,
+      h: 44,
+      doorId: laserDoor.id
+    };
+    if (
+      tryPlace(toRect(mirrorShelf), occupancy.platforms, 8) &&
+      tryPlace(toRect(sensorShelf), occupancy.platforms, 8) &&
+      tryPlace({ x: mirrorA.x, y: mirrorA.y, w: 36, h: 36 }, occupancy.buttons, 8) &&
+      tryPlace({ x: mirrorB.x, y: mirrorB.y, w: 36, h: 36 }, occupancy.buttons, 8) &&
+      tryPlace(toRect(sensor), occupancy.buttons, 8)
+    ) {
+      doors.push(laserDoor);
+      platforms.push(mirrorShelf, sensorShelf);
+      laserEmitters.push(emitter);
+      mirrors.push(mirrorA, mirrorB);
+      laserSensors.push(sensor);
+    } else {
+      occupancy.doors.pop();
+    }
+  }
+
+  const gemCount = difficulty === 'hard' ? rngInt(rng, 10, 16) : difficulty === 'medium' ? rngInt(rng, 8, 12) : rngInt(rng, 6, 10);
+  for (let i = 0; i < gemCount; i += 1) {
+    const owner = i % 2 === 0 ? 'fire' : 'water';
+    const laneY = rngPick(rng, [groundTop(groundY, groundH) - 40, midY - 30, topY - 30]);
+    const x = rngInt(rng, 320, width - 520);
+    const gem = { id: `gem_${owner}_${i}`, x, y: laneY, w: 18, h: 18, owner, kind: 'gem' };
+    const overlapsHazard = hazardsList.some(hz => rectsOverlap(toRect(gem), toRect(hz), 16));
+    if (overlapsHazard) continue;
+    collectibles.push(gem);
+  }
+
   const exits = {
     fire: { x: width - 260, y: gateY - 40, w: 56, h: 86 },
     water: { x: width - 180, y: gateY - 40, w: 56, h: 86 }
@@ -608,6 +818,11 @@ export function generateLevel({ seed, difficulty }) {
     doors,
     buttons,
     crates,
+    levers,
+    mirrors,
+    laserEmitters,
+    laserSensors,
+    collectibles,
     exits
   };
 }
