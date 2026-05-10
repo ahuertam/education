@@ -144,6 +144,7 @@ const FlappyBonusLevel = ({
   });
 
   const [, force] = useState(0);
+  const uiRef = useRef({ phase: 'ready', score: 0 });
 
   const reset = useCallback(() => {
     finishedRef.current = false;
@@ -155,6 +156,7 @@ const FlappyBonusLevel = ({
       spawnT: 0,
       score: 0,
     };
+    uiRef.current = { phase: 'ready', score: 0 };
     lastTRef.current = 0;
     force(v => v + 1);
   }, [config.height]);
@@ -171,7 +173,11 @@ const FlappyBonusLevel = ({
   const flap = useCallback(() => {
     const s = stateRef.current;
     if (s.phase === 'over') return;
-    if (s.phase === 'ready') s.phase = 'playing';
+    if (s.phase === 'ready') {
+      s.phase = 'playing';
+      uiRef.current.phase = 'playing';
+      force(v => v + 1);
+    }
     s.vy = config.jumpV;
   }, [config.jumpV]);
 
@@ -331,6 +337,10 @@ const FlappyBonusLevel = ({
     draw();
 
     const s = stateRef.current;
+    if (uiRef.current.phase !== s.phase || uiRef.current.score !== s.score) {
+      uiRef.current = { phase: s.phase, score: s.score };
+      force(v => v + 1);
+    }
     if (s.phase === 'over') {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
