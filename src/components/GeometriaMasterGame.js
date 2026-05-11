@@ -132,6 +132,15 @@ const Input = styled.input`
   font-size: 1.05rem;
 `;
 
+const UnitTag = styled.div`
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 900;
+  white-space: nowrap;
+`;
+
 const PrimaryButton = styled(Button)`
   background: #4dabf7;
   border-color: rgba(0, 0, 0, 0.12);
@@ -227,9 +236,44 @@ const RankDate = styled.div`
   font-size: 0.92rem;
 `;
 
+function buildNumberMaskVariants(n) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return [];
+  const variants = new Set();
+  const add = (s) => {
+    if (!s) return;
+    variants.add(s);
+    variants.add(s.replace('.', ','));
+  };
+  add(String(v));
+  add(String(Math.round(v)));
+  add(v.toFixed(1));
+  add(v.toFixed(2));
+  add(v.toFixed(3));
+  return Array.from(variants).sort((a, b) => b.length - a.length);
+}
+
+function maskAnswerInText(text, answer, unit) {
+  if (!text) return '';
+  let out = String(text);
+  const variants = buildNumberMaskVariants(answer);
+  for (const v of variants) out = out.split(v).join('▢▢▢');
+  if (unit) out = out.split(String(unit)).join(String(unit));
+  return out;
+}
+
+function getResultText(ex) {
+  if (!ex) return '';
+  if (ex.kind === 'number') return `${ex.answer}${ex.unit ? ` ${ex.unit}` : ''}`;
+  if (ex.kind === 'choice') return Array.isArray(ex.options) ? String(ex.options[ex.correctIndex] ?? '') : '';
+  return '';
+}
+
 function normalizeNumberInput(raw) {
   if (typeof raw !== 'string') return '';
-  return raw.replace(/\s+/g, '').replace(',', '.');
+  const cleaned = raw.replace(/\s+/g, '').replace(',', '.');
+  const m = cleaned.match(/[-+]?\d+(?:\.\d+)?/);
+  return m ? m[0] : '';
 }
 
 function isCorrectNumber(value, answer, tol) {
@@ -257,6 +301,7 @@ const GeometriaMasterGame = ({ onBack }) => {
   const [ranking, setRanking] = useState(() => loadGameRanking(gameKey));
   const bestStreakThisRunRef = useRef(0);
   const runRecordedRef = useRef(false);
+  const revealPenaltyRef = useRef(new Set());
   const [bonusMeta, setBonusMeta] = useState(null);
   const [lastBaseAward, setLastBaseAward] = useState(0);
 
@@ -277,7 +322,8 @@ const GeometriaMasterGame = ({ onBack }) => {
     setLastBaseAward(0);
     bestStreakThisRunRef.current = 0;
     runRecordedRef.current = false;
-  }, []);
+    revealPenaltyRef.current = new Set();
+  }, [setRunSeed]);
 
   useEffect(() => {
     if (streak > bestStreakThisRunRef.current) bestStreakThisRunRef.current = streak;
@@ -315,6 +361,11 @@ const GeometriaMasterGame = ({ onBack }) => {
     }
 
     if (!ok) {
+      const resultText = getResultText(ex);
+      const explanationMasked = ex.kind === 'number'
+        ? maskAnswerInText(ex.explanation, ex.answer, ex.unit)
+        : (ex.explanation ? String(ex.explanation).split(resultText).join('▢▢▢') : '');
+
       let hint = null;
       if (ex.kind === 'number' && Number.isFinite(numValue) && ex?.meta?.topic) {
         const a = Number(ex.answer);
@@ -373,7 +424,10 @@ const GeometriaMasterGame = ({ onBack }) => {
           ? 'No es correcto. Revisa el planteamiento y vuelve a intentarlo.'
           : (hint || 'No coincide. Comprueba fórmula, unidades y el valor de π (3,14).'),
         concept: ex.concept,
-        explanation: ex.explanation,
+        explanation: explanationMasked,
+        resultText,
+        exerciseId: ex.id,
+        revealed: false,
       });
       setStreak(0);
       setWrongAttempts(a => a + 1);
@@ -393,6 +447,21 @@ const GeometriaMasterGame = ({ onBack }) => {
     setBonusMeta(null);
     setPhase('flappy');
   }, [choiceIdx, computeBaseAward, ex, input]);
+
+  const revealResult = useCallback(() => {
+    setFeedback(prev => {
+      if (!prev || prev.type !== 'bad') return prev;
+      if (prev.revealed) return prev;
+      return { ...prev, revealed: true };
+    });
+    setPoints(p => {
+      const exId = feedback?.exerciseId;
+      if (!exId) return p;
+      if (revealPenaltyRef.current.has(exId)) return p;
+      revealPenaltyRef.current.add(exId);
+      return Math.max(0, p - 25);
+    });
+  }, [feedback?.exerciseId]);
 
   const continueAfterBonus = useCallback(() => {
     const nextIdx = idx + 1;
@@ -500,16 +569,17 @@ const GeometriaMasterGame = ({ onBack }) => {
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder={ex.unit ? `Respuesta en ${ex.unit}` : 'Escribe tu respuesta'}
+                    placeholder="Escribe solo el número"
                     inputMode="decimal"
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') submit();
                     }}
                   />
+                  {ex.unit && <UnitTag>{ex.unit}</UnitTag>}
                   <PrimaryButton type="button" onClick={submit}>Comprobar</PrimaryButton>
                 </AnswerRow>
-                {ex.unit && <SubTitle style={{ marginTop: 10 }}>Unidad esperada: {ex.unit}</SubTitle>}
+                {ex.unit && <SubTitle style={{ marginTop: 10 }}>Unidad: {ex.unit} (no hace falta escribirla)</SubTitle>}
               </>
             ) : (
               <>
@@ -540,6 +610,17 @@ const GeometriaMasterGame = ({ onBack }) => {
                   </div>
                 )}
                 {feedback.explanation && <div style={{ marginTop: 6, opacity: 0.9 }}>{feedback.explanation}</div>}
+                {feedback.type === 'bad' && feedback.resultText && (
+                  <div style={{ marginTop: 10, display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                    {!feedback.revealed ? (
+                      <>
+                        <SecondaryButton type="button" onClick={revealResult}>Revelar resultado (-25 pts)</SecondaryButton>
+                      </>
+                    ) : (
+                      <div style={{ fontWeight: 900 }}>Resultado: {feedback.resultText}</div>
+                    )}
+                  </div>
+                )}
               </Feedback>
             )}
           </ExerciseCard>
@@ -580,9 +661,6 @@ const GeometriaMasterGame = ({ onBack }) => {
       {phase === 'flappy' && (
         <Overlay>
           <OverlayPanel>
-            <Title style={{ marginBottom: 6 }}>Nivel bonus</Title>
-            <SubTitle>Pasa tuberías para sumar puntos extra (se añade encima de los puntos del ejercicio).</SubTitle>
-            <div style={{ height: 14 }} />
             <FlappyBonusLevel onFinish={handleBonusFinish} onSkip={handleSkipBonus} />
           </OverlayPanel>
         </Overlay>

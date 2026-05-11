@@ -79,10 +79,10 @@ function uniqueId(prefix, used, base) {
   return id;
 }
 
-function buildFixedExercises(used) {
-  const out = [];
+function buildFixedExercises(rng, used) {
+  const pool = [];
 
-  out.push(makeChoiceExercise({
+  pool.push(makeChoiceExercise({
     id: uniqueId('c1', used, 'concept-pi'),
     prompt: '¿Qué representa π (pi) en una circunferencia?',
     options: [
@@ -96,28 +96,35 @@ function buildFixedExercises(used) {
     meta: { topic: 'circle', subtype: 'pi' },
   }));
 
-  out.push(makeChoiceExercise({
-    id: uniqueId('c1', used, 'concept-radio-diametro'),
-    prompt: 'Si el diámetro de un círculo es 20 cm, ¿cuánto mide su radio?',
-    options: ['5 cm', '10 cm', '20 cm'],
+  const d0 = randInt(rng, 8, 40);
+  const d = d0 % 2 === 0 ? d0 : d0 + 1;
+  const r = d / 2;
+  pool.push(makeChoiceExercise({
+    id: uniqueId('c1', used, `concept-radio-diametro-${d}`),
+    prompt: `Si el diámetro de un círculo es ${d} cm, ¿cuánto mide su radio?`,
+    options: [`${Math.max(1, r - 2)} cm`, `${r} cm`, `${d} cm`],
     correctIndex: 1,
     concept: 'El radio es la mitad del diámetro: r = d/2.',
-    explanation: 'd = 20 → r = 10.',
-    meta: { topic: 'circle', subtype: 'radiusFromDiameter' },
+    explanation: `d = ${d} → r = ${r}.`,
+    meta: { topic: 'circle', subtype: 'radiusFromDiameter', d, r },
   }));
 
-  out.push(makeNumberExercise({
-    id: uniqueId('c1', used, 'jardin-libre'),
-    prompt: 'Un jardín rectangular mide 32 m por 18 m. Dentro hay una casa de 12 m por 9 m y una piscina de 8 m por 4 m. ¿Cuál es el área del jardín libre? (resta casa y piscina)',
-    answer: 436,
-    tolerance: 0,
-    unit: 'm²',
-    concept: 'En áreas compuestas: área libre = área total − áreas ocupadas.',
-    explanation: 'Área total: 32·18 = 576. Casa: 12·9 = 108. Piscina: 8·4 = 32. Libre: 576 - 108 - 32 = 436 m².',
-    meta: { topic: 'composite', subtype: 'subtractRectangles' },
+  const factor = pick(rng, [2, 3]);
+  pool.push(makeChoiceExercise({
+    id: uniqueId('c1', used, `escalado-radio-area-x${factor}`),
+    prompt: `Si multiplicas el radio de un círculo por ${factor}, ¿qué ocurre con su área?`,
+    options: [
+      `Se multiplica por ${factor}`,
+      `Se multiplica por ${factor * factor}`,
+      `Se multiplica por ${factor + factor}`,
+    ],
+    correctIndex: 1,
+    concept: 'A = π·r²: si r se multiplica por k, el área se multiplica por k².',
+    explanation: `Como r está al cuadrado, el factor pasa a ${factor}² = ${factor * factor}.`,
+    meta: { topic: 'circle', subtype: 'areaScaling', factor },
   }));
 
-  out.push(makeChoiceExercise({
+  pool.push(makeChoiceExercise({
     id: uniqueId('c1', used, 'altura-paralelogramo'),
     prompt: 'En un paralelogramo, ¿qué es la altura respecto a una base?',
     options: [
@@ -131,7 +138,7 @@ function buildFixedExercises(used) {
     meta: { topic: 'parallelogram', subtype: 'heightDefinition' },
   }));
 
-  out.push(makeChoiceExercise({
+  pool.push(makeChoiceExercise({
     id: uniqueId('c1', used, 'alturas-paralelogramo'),
     prompt: 'En un paralelogramo, ¿todas las alturas miden lo mismo?',
     options: [
@@ -145,42 +152,7 @@ function buildFixedExercises(used) {
     meta: { topic: 'parallelogram', subtype: 'heightsVary' },
   }));
 
-  out.push(makeChoiceExercise({
-    id: uniqueId('c1', used, 'escalado-radio-area'),
-    prompt: 'Si duplicas el radio de un círculo, ¿qué ocurre con su área?',
-    options: ['Se duplica', 'Se triplica', 'Se cuadruplica'],
-    correctIndex: 2,
-    concept: 'A = π·r²: si r se multiplica por 2, A se multiplica por 2² = 4.',
-    explanation: 'Al duplicar r: A nueva = π·(2r)² = 4·π·r².',
-    meta: { topic: 'circle', subtype: 'areaScaling' },
-  }));
-
-  out.push(makeChoiceExercise({
-    id: uniqueId('c1', used, 'escuadra-triangulo'),
-    prompt: 'Una escuadra típica (de dibujo) tiene forma de…',
-    options: [
-      'Triángulo equilátero (tres lados iguales)',
-      'Triángulo isósceles rectángulo (45°-45°-90°)',
-      'Triángulo escaleno (tres lados distintos)',
-    ],
-    correctIndex: 1,
-    concept: 'La escuadra suele ser un triángulo rectángulo con dos catetos iguales (45°-45°-90°).',
-    explanation: 'Por eso se llama isósceles rectángulo: tiene un ángulo recto y dos lados iguales.',
-    meta: { topic: 'triangle', subtype: 'setSquare' },
-  }));
-
-  out.push(makeNumberExercise({
-    id: uniqueId('c1', used, 'linea-semicirc'),
-    prompt: 'Una línea está formada por 3 semicircunferencias iguales de diámetro 10 cm. ¿Cuál es su longitud total? Usa π = 3,14.',
-    answer: round2(3 * (PI * 10) / 2),
-    tolerance: 0.2,
-    unit: 'cm',
-    concept: 'Longitud de una semicircunferencia: L = (π·d)/2.',
-    explanation: `Cada semicircunferencia mide (3,14·10)/2 = 15,7 cm. Total: 3·15,7 = ${round2(3 * (PI * 10) / 2)} cm.`,
-    meta: { topic: 'circle', subtype: 'semicircleLength', d: 10 },
-  }));
-
-  out.push(makeChoiceExercise({
+  pool.push(makeChoiceExercise({
     id: uniqueId('c1', used, 'corona-formula'),
     prompt: '¿Cómo se calcula el área de una corona circular (un “anillo”)?',
     options: [
@@ -194,18 +166,22 @@ function buildFixedExercises(used) {
     meta: { topic: 'annulus', subtype: 'formula' },
   }));
 
-  out.push(makeNumberExercise({
-    id: uniqueId('c1', used, 'figura-compuesta-ejemplo'),
-    prompt: 'Una figura amarilla se descompone en 2 rectángulos de área 4 cm² y 4 cm², pero tiene un hueco cuadrado de 1 cm². ¿Cuál es el área de la figura?',
-    answer: 7,
-    tolerance: 0,
-    unit: 'cm²',
-    concept: 'Área compuesta: suma áreas y resta el hueco (o lo que se recorta).',
-    explanation: 'Área total = 4 + 4 − 1 = 7 cm².',
-    meta: { topic: 'composite', subtype: 'addAndSubtract' },
+  pool.push(makeChoiceExercise({
+    id: uniqueId('c1', used, 'escuadra-triangulo'),
+    prompt: 'Una escuadra típica (de dibujo) tiene forma de…',
+    options: [
+      'Triángulo equilátero (tres lados iguales)',
+      'Triángulo isósceles rectángulo (45°-45°-90°)',
+      'Triángulo escaleno (tres lados distintos)',
+    ],
+    correctIndex: 1,
+    concept: 'La escuadra suele ser un triángulo rectángulo con dos catetos iguales (45°-45°-90°).',
+    explanation: 'Por eso se llama isósceles rectángulo: tiene un ángulo recto y dos lados iguales.',
+    meta: { topic: 'triangle', subtype: 'setSquare' },
   }));
 
-  return out;
+  shuffleInPlace(rng, pool);
+  return pool.slice(0, 6);
 }
 
 function templateCircleArea(rng, used) {
@@ -541,7 +517,7 @@ export const buildGeometriaMasterChannel1 = (seed, { count = 24 } = {}) => {
   const used = new Set();
   const out = [];
 
-  const fixed = buildFixedExercises(used);
+  const fixed = buildFixedExercises(rng, used);
   out.push(...fixed);
 
   const factories = [
@@ -567,10 +543,8 @@ export const buildGeometriaMasterChannel1 = (seed, { count = 24 } = {}) => {
     out.push(ex);
   }
 
-  const fixedCount = fixed.length;
-  const rest = out.slice(fixedCount);
-  shuffleInPlace(rng, rest);
-  return [...fixed, ...rest].slice(0, count);
+  shuffleInPlace(rng, out);
+  return out.slice(0, count);
 };
 
 export const GEOMETRIA_MASTER_CHANNEL_1 = buildGeometriaMasterChannel1('default');

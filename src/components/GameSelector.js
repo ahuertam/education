@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import { 
   FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle, 
-  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe, FaShieldAlt, FaTh, FaMapMarkedAlt, FaClock, FaProjectDiagram, FaHourglassHalf
+  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe, FaShieldAlt, FaTh, FaMapMarkedAlt, FaClock, FaProjectDiagram, FaHourglassHalf, FaBolt
 } from 'react-icons/fa';
 
 const SelectorContainer = styled.div`
@@ -152,6 +152,14 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       title: "Carrera de Coches",
       description: `¡Acelera respondiendo correctamente ${info.action}!`,
       color: "#E74C3C",
+      categories: ['addition', 'subtraction', 'multiplication', 'division']
+    },
+    {
+      id: 'pokemonmaths',
+      icon: <FaBolt />,
+      title: "PokemonMaths",
+      description: `Usa cartas Pokémon para resolver operaciones ${info.action}. Sin repetir preguntas y con ranking local.`,
+      color: "#FBBF24",
       categories: ['addition', 'subtraction', 'multiplication', 'division']
     },
     

@@ -26,6 +26,8 @@ import SintaxisGame from './components/SintaxisGame';
 import TiemposVerbalesGame from './components/TiemposVerbalesGame';
 import TiposDeVerbosGame from './components/TiposDeVerbosGame';
 import GeometriaMasterGame from './components/GeometriaMasterGame';
+import SupportFab from './components/SupportFab';
+import PokemonMathsGame from './components/PokemonMathsGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -146,6 +148,11 @@ function App() {
         return <TiposDeVerbosGame
           onBack={() => setCurrentView('game-selector')}
         />;
+      case 'pokemonmaths':
+        return <PokemonMathsGame
+          onBack={() => setCurrentView('game-selector')}
+          operation={selectedOperation}
+        />;
       default:
         return <Landing onNavigate={handleNavigate} />;
     }
@@ -155,6 +162,9 @@ function App() {
     <div className="App">
       <GlobalStyle />
       {renderView()}
+      {currentView !== 'landing' && currentView !== 'game-selector' && (
+        <SupportFab gameId={currentView} operation={selectedOperation} />
+      )}
     </div>
   );
 }

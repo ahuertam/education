@@ -333,7 +333,7 @@ function buildQuestion({ mode, step, op }) {
   };
 }
 
-function AnalogClock({ time }) {
+function AnalogClock({ time, showNumbers = false }) {
   const size = 320;
   const cx = size / 2;
   const cy = size / 2;
@@ -357,9 +357,23 @@ function AnalogClock({ time }) {
     ticks.push({ outer, inner, key: i });
   }
 
+  const numbers = [];
+  if (showNumbers) {
+    for (let i = 1; i <= 12; i++) {
+      const a = i * 30 - 90;
+      const p = toPoint(a, radius - 38);
+      numbers.push({ value: i, x: p.x, y: p.y, key: `n-${i}` });
+    }
+  }
+
   return (
     <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
       <svg width="100%" viewBox={`0 0 ${size} ${size}`} role="img" aria-label={`Reloj marcando ${formatTime(time)}`} style={{ maxWidth: 360 }}>
+        <defs>
+          <filter id="clockHandShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="2" stdDeviation="1.5" floodColor="rgba(15,23,42,0.45)" />
+          </filter>
+        </defs>
         <circle cx={cx} cy={cy} r={radius + 14} fill="rgba(255,255,255,0.14)" />
         <circle cx={cx} cy={cy} r={radius + 4} fill="#ffffff" stroke="#334155" strokeWidth="4" />
         {ticks.map(t => (
@@ -374,9 +388,31 @@ function AnalogClock({ time }) {
             strokeLinecap="round"
           />
         ))}
-        <line x1={cx} y1={cy} x2={hourEnd.x} y2={hourEnd.y} stroke="#0f172a" strokeWidth="8" strokeLinecap="round" />
-        <line x1={cx} y1={cy} x2={minuteEnd.x} y2={minuteEnd.y} stroke="#2563eb" strokeWidth="6" strokeLinecap="round" />
-        <circle cx={cx} cy={cy} r="8" fill="#0f172a" />
+        {numbers.map(n => (
+          <text
+            key={n.key}
+            x={n.x}
+            y={n.y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize="18"
+            fontWeight="900"
+            fill="#0f172a"
+            stroke="rgba(255,255,255,0.92)"
+            strokeWidth="4"
+            paintOrder="stroke"
+          >
+            {n.value}
+          </text>
+        ))}
+        <g filter="url(#clockHandShadow)">
+          <line x1={cx} y1={cy} x2={hourEnd.x} y2={hourEnd.y} stroke="rgba(255,255,255,0.92)" strokeWidth="14" strokeLinecap="round" />
+          <line x1={cx} y1={cy} x2={hourEnd.x} y2={hourEnd.y} stroke="#0f172a" strokeWidth="8" strokeLinecap="round" />
+          <line x1={cx} y1={cy} x2={minuteEnd.x} y2={minuteEnd.y} stroke="rgba(255,255,255,0.92)" strokeWidth="12" strokeLinecap="round" />
+          <line x1={cx} y1={cy} x2={minuteEnd.x} y2={minuteEnd.y} stroke="#2563eb" strokeWidth="6" strokeLinecap="round" />
+          <circle cx={cx} cy={cy} r="9" fill="#0f172a" />
+          <circle cx={cx} cy={cy} r="4" fill="#ffffff" opacity="0.92" />
+        </g>
       </svg>
     </div>
   );
@@ -388,6 +424,7 @@ export default function YLaHoraGame({ onBack }) {
   const [step, setStep] = useState('mix');
   const [op, setOp] = useState('both');
   const [questionCount, setQuestionCount] = useState(10);
+  const [showNumbers, setShowNumbers] = useState(false);
 
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
@@ -455,6 +492,7 @@ export default function YLaHoraGame({ onBack }) {
   }, [answers]);
 
   const mistakes = useMemo(() => answers.filter(a => !a.isCorrect), [answers]);
+  const helpNumbersLabel = showNumbers ? 'Ayuda: ocultar números' : 'Ayuda: mostrar números';
 
   return (
     <Container>
@@ -575,8 +613,11 @@ export default function YLaHoraGame({ onBack }) {
             <BigText>Vista previa</BigText>
             <SubText>Este reloj es el que usarás para jugar.</SubText>
             <div style={{ marginTop: 12 }}>
-              <AnalogClock time={{ hour: 3, minute: 15 }} />
+              <AnalogClock time={{ hour: 3, minute: 15 }} showNumbers={showNumbers} />
             </div>
+            <ControlsRow>
+              <SecondaryButton onClick={() => setShowNumbers(s => !s)}>{helpNumbersLabel}</SecondaryButton>
+            </ControlsRow>
             <BadgeRow>
               <Badge>15 min = 1 cuarto</Badge>
               <Badge>30 min = media</Badge>
@@ -589,11 +630,14 @@ export default function YLaHoraGame({ onBack }) {
       {phase === 'playing' && current && (
         <Grid>
           <Card>
-            <AnalogClock time={current.base} />
+            <AnalogClock time={current.base} showNumbers={showNumbers} />
             <BadgeRow>
               <Badge>⭐ Puntos: {points}</Badge>
               <Badge>🔥 Racha: {streak}</Badge>
             </BadgeRow>
+            <ControlsRow>
+              <SecondaryButton onClick={() => setShowNumbers(s => !s)}>{helpNumbersLabel}</SecondaryButton>
+            </ControlsRow>
           </Card>
 
           <Card>
@@ -714,8 +758,11 @@ export default function YLaHoraGame({ onBack }) {
             <BigText>Consejo rápido</BigText>
             <SubText>Los “cuartos” son saltos de 15 minutos.</SubText>
             <div style={{ marginTop: 12 }}>
-              <AnalogClock time={{ hour: 7, minute: 45 }} />
+              <AnalogClock time={{ hour: 7, minute: 45 }} showNumbers={showNumbers} />
             </div>
+            <ControlsRow>
+              <SecondaryButton onClick={() => setShowNumbers(s => !s)}>{helpNumbersLabel}</SecondaryButton>
+            </ControlsRow>
             <BadgeRow>
               <Badge>+15 = 1 salto</Badge>
               <Badge>+30 = 2 saltos</Badge>

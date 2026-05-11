@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Container, GameStage } from './puzzles/firewater/styles';
 import StartScreen from './puzzles/firewater/StartScreen';
 import HudBar from './puzzles/firewater/HudBar';
@@ -43,12 +43,11 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
     setRunId(v => v + 1);
   };
 
-  const restartSame = () => {
-    if (!activeSeed) return;
+  const restartSame = useCallback(() => {
     setPhase('playing');
     setGems({ fire: 0, water: 0, total: { fire: 0, water: 0 } });
     setRunId(v => v + 1);
-  };
+  }, []);
 
   const newSeed = () => {
     const s = createRandomSeed();
@@ -63,10 +62,10 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
     setPhase('start');
   };
 
-  const onRequestPause = () => setPhase('paused');
+  const onRequestPause = useCallback(() => setPhase('paused'), []);
   const onResume = () => setPhase('playing');
-  const onDeath = () => setPhase('paused');
-  const onComplete = () => setPhase('complete');
+  const onDeath = useCallback(() => setPhase('paused'), []);
+  const onComplete = useCallback(() => setPhase('complete'), []);
 
   const difficultyLabel = difficulty === 'easy' ? 'Fácil' : difficulty === 'medium' ? 'Medio' : 'Difícil';
 

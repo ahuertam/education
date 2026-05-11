@@ -136,6 +136,8 @@ const FlappyBonusLevel = ({
 
   const stateRef = useRef({
     phase: 'ready',
+    started: false,
+    countdown: 0,
     y: config.height * 0.45,
     vy: 0,
     pipes: [],
@@ -144,19 +146,21 @@ const FlappyBonusLevel = ({
   });
 
   const [, force] = useState(0);
-  const uiRef = useRef({ phase: 'ready', score: 0 });
+  const uiRef = useRef({ phase: 'ready', score: 0, countdown: 0 });
 
   const reset = useCallback(() => {
     finishedRef.current = false;
     stateRef.current = {
       phase: 'ready',
+      started: false,
+      countdown: 0,
       y: config.height * 0.45,
       vy: 0,
       pipes: [],
       spawnT: 0,
       score: 0,
     };
-    uiRef.current = { phase: 'ready', score: 0 };
+    uiRef.current = { phase: 'ready', score: 0, countdown: 0 };
     lastTRef.current = 0;
     force(v => v + 1);
   }, [config.height]);
@@ -170,16 +174,28 @@ const FlappyBonusLevel = ({
     onFinish?.({ score, completed, bonus });
   }, [completionBonus, onFinish, pointsPerPipe, targetPipes]);
 
+  const startCountdown = useCallback(() => {
+    const s = stateRef.current;
+    if (s.phase !== 'ready') return;
+    s.phase = 'countdown';
+    s.started = false;
+    s.countdown = 3;
+    s.y = config.height * 0.45;
+    s.vy = 0;
+    s.pipes = [];
+    s.spawnT = 0;
+    s.score = 0;
+    force(v => v + 1);
+  }, [config.height]);
+
   const flap = useCallback(() => {
     const s = stateRef.current;
     if (s.phase === 'over') return;
-    if (s.phase === 'ready') {
-      s.phase = 'playing';
-      uiRef.current.phase = 'playing';
-      force(v => v + 1);
-    }
+    if (s.phase === 'ready') return startCountdown();
+    if (s.phase === 'countdown') return;
+    if (s.phase === 'playing' && !s.started) s.started = true;
     s.vy = config.jumpV;
-  }, [config.jumpV]);
+  }, [config.jumpV, startCountdown]);
 
   const spawnPipe = useCallback(() => {
     const minY = 80;
@@ -194,7 +210,16 @@ const FlappyBonusLevel = ({
 
   const step = useCallback((dt) => {
     const s = stateRef.current;
+    if (s.phase === 'countdown') {
+      s.countdown -= dt;
+      if (s.countdown <= 0) {
+        s.countdown = 0;
+        s.phase = 'playing';
+      }
+      return;
+    }
     if (s.phase !== 'playing') return;
+    if (!s.started) return;
 
     s.vy += config.gravity * dt;
     s.y += s.vy * dt;
@@ -326,6 +351,17 @@ const FlappyBonusLevel = ({
       ctx.fillText(`Pasa ${targetPipes} tuberías para completar`, 34, 242);
       ctx.fillText(`Bonus: +${pointsPerPipe} por tubería`, 34, 268);
     }
+
+    if (s.phase === 'countdown') {
+      const n = Math.max(1, Math.ceil(s.countdown));
+      ctx.fillStyle = 'rgba(0,0,0,0.62)';
+      ctx.fillRect(18, 170, w - 36, 128);
+      ctx.fillStyle = '#fff';
+      ctx.font = '900 18px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+      ctx.fillText('Prepárate...', 34, 212);
+      ctx.font = '900 56px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+      ctx.fillText(String(n), 34, 268);
+    }
   }, [config.birdR, config.birdX, config.gapHeight, config.groundH, config.height, config.pipeWidth, config.width, pointsPerPipe, targetPipes]);
 
   const loop = useCallback((t) => {
@@ -337,8 +373,9 @@ const FlappyBonusLevel = ({
     draw();
 
     const s = stateRef.current;
-    if (uiRef.current.phase !== s.phase || uiRef.current.score !== s.score) {
-      uiRef.current = { phase: s.phase, score: s.score };
+    const cd = s.phase === 'countdown' ? Math.max(1, Math.ceil(s.countdown)) : 0;
+    if (uiRef.current.phase !== s.phase || uiRef.current.score !== s.score || uiRef.current.countdown !== cd) {
+      uiRef.current = { phase: s.phase, score: s.score, countdown: cd };
       force(v => v + 1);
     }
     if (s.phase === 'over') {
@@ -407,6 +444,17 @@ const FlappyBonusLevel = ({
               <Button type="button" onClick={() => { flap(); ensureRunning(); }}>Empezar</Button>
               {onSkip && <Button type="button" onClick={onSkip}>Saltar</Button>}
               <Button type="button" onClick={reset}>Reiniciar</Button>
+            </Actions>
+          </Panel>
+        </Overlay>
+      )}
+      {s.phase === 'countdown' && (
+        <Overlay>
+          <Panel>
+            <Title>Empieza en {uiRef.current.countdown || 3}</Title>
+            <Text>En cuanto termine, toca para saltar.</Text>
+            <Actions>
+              <Button type="button" onClick={reset}>Cancelar</Button>
             </Actions>
           </Panel>
         </Overlay>
