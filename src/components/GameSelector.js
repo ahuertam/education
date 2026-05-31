@@ -332,7 +332,7 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         </BackButton>
         <Title>{info.title}</Title>
         <BrandMini
-          src={`${process.env.PUBLIC_URL}/branding/edutika-mascot.png`}
+          src={`${process.env.PUBLIC_URL}/logo2.png`}
           alt="Mascota de Edutika"
           onError={(e) => {
             e.currentTarget.style.display = 'none';

@@ -74,8 +74,8 @@ const Header = () => {
   const [logoErrored, setLogoErrored] = useState(false);
   const [mascotErrored, setMascotErrored] = useState(false);
 
-  const logoSrc = useMemo(() => `${process.env.PUBLIC_URL}/branding/edutika-logo.png`, []);
-  const mascotSrc = useMemo(() => `${process.env.PUBLIC_URL}/branding/edutika-mascot.png`, []);
+  const logoSrc = useMemo(() => `${process.env.PUBLIC_URL}/edutikalogo.png`, []);
+  const mascotSrc = useMemo(() => `${process.env.PUBLIC_URL}/logo2.png`, []);
 
   return (
     <HeaderContainer>
