@@ -38,13 +38,13 @@ const Title = styled.h1`
 `;
 
 const LogoImage = styled.img`
-  height: 76px;
+  height: 87px;
   width: auto;
   max-width: min(560px, 90vw);
   filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.25));
 
   @media (max-width: 768px) {
-    height: 60px;
+    height: 68px;
   }
 `;
 
@@ -63,7 +63,7 @@ const Subtitle = styled.p`
 const Header = () => {
   const [logoErrored, setLogoErrored] = useState(false);
 
-  const logoSrc = useMemo(() => `${process.env.PUBLIC_URL}/edutikalogo.png`, []);
+  const logoSrc = useMemo(() => `${process.env.PUBLIC_URL}/logo22.png`, []);
 
   return (
     <HeaderContainer>

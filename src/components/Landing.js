@@ -270,7 +270,7 @@ const Landing = ({ onNavigate }) => {
       <Footer>
         <p>
           © 2024 Edutika - Aprendiendo mientras nos divertimos
-          <FooterLogo src={`${process.env.PUBLIC_URL}/logo22.png`} alt="Edutika" />
+          <FooterLogo src={`${process.env.PUBLIC_URL}/edutikalogo.png`} alt="Edutika" />
         </p>
         <ManifestoDetails>
           <ManifestoSummary>Sobre el proyecto</ManifestoSummary>
