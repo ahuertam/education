@@ -120,19 +120,22 @@
   }
 
   class SpriteSheet {
-    constructor(image, frameW, frameH) {
+    constructor(image, frameW, frameH, opts = {}) {
       this.image = image;
       this.frameW = frameW;
       this.frameH = frameH;
-      this.columns = Math.max(1, Math.floor(image.width / frameW));
+      const { offsetX = 0, offsetY = 0, columns = null } = opts || {};
+      this.offsetX = offsetX;
+      this.offsetY = offsetY;
+      this.columns = Math.max(1, columns != null ? columns : Math.floor((image.width - offsetX) / frameW));
     }
 
     drawFrame(ctx, frameIndex, dx, dy, opts = {}) {
       const prevSmooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
       const { flipX = false } = opts;
-      const sx = (frameIndex % this.columns) * this.frameW;
-      const sy = Math.floor(frameIndex / this.columns) * this.frameH;
+      const sx = this.offsetX + (frameIndex % this.columns) * this.frameW;
+      const sy = this.offsetY + Math.floor(frameIndex / this.columns) * this.frameH;
 
       if (!flipX) {
         ctx.drawImage(this.image, sx, sy, this.frameW, this.frameH, dx, dy, this.frameW, this.frameH);
@@ -152,8 +155,8 @@
       const prevSmooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
       const { flipX = false } = opts;
-      const sx = (frameIndex % this.columns) * this.frameW;
-      const sy = Math.floor(frameIndex / this.columns) * this.frameH;
+      const sx = this.offsetX + (frameIndex % this.columns) * this.frameW;
+      const sy = this.offsetY + Math.floor(frameIndex / this.columns) * this.frameH;
 
       if (!flipX) {
         ctx.drawImage(this.image, sx, sy, this.frameW, this.frameH, dx, dy, dw, dh);
@@ -625,7 +628,7 @@
         sheetWarning = e && e.message ? e.message : String(e);
       }
       const bodySheet = sheets.white || this._makeFallbackBodySheet();
-      this.uiSheet = uiImg ? new SpriteSheet(uiImg, 64, 64) : this._makeFallbackUiSheet();
+      this.uiSheet = uiImg ? new SpriteSheet(uiImg, 256, 128, { offsetX: 384, offsetY: 0, columns: 4 }) : this._makeFallbackUiSheet();
       this.commentator = new Commentator({ sheet: this.uiSheet });
       this._initAudio();
 
@@ -1774,27 +1777,35 @@
 
     _makeFallbackUiSheet() {
       const c = document.createElement("canvas");
-      c.width = 64 * 3;
-      c.height = 64;
+      c.width = 256 * 4;
+      c.height = 128;
       const ctx = c.getContext("2d");
       ctx.imageSmoothingEnabled = false;
 
-      for (let i = 0; i < 3; i++) {
-        const ox = i * 64;
+      for (let i = 0; i < 4; i++) {
+        const ox = i * 256;
+        ctx.fillStyle = "#0b3a78";
+        ctx.fillRect(ox, 0, 256, 128);
         ctx.fillStyle = "#1f2937";
-        ctx.fillRect(ox, 0, 64, 64);
+        ctx.fillRect(ox + 10, 10, 236, 108);
+
         ctx.fillStyle = "#f1c27d";
-        ctx.fillRect(ox + 18, 18, 28, 28);
+        ctx.fillRect(ox + 96, 28, 64, 64);
         ctx.fillStyle = "#111";
-        ctx.fillRect(ox + 14, 12, 36, 10);
+        ctx.fillRect(ox + 92, 22, 72, 18);
         ctx.fillStyle = "#000";
-        ctx.fillRect(ox + 22, 26, 6, 6);
-        ctx.fillRect(ox + 36, 26, 6, 6);
-        if (i === 1) ctx.fillRect(ox + 26, 40, 12, 4);
-        if (i === 2) ctx.fillRect(ox + 26, 38, 12, 8);
+        ctx.fillRect(ox + 110, 52, 10, 10);
+        ctx.fillRect(ox + 140, 52, 10, 10);
+        if (i === 1) ctx.fillRect(ox + 118, 82, 20, 6);
+        if (i === 2) ctx.fillRect(ox + 118, 78, 20, 12);
+        if (i === 3) {
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(ox + 88, 32, 6, 6);
+          ctx.fillRect(ox + 162, 32, 6, 6);
+        }
       }
 
-      return new SpriteSheet(c, 64, 64);
+      return new SpriteSheet(c, 256, 128, { columns: 4 });
     }
 
     _makeBodySheetsFromUnified(playersImg) {
