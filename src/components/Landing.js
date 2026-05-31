@@ -30,7 +30,10 @@ const ActivitiesSection = styled.section`
 const SectionTitle = styled.h2`
   text-align: center;
   font-size: 2.5rem;
-  color: white;
+  background: linear-gradient(45deg, var(--brand-teal), var(--brand-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 3rem;
   font-weight: 700;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);

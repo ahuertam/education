@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { FaGraduationCap } from 'react-icons/fa';
 
@@ -8,12 +8,13 @@ const HeaderContainer = styled.header`
   color: white;
 `;
 
-const Logo = styled.div`
+const BrandRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 `;
 
 const LogoIcon = styled(FaGraduationCap)`
@@ -25,7 +26,7 @@ const LogoIcon = styled(FaGraduationCap)`
 const Title = styled.h1`
   font-size: 3rem;
   font-weight: 800;
-  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  background: linear-gradient(45deg, var(--brand-teal), var(--brand-orange));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -33,6 +34,27 @@ const Title = styled.h1`
   
   @media (max-width: 768px) {
     font-size: 2rem;
+  }
+`;
+
+const LogoImage = styled.img`
+  height: 76px;
+  width: auto;
+  max-width: min(560px, 90vw);
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.25));
+
+  @media (max-width: 768px) {
+    height: 60px;
+  }
+`;
+
+const MascotImage = styled.img`
+  height: 86px;
+  width: auto;
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.25));
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -49,12 +71,35 @@ const Subtitle = styled.p`
 `;
 
 const Header = () => {
+  const [logoErrored, setLogoErrored] = useState(false);
+  const [mascotErrored, setMascotErrored] = useState(false);
+
+  const logoSrc = useMemo(() => `${process.env.PUBLIC_URL}/branding/edutika-logo.png`, []);
+  const mascotSrc = useMemo(() => `${process.env.PUBLIC_URL}/branding/edutika-mascot.png`, []);
+
   return (
     <HeaderContainer>
-      <Logo>
-        <LogoIcon />
-        <Title>Edutika</Title>
-      </Logo>
+      <BrandRow>
+        {!logoErrored ? (
+          <LogoImage
+            src={logoSrc}
+            alt="Edutika"
+            onError={() => setLogoErrored(true)}
+          />
+        ) : (
+          <>
+            <LogoIcon />
+            <Title>Edutika</Title>
+          </>
+        )}
+        {!mascotErrored && (
+          <MascotImage
+            src={mascotSrc}
+            alt="Mascota de Edutika"
+            onError={() => setMascotErrored(true)}
+          />
+        )}
+      </BrandRow>
       <Subtitle>
         ¡Aprende jugando! Descubre actividades educativas divertidas para desarrollar tus habilidades matemáticas y conocimientos generales.
       </Subtitle>

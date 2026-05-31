@@ -17,10 +17,12 @@ const Header = styled.header`
   align-items: center;
   margin-bottom: 3rem;
   color: white;
+  gap: 1rem;
+  flex-wrap: wrap;
 `;
 
 const BackButton = styled.button`
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.14);
   border: none;
   color: white;
   padding: 0.8rem 1.5rem;
@@ -34,7 +36,7 @@ const BackButton = styled.button`
   backdrop-filter: blur(5px);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.22);
     transform: translateX(-5px);
   }
 `;
@@ -45,6 +47,22 @@ const Title = styled.h2`
   font-size: 2.5rem;
   margin: 0;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+
+  @media (max-width: 768px) {
+    flex: 0 0 100%;
+    text-align: left;
+    font-size: 2rem;
+  }
+`;
+
+const BrandMini = styled.img`
+  height: 54px;
+  width: auto;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.25));
+
+  @media (max-width: 768px) {
+    height: 46px;
+  }
 `;
 
 const Grid = styled.div`
@@ -204,6 +222,14 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       color: "#16A085",
       categories: ['advanced']
     },
+    {
+      id: 'tsubasa',
+      icon: <FaGamepad />,
+      title: "RPG Fútbol (Turnos)",
+      description: "Estilo retro: elige Regate/Pase/Tiro y resuelve retos matemáticos para subir la probabilidad de éxito.",
+      color: "#1D4ED8",
+      categories: ['advanced']
+    },
 
     // Vocabulary Games
     {
@@ -305,7 +331,13 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
           <FaArrowLeft /> Volver
         </BackButton>
         <Title>{info.title}</Title>
-        <div style={{ width: 100 }} />
+        <BrandMini
+          src={`${process.env.PUBLIC_URL}/branding/edutika-mascot.png`}
+          alt="Mascota de Edutika"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
       </Header>
       
       <Grid>

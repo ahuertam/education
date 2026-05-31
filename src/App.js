@@ -28,6 +28,7 @@ import TiposDeVerbosGame from './components/TiposDeVerbosGame';
 import GeometriaMasterGame from './components/GeometriaMasterGame';
 import SupportFab from './components/SupportFab';
 import PokemonMathsGame from './components/PokemonMathsGame';
+import TsubasaRpgGame from './components/TsubasaRpgGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -152,6 +153,10 @@ function App() {
         return <PokemonMathsGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+        />;
+      case 'tsubasa':
+        return <TsubasaRpgGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       default:
         return <Landing onNavigate={handleNavigate} />;

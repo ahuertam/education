@@ -2,33 +2,30 @@ import React from 'react';
 import styled from 'styled-components';
 
 const CardContainer = styled.div`
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(245, 250, 250, 0.92));
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 
-    20px 20px 60px #bebebe,
-    -20px -20px 60px #ffffff;
+    20px 20px 60px rgba(11, 43, 69, 0.25),
+    -20px -20px 60px rgba(255, 255, 255, 0.35);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   
-  /* Optimización de rendimiento */
   will-change: transform, box-shadow;
-  transform: translateZ(0); /* Fuerza aceleración por hardware */
+  transform: translateZ(0);
   backface-visibility: hidden;
   
-  /* Transiciones separadas para mejor control */
-  // Reducir aún más la duración
   transition: 
     transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   
-  // O simplificar el hover
   &:hover {
     transform: translateY(-5px) translateZ(0);
     box-shadow: 
-      25px 25px 80px rgba(190, 190, 190, 0.4),
-      -25px -25px 80px rgba(255, 255, 255, 0.8);
+      25px 25px 80px rgba(11, 43, 69, 0.28),
+      -25px -25px 80px rgba(255, 255, 255, 0.5);
   }
 
 
@@ -57,7 +54,7 @@ const Title = styled.h3`
   transition: color 0.2s ease;
   
   ${CardContainer}:hover & {
-    color: #2196F3;
+    color: var(--brand-teal);
   }
 `;
 
