@@ -62,7 +62,52 @@ const Footer = styled.footer`
   opacity: 0.8;
 `;
 
+const ManifestoDetails = styled.details`
+  margin: 1rem auto 0;
+  max-width: 760px;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.9;
+
+  summary {
+    cursor: pointer;
+    list-style: none;
+    outline: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+`;
+
+const ManifestoSummary = styled.summary`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+`;
+
+const ManifestoContent = styled.div`
+  margin-top: 0.75rem;
+  opacity: 0.95;
+
+  p {
+    margin: 0.5rem 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+`;
+
 const Landing = ({ onNavigate }) => {
+  const donationUrl = process.env.REACT_APP_DONATION_URL;
+
   const activities = [
     {
       id: 1,
@@ -216,6 +261,28 @@ const Landing = ({ onNavigate }) => {
       </ActivitiesSection>
       <Footer>
         <p>© 2024 Edutika - Aprendiendo mientras nos divertimos 🚀</p>
+        <ManifestoDetails>
+          <ManifestoSummary>Sobre el proyecto</ManifestoSummary>
+          <ManifestoContent>
+            <p>
+              Edutika es un proyecto educativo sin publicidad y gratuito para cualquiera.
+            </p>
+            <p>
+              Si te resulta útil y quieres ayudar con el mantenimiento (por ejemplo, dominio/servidor),
+              {donationUrl ? (
+                <>
+                  puedes aportar una donación de forma discreta{' '}
+                  <a href={donationUrl} target="_blank" rel="noreferrer">
+                    aquí
+                  </a>
+                  .
+                </>
+              ) : (
+                <>puedes aportar una donación de forma discreta.</>
+              )}
+            </p>
+          </ManifestoContent>
+        </ManifestoDetails>
       </Footer>
     </LandingContainer>
   );
