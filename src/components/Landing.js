@@ -62,6 +62,14 @@ const Footer = styled.footer`
   opacity: 0.8;
 `;
 
+const FooterLogo = styled.img`
+  height: 22px;
+  width: auto;
+  vertical-align: -4px;
+  margin-left: 0.4rem;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+`;
+
 const ManifestoDetails = styled.details`
   margin: 1rem auto 0;
   max-width: 760px;
@@ -260,7 +268,10 @@ const Landing = ({ onNavigate }) => {
         </CardsGrid>
       </ActivitiesSection>
       <Footer>
-        <p>© 2024 Edutika - Aprendiendo mientras nos divertimos 🚀</p>
+        <p>
+          © 2024 Edutika - Aprendiendo mientras nos divertimos
+          <FooterLogo src={`${process.env.PUBLIC_URL}/logo22.png`} alt="Edutika" />
+        </p>
         <ManifestoDetails>
           <ManifestoSummary>Sobre el proyecto</ManifestoSummary>
           <ManifestoContent>

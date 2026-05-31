@@ -48,16 +48,6 @@ const LogoImage = styled.img`
   }
 `;
 
-const MascotImage = styled.img`
-  height: 86px;
-  width: auto;
-  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.25));
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
 const Subtitle = styled.p`
   font-size: 1.2rem;
   opacity: 0.9;
@@ -72,10 +62,8 @@ const Subtitle = styled.p`
 
 const Header = () => {
   const [logoErrored, setLogoErrored] = useState(false);
-  const [mascotErrored, setMascotErrored] = useState(false);
 
   const logoSrc = useMemo(() => `${process.env.PUBLIC_URL}/edutikalogo.png`, []);
-  const mascotSrc = useMemo(() => `${process.env.PUBLIC_URL}/logo2.png`, []);
 
   return (
     <HeaderContainer>
@@ -91,13 +79,6 @@ const Header = () => {
             <LogoIcon />
             <Title>Edutika</Title>
           </>
-        )}
-        {!mascotErrored && (
-          <MascotImage
-            src={mascotSrc}
-            alt="Mascota de Edutika"
-            onError={() => setMascotErrored(true)}
-          />
         )}
       </BrandRow>
       <Subtitle>
