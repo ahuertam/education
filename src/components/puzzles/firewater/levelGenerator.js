@@ -657,7 +657,7 @@ export function generateLevel({ seed, difficulty }) {
   ];
   for (let i = 0; i < roomBands.length; i += 1) {
     const band = roomBands[i];
-    let x = 220;
+    let x = 420;
     while (x < width - 420) {
       const roomW = rngInt(rng, 320, 560);
       const wallW = 26;

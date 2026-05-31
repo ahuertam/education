@@ -57,6 +57,30 @@ export function validateLevel(level) {
     { x: level.spawns.fire.x, y: level.spawns.fire.y, w: 40, h: 60 },
     { x: level.spawns.water.x, y: level.spawns.water.y, w: 40, h: 60 }
   ];
+  if (rectsOverlapWithPadding(spawnRects[0], spawnRects[1], 6)) reasons.push('spawns_overlap');
+
+  const solids = [
+    ...level.platforms.map(p => ({ kind: 'platform', id: p.id, rect: { x: p.x, y: p.y, w: p.w, h: p.h } })),
+    ...level.doors.map(d => ({ kind: 'door', id: d.id, rect: { x: d.x, y: d.y, w: d.w, h: d.h } })),
+    ...level.crates.map(c => ({ kind: 'crate', id: c.id, rect: { x: c.x, y: c.y, w: c.w, h: c.h } }))
+  ];
+  const spawnMeta = [
+    { who: 'fire', rect: spawnRects[0] },
+    { who: 'water', rect: spawnRects[1] }
+  ];
+  for (const s of spawnMeta) {
+    const left = s.rect.x - s.rect.w / 2;
+    const right = s.rect.x + s.rect.w / 2;
+    const top = s.rect.y - s.rect.h / 2;
+    const bottom = s.rect.y + s.rect.h / 2;
+    if (left < 0 || right > level.size.width || top < 0 || bottom > level.size.height) reasons.push(`spawn_out_of_bounds:${s.who}`);
+    for (const solid of solids) {
+      if (rectsOverlapWithPadding(solid.rect, s.rect, 4)) {
+        reasons.push(`spawn_overlaps_${solid.kind}:${s.who}:${solid.id}`);
+        break;
+      }
+    }
+  }
   for (const hz of level.hazards) {
     for (const s of spawnRects) {
       if (rectsOverlap({ x: hz.x, y: hz.y, w: hz.w, h: hz.h }, s)) reasons.push(`hazard_on_spawn:${hz.id}`);

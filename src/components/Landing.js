@@ -212,7 +212,7 @@ const Landing = ({ onNavigate }) => {
         </CardsGrid>
       </ActivitiesSection>
       <Footer>
-        <p>© 2024 EduJuegos - Aprendiendo mientras nos divertimos 🚀</p>
+        <p>© 2024 Edutika - Aprendiendo mientras nos divertimos 🚀</p>
       </Footer>
     </LandingContainer>
   );

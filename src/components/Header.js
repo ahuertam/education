@@ -53,7 +53,7 @@ const Header = () => {
     <HeaderContainer>
       <Logo>
         <LogoIcon />
-        <Title>EduJuegos</Title>
+        <Title>Edutika</Title>
       </Logo>
       <Subtitle>
         ¡Aprende jugando! Descubre actividades educativas divertidas para desarrollar tus habilidades matemáticas y conocimientos generales.
