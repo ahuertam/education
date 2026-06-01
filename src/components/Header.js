@@ -38,14 +38,10 @@ const Title = styled.h1`
 `;
 
 const LogoImage = styled.img`
-  height: 87px;
+  height: clamp(120px, 14vw, 190px);
   width: auto;
-  max-width: min(560px, 90vw);
+  max-width: min(860px, 92vw);
   filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.25));
-
-  @media (max-width: 768px) {
-    height: 68px;
-  }
 `;
 
 const Subtitle = styled.p`
