@@ -31,11 +31,20 @@
   const UI_Y = FIELD_HEIGHT;
   const FIELD_W = 256;
   const FIELD_H = FIELD_HEIGHT;
+  const DUEL_DISTANCE = 15;
+  const PENALTY_AWAY_X = 200;
+  const PENALTY_HOME_X = 56;
 
   const COLLAGE_ATLAS = {
     cell: 64,
     playerFrames: 5,
     keeperFrames: 2,
+  };
+
+  const KEEPER_ANIMATIONS = {
+    RUN: { row: 0, frames: 2, headOffsets: [{ x: 0, y: 0 }, { x: 0, y: 0 }] },
+    SHOT: { row: 1, frames: 2, headOffsets: [{ x: 0, y: 0 }, { x: 0, y: 0 }] },
+    IDLE: { row: 0, frames: 1, headOffsets: [{ x: 0, y: 0 }] },
   };
 
   class Input {
@@ -127,15 +136,17 @@
       const { offsetX = 0, offsetY = 0, columns = null } = opts || {};
       this.offsetX = offsetX;
       this.offsetY = offsetY;
-      this.columns = Math.max(1, columns != null ? columns : Math.floor((image.width - offsetX) / frameW));
+      this.stepX = opts?.stepX ?? frameW;
+      this.stepY = opts?.stepY ?? frameH;
+      this.columns = Math.max(1, columns != null ? columns : Math.floor((image.width - offsetX) / this.stepX));
     }
 
     drawFrame(ctx, frameIndex, dx, dy, opts = {}) {
       const prevSmooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
       const { flipX = false } = opts;
-      const sx = this.offsetX + (frameIndex % this.columns) * this.frameW;
-      const sy = this.offsetY + Math.floor(frameIndex / this.columns) * this.frameH;
+      const sx = this.offsetX + (frameIndex % this.columns) * this.stepX;
+      const sy = this.offsetY + Math.floor(frameIndex / this.columns) * this.stepY;
 
       if (!flipX) {
         ctx.drawImage(this.image, sx, sy, this.frameW, this.frameH, dx, dy, this.frameW, this.frameH);
@@ -155,8 +166,8 @@
       const prevSmooth = ctx.imageSmoothingEnabled;
       ctx.imageSmoothingEnabled = false;
       const { flipX = false } = opts;
-      const sx = this.offsetX + (frameIndex % this.columns) * this.frameW;
-      const sy = this.offsetY + Math.floor(frameIndex / this.columns) * this.frameH;
+      const sx = this.offsetX + (frameIndex % this.columns) * this.stepX;
+      const sy = this.offsetY + Math.floor(frameIndex / this.columns) * this.stepY;
 
       if (!flipX) {
         ctx.drawImage(this.image, sx, sy, this.frameW, this.frameH, dx, dy, dw, dh);
@@ -184,6 +195,7 @@
       facing = 1,
       name = "Player",
       paperDoll = {},
+      animations = BODY_ANIMATIONS,
     }) {
       this.x = x;
       this.y = y;
@@ -205,6 +217,7 @@
       this.actionTime = 0;
       this.animName = "IDLE";
       this.animFrame = 0;
+      this.animations = animations;
 
       this.paperDoll = {
         bodyNeckX: 32,
@@ -227,11 +240,13 @@
       if (this.action === "kick") {
         this.actionTime += dt;
         this.animName = "SHOT";
-        if (this.actionTime < 0.10) this.animFrame = 0;
-        else if (this.actionTime < 0.20) this.animFrame = 1;
-        else if (this.actionTime < 0.30) this.animFrame = 2;
-        else if (this.actionTime < 0.40) this.animFrame = 3;
-        else if (this.actionTime < 0.55) this.animFrame = 4;
+        const shotAnim = this.animations.SHOT || BODY_ANIMATIONS.SHOT;
+        const maxFrame = Math.max(0, (shotAnim?.frames ?? 1) - 1);
+        if (this.actionTime < 0.10) this.animFrame = Math.min(0, maxFrame);
+        else if (this.actionTime < 0.20) this.animFrame = Math.min(1, maxFrame);
+        else if (this.actionTime < 0.30) this.animFrame = Math.min(2, maxFrame);
+        else if (this.actionTime < 0.40) this.animFrame = Math.min(3, maxFrame);
+        else if (this.actionTime < 0.55) this.animFrame = Math.min(4, maxFrame);
         else {
           this.action = null;
           this.actionTime = 0;
@@ -243,7 +258,7 @@
 
       if (Math.abs(this.vx) + Math.abs(this.vy) > 0.01) {
         this.animName = "RUN";
-        const anim = BODY_ANIMATIONS.RUN;
+        const anim = this.animations.RUN || BODY_ANIMATIONS.RUN;
         const phase = Math.floor(this.animTime * this.animRate) % anim.frames;
         this.animFrame = phase;
       } else {
@@ -258,7 +273,7 @@
     }
 
     _poseOffsets() {
-      const anim = BODY_ANIMATIONS[this.animName] || BODY_ANIMATIONS.IDLE;
+      const anim = this.animations[this.animName] || this.animations.IDLE || BODY_ANIMATIONS.IDLE;
       const o = anim.headOffsets[this.animFrame] || anim.headOffsets[0] || { x: this.paperDoll.headOffsetX, y: this.paperDoll.headOffsetY };
       let headOffsetY = o.y;
       if (this.animName === "RUN") headOffsetY += this.animFrame % 2 === 1 ? 1 : -1;
@@ -266,7 +281,7 @@
     }
 
     _poseAnchors() {
-      const anim = BODY_ANIMATIONS[this.animName] || BODY_ANIMATIONS.IDLE;
+      const anim = this.animations[this.animName] || this.animations.IDLE || BODY_ANIMATIONS.IDLE;
       const a = anim.bodyAnchors && (anim.bodyAnchors[this.animFrame] || anim.bodyAnchors[0]);
       const baseBody = a || { x: this.paperDoll.bodyNeckX, y: this.paperDoll.bodyNeckY };
       const body = { x: baseBody.x, y: baseBody.y };
@@ -288,7 +303,7 @@
       const bodyAnchorX = flipX ? bodyW - anchors.body.x : anchors.body.x;
       const bodyAnchorY = anchors.body.y;
 
-      const anim = BODY_ANIMATIONS[this.animName] || BODY_ANIMATIONS.IDLE;
+      const anim = this.animations[this.animName] || this.animations.IDLE || BODY_ANIMATIONS.IDLE;
       const bodyFrameIndex = anim.row * this.bodySheet.columns + this.animFrame;
       this.bodySheet.drawFrame(ctx, bodyFrameIndex, bx, by, { flipX });
 
@@ -351,6 +366,11 @@
       this.options = options;
       this.index = 0;
       this.enabled = true;
+    }
+
+    setOptions(options) {
+      this.options = Array.isArray(options) && options.length ? options : this.options;
+      this.index = 0;
     }
 
     move(delta) {
@@ -455,6 +475,7 @@
       this.glintEvery = 5;
       this.glintTime = 0;
       this.glintDuration = 0.18;
+      this.crop = { x: 16, y: 24, w: 208, h: 192 };
     }
 
     setTalking(isTalking) {
@@ -491,9 +512,22 @@
     }
 
     draw(ctx, x, y, size = 52) {
-      const sx = (this.frame % this.sheet.columns) * this.sheet.frameW;
-      const sy = Math.floor(this.frame / this.sheet.columns) * this.sheet.frameH;
-      ctx.drawImage(this.sheet.image, sx, sy, this.sheet.frameW, this.sheet.frameH, x, y, size, size);
+      const prevSmooth = ctx.imageSmoothingEnabled;
+      ctx.imageSmoothingEnabled = false;
+      const sx = this.sheet.offsetX + (this.frame % this.sheet.columns) * this.sheet.stepX;
+      const sy = this.sheet.offsetY + Math.floor(this.frame / this.sheet.columns) * this.sheet.stepY;
+      ctx.drawImage(
+        this.sheet.image,
+        sx + this.crop.x,
+        sy + this.crop.y,
+        this.crop.w,
+        this.crop.h,
+        x,
+        y,
+        size,
+        size
+      );
+      ctx.imageSmoothingEnabled = prevSmooth;
     }
   }
 
@@ -525,11 +559,14 @@
 
       this.player = null;
       this.rival = null;
+      this.keeperHome = null;
+      this.keeperAway = null;
       this.scenePlayer = null;
       this.sceneRival = null;
       this.commentator = null;
       this.uiSheet = null;
       this.npcs = [];
+      this.encounter = null;
 
       this.fx = {
         shakeTime: 0,
@@ -543,6 +580,8 @@
       this.netBreakImage = null;
       this.netBreakSheet = null;
       this.goalScene = null;
+      this.kickoff = { player: { x: 52, y: 72 }, rival: { x: 140, y: 72 } };
+      this.rivalReactCooldown = 0;
 
       this.lines = {
         encounter: [
@@ -606,16 +645,19 @@
 
       const v = Date.now();
       const playersSrc = `./assets/nuevo3.png?v=${v}`;
+      const playersAltSrc = `./assets/players_goalkeepers_spritesheet.png?v=${v}`;
       const netBreakSrc = `./assets/net_break.png?v=${v}`;
       const uiSrc = `./assets/ui_elements.png?v=${v}`;
 
       await Promise.all([
         this.assets.loadImage("players", playersSrc).catch(() => null),
+        this.assets.loadImage("playersAlt", playersAltSrc).catch(() => null),
         this.assets.loadImage("netBreak", netBreakSrc).catch(() => null),
         this.assets.loadImage("ui", uiSrc).catch(() => null),
       ]);
 
       const playersImg = this.assets.images.get("players");
+      const playersAltImg = this.assets.images.get("playersAlt") || null;
       this.netBreakImage = this.assets.images.get("netBreak") || null;
       this.netBreakSheet = this.netBreakImage ? new SpriteSheet(this.netBreakImage, 48, 48) : null;
       const uiImg = this.assets.images.get("ui") || null;
@@ -627,8 +669,18 @@
       } catch (e) {
         sheetWarning = e && e.message ? e.message : String(e);
       }
+
+      if (playersAltImg) {
+        try {
+          this.kitBlueColor = this._sampleBlueKitColor(playersAltImg);
+        } catch {}
+      }
       const bodySheet = sheets.white || this._makeFallbackBodySheet();
-      this.uiSheet = uiImg ? new SpriteSheet(uiImg, 256, 128, { offsetX: 384, offsetY: 0, columns: 4 }) : this._makeFallbackUiSheet();
+      if (sheets.white) {
+        const blueSrc = sheets.blue || sheets.white;
+        if (this._shouldTintToBlue(blueSrc)) sheets.blue = this._tintUniformToColor(blueSrc, this.kitBlueColor);
+      }
+      this.uiSheet = uiImg ? new SpriteSheet(uiImg, 256, 256, { offsetX: 296, offsetY: 0, columns: 4, stepX: 272 }) : this._makeFallbackUiSheet();
       this.commentator = new Commentator({ sheet: this.uiSheet });
       this._initAudio();
 
@@ -642,9 +694,26 @@
       this.rival = new Player({
         x: 140,
         y: 72,
-        bodySheet: sheets.blue || this.player.bodySheet,
+        bodySheet: sheets.blue || sheets.white || this.player.bodySheet,
         name: "Rival",
         facing: -1,
+      });
+
+      this.keeperHome = new Player({
+        x: 0,
+        y: 0,
+        bodySheet: sheets.keeperWhite || this.player.bodySheet,
+        name: "Portero",
+        animations: KEEPER_ANIMATIONS,
+      });
+
+      this.keeperAway = new Player({
+        x: 0,
+        y: 0,
+        bodySheet: sheets.keeperBlue || this.keeperHome.bodySheet,
+        name: "Portero",
+        facing: -1,
+        animations: KEEPER_ANIMATIONS,
       });
       this._setPossession("player");
 
@@ -755,6 +824,7 @@
     update(dt) {
       if (this.state === "LOADING") return;
 
+      this.rivalReactCooldown = Math.max(0, this.rivalReactCooldown - dt);
       this._updateProjectile(dt);
       this._updateNpcDots(dt);
       this._updateMusic();
@@ -780,47 +850,91 @@
         const dismiss = this.input.consumePressed("Enter") || this.input.consumePressed(" ");
         if (dismiss) this._clearDialog();
       }
-      const ax = (this.input.isDown("ArrowRight") ? 1 : 0) - (this.input.isDown("ArrowLeft") ? 1 : 0);
-      const ay = (this.input.isDown("ArrowDown") ? 1 : 0) - (this.input.isDown("ArrowUp") ? 1 : 0);
-
-      p.vx = ax * p.speed;
-      p.vy = ay * p.speed;
-      if (ax !== 0) p.facing = ax;
-
-      p.update(dt);
+      const r = this.rival;
       const bw = p.bodySheet.frameW;
       const bh = p.bodySheet.frameH;
+      const rw = r.bodySheet.frameW;
+      const rh = r.bodySheet.frameH;
+      const holder = this.possession === "rival" ? r : p;
+      const holderCx = holder.x + holder.bodySheet.frameW / 2;
+      const holderCy = holder.y + holder.bodySheet.frameH / 2;
+      const inAwayPenalty = this.possession === "player" && holderCx > PENALTY_AWAY_X;
+      const inHomePenalty = this.possession === "rival" && holderCx < PENALTY_HOME_X;
+      if (inAwayPenalty) {
+        this._startEncounter({ opponent: "keeperAway", attacker: "player" });
+        return;
+      }
+      if (inHomePenalty) {
+        this._startEncounter({ opponent: "keeperHome", attacker: "rival" });
+        return;
+      }
+
+      const ax = (this.input.isDown("ArrowRight") ? 1 : 0) - (this.input.isDown("ArrowLeft") ? 1 : 0);
+      const ay = (this.input.isDown("ArrowDown") ? 1 : 0) - (this.input.isDown("ArrowUp") ? 1 : 0);
+      const chasing = this.possession === "rival" && ax === 0 && ay === 0;
+      const chaseDir = chasing
+        ? (() => {
+            const pcx = p.x + bw / 2;
+            const pcy = p.y + bh / 2;
+            const rcx = r.x + rw / 2;
+            const rcy = r.y + rh / 2;
+            const dx = rcx - pcx;
+            const dy = rcy - pcy;
+            const len = Math.hypot(dx, dy) || 1;
+            return { x: dx / len, y: dy / len };
+          })()
+        : null;
+
+      p.vx = (chasing ? chaseDir.x : ax) * p.speed;
+      p.vy = (chasing ? chaseDir.y : ay) * p.speed;
+      if (ax !== 0) p.facing = ax;
+      else if (chasing && chaseDir && Math.abs(chaseDir.x) > 0.05) p.facing = chaseDir.x >= 0 ? 1 : -1;
+
+      p.update(dt);
       p.x = clamp(p.x, 8, 256 - 8 - bw);
       p.y = clamp(p.y, 8, FIELD_HEIGHT - 8 - bh);
 
-      const r = this.rival;
-      const sector = p.x + bw / 2 < 86 ? 1 : (p.x + bw / 2 < 170 ? 2 : 3);
-      const rs = 22;
+      const rs = 24;
       r.vx = 0;
       r.vy = 0;
-      if (sector === 2) {
-        r.vy = Math.sign(p.y - r.y) * rs;
-      } else if (sector === 3) {
-        r.vx = Math.sign(p.x - r.x) * rs;
-        r.vy = Math.sign(p.y - r.y) * rs;
+      if (this.possession === "player") {
+        if (this.rivalReactCooldown > 0) {
+          r.vx = 0;
+          r.vy = 0;
+        } else {
+        const sector = p.x + bw / 2 < 86 ? 1 : (p.x + bw / 2 < 170 ? 2 : 3);
+        if (sector === 2) {
+          r.vy = Math.sign(p.y - r.y) * rs;
+        } else if (sector === 3) {
+          r.vx = Math.sign(p.x - r.x) * rs;
+          r.vy = Math.sign(p.y - r.y) * rs;
+        }
+        }
+      } else {
+        const targetX = 18;
+        const targetY = clamp(p.y + Math.sin(this.time * 2.4) * 18, 10, FIELD_H - 20);
+        const rcx = r.x + rw / 2;
+        const rcy = r.y + rh / 2;
+        const dx = targetX - rcx;
+        const dy = targetY - rcy;
+        const len = Math.hypot(dx, dy) || 1;
+        r.vx = (dx / len) * rs;
+        r.vy = (dy / len) * rs;
       }
-      if (r.vx !== 0) r.facing = r.vx < 0 ? -1 : 1;
+      if (Math.abs(r.vx) > 0.01) r.facing = r.vx < 0 ? -1 : 1;
       r.update(dt);
       r.x = clamp(r.x, 8, 256 - 8 - r.bodySheet.frameW);
       r.y = clamp(r.y, 8, FIELD_HEIGHT - 8 - r.bodySheet.frameH);
       const dx = (p.x + bw / 2) - (r.x + r.bodySheet.frameW / 2);
       const dy = (p.y + bh / 2) - (r.y + r.bodySheet.frameH / 2);
       const dist2 = dx * dx + dy * dy;
-      if (dist2 < 15 * 15) {
+      if (dist2 < DUEL_DISTANCE * DUEL_DISTANCE) {
         p.vx = 0;
         p.vy = 0;
         const side = p.x + bw / 2 <= r.x + r.bodySheet.frameW / 2 ? 1 : -1;
         p.facing = side;
         r.facing = -side;
-        this.state = "MENU";
-        this.menu.enabled = true;
-        this._setDialog(this._pick(this.lines.encounter), { typewriter: true });
-        this.messageTimer = 0;
+        this._startEncounter({ opponent: "rival", attacker: this.possession });
       }
     }
 
@@ -829,6 +943,7 @@
       if (this.input.consumePressed("ArrowDown")) this.menu.move(1);
       if (this.input.consumePressed("Escape")) {
         this.state = "FIELD";
+        this.encounter = null;
         this._clearDialog();
         return;
       }
@@ -836,24 +951,51 @@
       const confirm = this.input.consumePressed("Enter") || this.input.consumePressed(" ");
       if (!confirm) return;
 
-      this.challenge = new MathChallenge(this._difficultyFromFieldPosition());
+      this.challenge = new MathChallenge(this._difficultyFromFieldPosition(this.encounter?.attacker));
       this.state = "MATH";
       this._setDialog(`${this.menu.current().toUpperCase()}: ${this.challenge.prompt()}`, { typewriter: true });
     }
 
     _updateMath() {
       if (!this.challenge) return;
+      const attacker = this.encounter?.attacker === "rival" ? "rival" : "player";
+      const opponent = this.encounter?.opponent || "rival";
+      const attackerPl = attacker === "rival" ? this.rival : this.player;
+      const isDefense = attacker === "rival";
 
       if (performance.now() > this.challenge.expiresAt) {
         this.challenge.done = true;
         this.challenge.correct = false;
+        const action = this.menu.current();
+        if (!isDefense) {
+          this.score.rival += 1;
+          this._setPossession("rival");
+          if (this.encounter) this.encounter.result = { attackerKept: this.possession === attacker };
+          const success = Math.random() < 0.1;
+          const line1 = this._pick(this.lines.fail);
+          const line2 = success ? `${action}: ¡ÉXITO!` : `${action}: FALLA`;
+          this._setDialog(`${line1}\n${line2}`, { typewriter: true });
+          this.messageTimer = 1.2;
+          this.state = "RESOLVE";
+          return;
+        }
+
+        if (opponent === "keeperHome") {
+          this.score.rival += 2;
+          this._setPossession("player");
+          this._spawnShot({ attacker: "rival", special: false, netBreak: false });
+          this._startGoalScene({ goal: true, netBreak: false, context: { attacker: "rival", opponent: "keeperHome" } });
+          this._setDialog(GAME_TEXTS.GOAL, { typewriter: true });
+          this.state = "GOAL_SCENE";
+          this.challenge = null;
+          return;
+        }
+
         this.score.rival += 1;
         this._setPossession("rival");
-        const action = this.menu.current();
-        const successChance = 0.1;
-        const success = Math.random() < successChance;
+        if (this.encounter) this.encounter.result = { attackerKept: this.possession === attacker };
         const line1 = this._pick(this.lines.fail);
-        const line2 = success ? `${action}: ¡ÉXITO!` : `${action}: FALLA`;
+        const line2 = `${action}: FALLA`;
         this._setDialog(`${line1}\n${line2}`, { typewriter: true });
         this.messageTimer = 1.2;
         this.state = "RESOLVE";
@@ -879,12 +1021,62 @@
 
       const ok = this.challenge.submitChoice();
       const action = this.menu.current();
-      const isSpecialShot = action === "Tiro" && ok && this.challenge.difficulty === 3;
+      const isSpecialShot = !isDefense && action === "Tiro" && ok && this.challenge.difficulty === 3;
       const actionLabel = isSpecialShot ? "Tiro Especial" : action;
 
-      const nearGoal = this.player.x + this.player.bodySheet.frameW / 2 > 200;
-      const successChance = ok ? (isFast ? 0.95 : 0.7) : 0.1;
-      const success = Math.random() < successChance;
+      const nearGoal = attacker === "player"
+        ? attackerPl.x + attackerPl.bodySheet.frameW / 2 > PENALTY_AWAY_X
+        : attackerPl.x + attackerPl.bodySheet.frameW / 2 < PENALTY_HOME_X;
+      const baseSuccessChance = ok ? (isFast ? 0.95 : 0.7) : 0.1;
+      const success = Math.random() < baseSuccessChance;
+
+      if (isDefense && opponent === "keeperHome") {
+        const keeperChance = (() => {
+          if (action === "Esperar") return ok ? (isFast ? 0.82 : 0.62) : 0.18;
+          if (action === "Salir") return ok ? (isFast ? 0.88 : 0.55) : 0.12;
+          if (action === "Coger") return ok ? (isFast ? 0.92 : 0.65) : 0.10;
+          if (action === "Despejar") return ok ? (isFast ? 0.86 : 0.60) : 0.16;
+          return ok ? (isFast ? 0.85 : 0.65) : 0.15;
+        })();
+        const saved = Math.random() < keeperChance;
+        this._spawnShot({ attacker: "rival", special: false, netBreak: false });
+        this._startGoalScene({ goal: !saved, netBreak: false, context: { attacker: "rival", opponent: "keeperHome" } });
+        if (saved) {
+          this.score.player += 1;
+          this._setPossession("player");
+          this.rivalReactCooldown = Math.max(this.rivalReactCooldown, 1.0);
+          const extra = action === "Despejar" ? "¡DESPEJE!" : (action === "Salir" ? "¡SALIDA!" : (action === "Coger" ? "¡ATRAPA EL BALÓN!" : "¡BIEN COLOCADO!"));
+          this._setDialog(`${GAME_TEXTS.SAVE}\n${extra}`, { typewriter: true });
+        } else {
+          this.score.rival += 2;
+          this._setPossession("player");
+          const extra = action === "Salir" ? "¡Le han pillado a contrapié!" : (action === "Coger" ? "¡Se le escapa entre las manos!" : (action === "Despejar" ? "¡No llega al despeje!" : "¡No reacciona a tiempo!"));
+          this._setDialog(`${GAME_TEXTS.GOAL}\n${extra}`, { typewriter: true });
+        }
+        this.state = "GOAL_SCENE";
+        this.challenge = null;
+        return;
+      }
+
+      if (isDefense) {
+        const defChance = ok ? (isFast ? 0.9 : 0.7) : 0.12;
+        const defended = Math.random() < defChance;
+        const line1 = defended ? (isFast ? this._pick(this.lines.successFast) : this._pick(this.lines.success)) : this._pick(this.lines.fail);
+        const line2 = defended ? `${actionLabel}: ¡ÉXITO!` : `${actionLabel}: FALLA`;
+        this._setDialog(`${line1}\n${line2}`, { typewriter: true });
+        this.messageTimer = 1.2;
+        if (defended) {
+          this.score.player += 1;
+          this._setPossession("player");
+          this.rivalReactCooldown = Math.max(this.rivalReactCooldown, 1.0);
+        } else {
+          this.score.rival += 1;
+          this._setPossession("rival");
+        }
+        if (this.encounter) this.encounter.result = { attackerKept: this.possession === attacker };
+        this.state = "RESOLVE";
+        return;
+      }
 
       if (action === "Tiro" && nearGoal) {
         const goalieDefense = 105;
@@ -893,13 +1085,28 @@
         const isGoal = ok && mathScore + shotPower > goalieDefense;
 
         if (isSpecialShot) this._triggerSpecialShotFx();
-        this.player.triggerKick();
-        this._spawnShot({ special: isSpecialShot, netBreak: Boolean(isGoal && isSpecialShot) });
-        this._startGoalScene({ goal: isGoal, netBreak: Boolean(isGoal && isSpecialShot) });
+        attackerPl.triggerKick();
+        this._spawnShot({ attacker, special: isSpecialShot, netBreak: Boolean(isGoal && isSpecialShot) });
+        this._startGoalScene({
+          goal: isGoal,
+          netBreak: Boolean(isGoal && isSpecialShot),
+          context: { attacker, opponent: attacker === "player" ? "keeperAway" : "keeperHome" },
+        });
+        if (this.encounter) {
+          this.encounter.opponent = attacker === "player" ? "keeperAway" : "keeperHome";
+          this.encounter.attacker = attacker;
+        }
 
-        if (isGoal) this.score.player += 2;
-        else this.score.rival += 1;
-        this._setPossession("rival");
+        if (attacker === "player") {
+          if (isGoal) this.score.player += 2;
+          else this.score.rival += 1;
+          this._setPossession("rival");
+        } else {
+          if (isGoal) this.score.rival += 2;
+          else this.score.player += 1;
+          this._setPossession("player");
+        }
+        if (attacker === "player" && !isGoal) this.rivalReactCooldown = Math.max(this.rivalReactCooldown, 1.0);
         const text = isGoal ? (isSpecialShot ? `${GAME_TEXTS.SPECIAL_SHOT}\n${GAME_TEXTS.GOAL}` : GAME_TEXTS.GOAL) : GAME_TEXTS.SAVE;
         this._setDialog(text, { typewriter: true });
         this.state = "GOAL_SCENE";
@@ -914,22 +1121,32 @@
       this._setDialog(`${line1}\n${line2}`, { typewriter: true });
       this.messageTimer = 1.2;
       if (action === "Tiro" && success) {
-        this.player.triggerKick();
-        this._spawnShot({ special: isSpecialShot, netBreak: false });
+        attackerPl.triggerKick();
+        this._spawnShot({ attacker, special: isSpecialShot, netBreak: false });
       }
-      if (action === "Pase" && success) this._spawnPass();
+      if (action === "Pase" && success) this._spawnPass(attacker);
       if (isSpecialShot) this._triggerSpecialShotFx();
-      if (success) this.score.player += 1;
-      else this.score.rival += 1;
-      this._setPossession(success ? "player" : "rival");
+      if (attacker === "player") {
+        if (success) this.score.player += 1;
+        else this.score.rival += 1;
+        this._setPossession(success ? "player" : "rival");
+        if (success) this.rivalReactCooldown = Math.max(this.rivalReactCooldown, 1.0);
+      } else {
+        if (success) this.score.rival += 1;
+        else this.score.player += 1;
+        this._setPossession(success ? "rival" : "player");
+      }
+      if (this.encounter) this.encounter.result = { attackerKept: this.possession === attacker };
       this.state = "RESOLVE";
     }
 
-    _difficultyFromFieldPosition() {
-      const p = this.player;
-      const x = p.x + p.bodySheet.frameW / 2;
-      if (x < 96) return 1;
-      if (x < 176) return 2;
+    _difficultyFromFieldPosition(attacker) {
+      const team = attacker === "rival" ? "rival" : "player";
+      const pl = team === "rival" ? this.rival : this.player;
+      const x = pl.x + pl.bodySheet.frameW / 2;
+      const nx = team === "rival" ? (FIELD_W - x) : x;
+      if (nx < 96) return 1;
+      if (nx < 176) return 2;
       return 3;
     }
 
@@ -937,12 +1154,30 @@
       this.messageTimer -= dt;
       if (this.messageTimer > 0) return;
 
+      const snap = this.encounter?.field || null;
+      if (snap) this._applyFieldSnapshot(snap, { possession: false });
+
       const p = this.player;
-      p.x = 52;
-      p.y = 72;
-      this.rival.x = 140;
-      this.rival.y = 72;
+      const r = this.rival;
+      const attacker = this.encounter?.attacker === "rival" ? "rival" : "player";
+      const opponent = this.encounter?.opponent || "rival";
+      const attackerKept = this.encounter?.result?.attackerKept ?? (this.possession === attacker);
+
+      if (opponent === "rival") {
+        const adv = 26;
+        const ret = 18;
+        if (attacker === "player") {
+          if (attackerKept) p.x += adv;
+          else p.x -= ret;
+        } else {
+          if (attackerKept) r.x -= adv;
+          else r.x += ret;
+        }
+      }
+
+      this._clampFieldPlayers();
       this.challenge = null;
+      this.encounter = null;
       this._clearDialog();
       this.shot = null;
       this.pass = null;
@@ -1064,7 +1299,18 @@
 
       if (this.state === "MENU") this._drawMenu(ctx, menuBox);
       if (this.state === "MATH") this._drawMath(ctx, menuBox);
-      if (this.commentator) this.commentator.draw(ctx, commentatorBox.x + 12, commentatorBox.y + 2, 48);
+      if (this.commentator) {
+        const inner = { x: commentatorBox.x + 2, y: commentatorBox.y + 2, w: commentatorBox.w - 4, h: commentatorBox.h - 4 };
+        const size = 48;
+        const px = inner.x + Math.floor((inner.w - size) / 2);
+        const py = inner.y + Math.floor((inner.h - size) / 2);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(inner.x, inner.y, inner.w, inner.h);
+        ctx.clip();
+        this.commentator.draw(ctx, px, py, size);
+        ctx.restore();
+      }
       if (DEBUG_ANCHORS && this.player && this.player.headSheet && this.player.headSheet.image) {
         ctx.save();
         ctx.imageSmoothingEnabled = false;
@@ -1077,9 +1323,12 @@
       const inner = { x: rect.x + 6, y: rect.y + 6, w: rect.w - 12, h: rect.h - 12 };
       const mode = this.state === "MENU" || this.state === "MATH";
       const action = this.menu?.current?.() || "Regate";
-      const sp = this.scenePlayer || this.player;
-      const sr = this.sceneRival || this.rival;
-      const nearGoal = Boolean(this.player && this.player.x + this.player.bodySheet.frameW / 2 > 200);
+      const { left: sp, right: sr } = this._sceneActors();
+      const attacker = this.encounter?.attacker === "rival" ? "rival" : "player";
+      const attackerPl = attacker === "rival" ? this.rival : this.player;
+      const nearGoal = attacker === "player"
+        ? Boolean(attackerPl && attackerPl.x + attackerPl.bodySheet.frameW / 2 > PENALTY_AWAY_X)
+        : Boolean(attackerPl && attackerPl.x + attackerPl.bodySheet.frameW / 2 < PENALTY_HOME_X);
 
       ctx.save();
       ctx.globalAlpha = 0.18;
@@ -1088,7 +1337,8 @@
       ctx.restore();
 
       if (nearGoal) {
-        const gx = inner.x + inner.w - 92;
+        const goalOnRight = attacker === "player";
+        const gx = goalOnRight ? (inner.x + inner.w - 92) : (inner.x + 12);
         const gy = inner.y + 28;
         const gw = 80;
         const gh = 52;
@@ -1135,9 +1385,9 @@
 
       const scale = 1.1;
       const px = inner.x + 66;
-      const py = inner.y + 56;
+      const py = inner.y + Math.floor((inner.h - (sp?.bodySheet?.frameH ?? 64) * scale) / 2);
       const rx = inner.x + inner.w - 66;
-      const ry = inner.y + 56;
+      const ry = inner.y + Math.floor((inner.h - (sr?.bodySheet?.frameH ?? 64) * scale) / 2);
 
       drawScaled(sp, px, py, scale, { facing: 1 });
       drawScaled(sr, rx, ry, scale, { facing: -1 });
@@ -1157,7 +1407,7 @@
 
       if (this.shot) {
         const p = clamp(this.shot.t, 0, 1);
-        const x = px + 32 + p * (inner.w - 72);
+        const x = attacker === "player" ? (px + 32 + p * (inner.w - 72)) : (rx - 32 - p * (inner.w - 72));
         const y = py + 30 - p * 18;
         const phase = Math.sin(p * Math.PI);
         const stretch = 1 + phase * (this.shot.special ? 0.9 : 0.45);
@@ -1193,7 +1443,7 @@
 
       if (mode && action === "Tiro") {
         const p = (this.time * 0.9) % 1;
-        const x = px + 30 + p * (inner.w - 80);
+        const x = attacker === "player" ? (px + 30 + p * (inner.w - 80)) : (rx - 30 - p * (inner.w - 80));
         const y = py + 30 - Math.sin(p * Math.PI) * 18;
         ctx.save();
         ctx.fillStyle = "#fff";
@@ -1254,9 +1504,9 @@
       const li = { x: left.x + 6, y: left.y + 6, w: left.w - 12, h: left.h - 12 };
       const ri = { x: right.x + 6, y: right.y + 6, w: right.w - 12, h: right.h - 12 };
       const px = li.x + 10;
-      const py = li.y + 18;
+      const py = li.y + Math.floor((li.h - (this.player?.bodySheet?.frameH ?? 64)) / 2);
       const rx = li.x + 62;
-      const ry = li.y + 18;
+      const ry = li.y + Math.floor((li.h - (this.rival?.bodySheet?.frameH ?? 64)) / 2);
       const s = 1;
       const mode = this.state === "MENU" || this.state === "MATH";
       const action = this.menu?.current?.() || "Regate";
@@ -1536,12 +1786,13 @@
       this.fx.slowMoTime = 1.0;
     }
 
-    _startGoalScene({ goal, netBreak }) {
+    _startGoalScene({ goal, netBreak, context = null }) {
       this.goalScene = {
         t: 0,
         duration: goal ? 1.8 : 1.4,
         goal,
         netBreak,
+        context,
       };
     }
 
@@ -1553,23 +1804,43 @@
       this.goalScene.t += dt;
       if (this.goalScene.t < this.goalScene.duration) return;
 
-      const p = this.player;
-      p.x = 52;
-      p.y = 72;
-      this.rival.x = 140;
-      this.rival.y = 72;
+      if (this.goalScene.goal) {
+        this._applyKickoffPositions();
+      } else {
+        const ctx = this.goalScene.context;
+        if (ctx && ctx.opponent === "keeperAway") {
+          this.rival.x = PENALTY_AWAY_X - 4;
+          this.rival.y = clamp(this.player.y, 12, FIELD_H - 72);
+          this.rival.facing = -1;
+          this.player.x = PENALTY_AWAY_X - 34;
+          this.player.y = this.rival.y;
+          this.player.facing = -1;
+        } else if (ctx && ctx.opponent === "keeperHome") {
+          this.player.x = PENALTY_HOME_X + 6;
+          this.player.y = clamp(this.rival.y, 12, FIELD_H - 72);
+          this.player.facing = 1;
+          this.rival.x = PENALTY_HOME_X + 38;
+          this.rival.y = this.player.y;
+          this.rival.facing = 1;
+        } else {
+          this._applyKickoffPositions();
+        }
+        this._clampFieldPlayers();
+      }
       this.shot = null;
       this.netBreak = null;
       this.goalScene = null;
+      this.encounter = null;
       this._clearDialog();
       this.state = "FIELD";
     }
 
-    _spawnShot({ special, netBreak }) {
-      const p = this.player;
-      const startX = p.x + p.bodySheet.frameW / 2;
-      const startY = p.y + p.bodySheet.frameH / 2;
-      const endX = 242;
+    _spawnShot({ attacker, special, netBreak }) {
+      const team = attacker === "rival" ? "rival" : "player";
+      const pl = team === "rival" ? this.rival : this.player;
+      const startX = pl.x + pl.bodySheet.frameW / 2;
+      const startY = pl.y + pl.bodySheet.frameH / 2;
+      const endX = team === "rival" ? 14 : 242;
       const endY = 122;
       this.shot = {
         x0: startX,
@@ -1583,17 +1854,18 @@
       };
     }
 
-    _spawnPass() {
-      const p = this.player;
-      const startX = p.x + p.bodySheet.frameW / 2;
-      const startY = p.y + p.bodySheet.frameH / 2;
-      const dir = p.facing >= 0 ? 1 : -1;
+    _spawnPass(attacker) {
+      const team = attacker === "rival" ? "rival" : "player";
+      const pl = team === "rival" ? this.rival : this.player;
+      const startX = pl.x + pl.bodySheet.frameW / 2;
+      const startY = pl.y + pl.bodySheet.frameH / 2;
+      const dir = pl.facing >= 0 ? 1 : -1;
       const endX = clamp(startX + dir * 86, 20, 236);
       const endY = clamp(startY + dir * 6, 70, 220);
 
-      const r = this.rival;
-      const rcx = r.x + r.bodySheet.frameW / 2;
-      const rcy = r.y + r.bodySheet.frameH / 2;
+      const opp = team === "rival" ? this.player : this.rival;
+      const rcx = opp.x + opp.bodySheet.frameW / 2;
+      const rcy = opp.y + opp.bodySheet.frameH / 2;
       const dx = endX - startX;
       const dy = endY - startY;
       const len2 = dx * dx + dy * dy || 1;
@@ -1611,6 +1883,7 @@
         t: 0,
         duration: 0.55,
         interceptT,
+        attacker: team,
       };
     }
 
@@ -1627,16 +1900,15 @@
       if (this.pass) {
         this.pass.t += dt / Math.max(0.0001, this.pass.duration);
         if (this.pass.interceptT != null && this.pass.t >= this.pass.interceptT) {
+          const passAttacker = this.pass.attacker === "rival" ? "rival" : "player";
           this.pass = null;
-          this._setPossession("rival");
+          this._setPossession(passAttacker === "player" ? "rival" : "player");
           const p = this.player;
           const r = this.rival;
           const side = p.x + p.bodySheet.frameW / 2 <= r.x + r.bodySheet.frameW / 2 ? 1 : -1;
           p.facing = side;
           r.facing = -side;
-          this.state = "MENU";
-          this.menu.enabled = true;
-          this._setDialog(GAME_TEXTS.ENCOUNTER, { typewriter: true });
+          this._startEncounter({ opponent: "rival", attacker: passAttacker === "player" ? "rival" : "player" });
         } else if (this.pass.t >= 1.0) {
           this.pass = null;
         }
@@ -1778,16 +2050,16 @@
     _makeFallbackUiSheet() {
       const c = document.createElement("canvas");
       c.width = 256 * 4;
-      c.height = 128;
+      c.height = 256;
       const ctx = c.getContext("2d");
       ctx.imageSmoothingEnabled = false;
 
       for (let i = 0; i < 4; i++) {
         const ox = i * 256;
         ctx.fillStyle = "#0b3a78";
-        ctx.fillRect(ox, 0, 256, 128);
+        ctx.fillRect(ox, 0, 256, 256);
         ctx.fillStyle = "#1f2937";
-        ctx.fillRect(ox + 10, 10, 236, 108);
+        ctx.fillRect(ox + 10, 10, 236, 236);
 
         ctx.fillStyle = "#f1c27d";
         ctx.fillRect(ox + 96, 28, 64, 64);
@@ -1805,7 +2077,7 @@
         }
       }
 
-      return new SpriteSheet(c, 256, 128, { columns: 4 });
+      return new SpriteSheet(c, 256, 256, { columns: 4 });
     }
 
     _makeBodySheetsFromUnified(playersImg) {
@@ -1849,7 +2121,7 @@
         const dw = Math.max(1, Math.round(sw * scale));
         const dh = Math.max(1, Math.round(sh * scale));
         const ox = Math.floor((cell - dw) / 2);
-        const oy = Math.floor((cell - dh) / 2);
+        const oy = Math.max(0, cell - dh - 1);
         cctx.drawImage(playersImg, sx, sy, sw, sh, ox, oy, dw, dh);
         const img = cctx.getImageData(0, 0, cell, cell);
         const d = img.data;
@@ -1939,7 +2211,11 @@
         const r = quad(q);
         const comps = extractComponents(r);
         if (comps.length < 10) return null;
-        const sorted = comps.slice(0, 10).sort((a, b) => (a.y - b.y) || (a.x - b.x));
+        const sorted = comps
+          .slice()
+          .sort((a, b) => (b.size - a.size) || (a.y - b.y) || (a.x - b.x))
+          .slice(0, 10)
+          .sort((a, b) => (a.y - b.y) || (a.x - b.x));
         const run = sorted.slice(0, 5).sort((a, b) => a.x - b.x);
         const kick = sorted.slice(5, 10).sort((a, b) => a.x - b.x);
 
@@ -1959,7 +2235,11 @@
         const r = quad(q);
         const comps = extractComponents(r);
         if (comps.length < 6) return null;
-        const sorted = comps.slice(0, 6).sort((a, b) => a.x - b.x);
+        const sorted = comps
+          .slice()
+          .sort((a, b) => (b.size - a.size) || (a.y - b.y) || (a.x - b.x))
+          .slice(0, 6)
+          .sort((a, b) => a.x - b.x);
         const stand = sorted.slice(0, 2).sort((a, b) => a.y - b.y);
         const rest = sorted.slice(2).sort((a, b) => (a.y - b.y) || (a.x - b.x));
         const row1 = rest.slice(0, 2).sort((a, b) => a.x - b.x);
@@ -1982,6 +2262,393 @@
       out.keeperWhite = mkKeeperSheet("TR") || null;
       out.keeperBlue = mkKeeperSheet("BR") || null;
       return out;
+    }
+
+    _sampleBlueKitColor(playersImg) {
+      if (!playersImg || !playersImg.width || !playersImg.height) return { r: 70, g: 140, b: 255 };
+      const c = document.createElement("canvas");
+      c.width = playersImg.width;
+      c.height = playersImg.height;
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(playersImg, 0, 0);
+      const img = ctx.getImageData(0, 0, c.width, c.height);
+      const d = img.data;
+      let sr = 0;
+      let sg = 0;
+      let sb = 0;
+      let n = 0;
+      for (let y = 0; y < c.height; y += 8) {
+        for (let x = 0; x < c.width; x += 8) {
+          const i = (y * c.width + x) * 4;
+          const a = d[i + 3];
+          if (a < 200) continue;
+          const r = d[i];
+          const g = d[i + 1];
+          const b = d[i + 2];
+          if (b < g + 25 || b < r + 25) continue;
+          if (b < 80) continue;
+          sr += r;
+          sg += g;
+          sb += b;
+          n++;
+        }
+      }
+      if (!n) return { r: 70, g: 140, b: 255 };
+      return { r: Math.round(sr / n), g: Math.round(sg / n), b: Math.round(sb / n) };
+    }
+
+    _shouldTintToBlue(sheet) {
+      if (!sheet || !sheet.image) return false;
+      const img = sheet.image;
+      const c = document.createElement("canvas");
+      c.width = img.width;
+      c.height = img.height;
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, 0);
+      const data = ctx.getImageData(0, 0, c.width, c.height).data;
+      let n = 0;
+      let blueScore = 0;
+      let lum = 0;
+      for (let y = 0; y < c.height; y += 6) {
+        for (let x = 0; x < c.width; x += 6) {
+          const i = (y * c.width + x) * 4;
+          const a = data[i + 3];
+          if (a < 180) continue;
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          const l = (r + g + b) / 3;
+          if (l < 60) continue;
+          blueScore += b - (r + g) / 2;
+          lum += l;
+          n++;
+        }
+      }
+      if (!n) return false;
+      return (blueScore / n) < 8 && (lum / n) > 110;
+    }
+
+    _tintUniformToColor(sheet, tint = { r: 70, g: 140, b: 255 }) {
+      const src = sheet.image;
+      const c = document.createElement("canvas");
+      c.width = src.width;
+      c.height = src.height;
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(src, 0, 0);
+      const img = ctx.getImageData(0, 0, c.width, c.height);
+      const d = img.data;
+      const tr = clamp(Math.floor(tint.r ?? 70), 0, 255);
+      const tg = clamp(Math.floor(tint.g ?? 140), 0, 255);
+      const tb = clamp(Math.floor(tint.b ?? 255), 0, 255);
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] < 10) continue;
+        const r = d[i];
+        const g = d[i + 1];
+        const b = d[i + 2];
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        const lum = (r + g + b) / 3;
+        const isWhiteish = lum > 155 && (max - min) < 40;
+        if (!isWhiteish) continue;
+        const f = lum / 255;
+        d[i] = clamp(Math.round(tr * f), 0, 255);
+        d[i + 1] = clamp(Math.round(tg * f), 0, 255);
+        d[i + 2] = clamp(Math.round(tb * f), 0, 255);
+      }
+      ctx.putImageData(img, 0, 0);
+      return new SpriteSheet(c, sheet.frameW, sheet.frameH);
+    }
+
+    _makeBodySheetsFromPlayersGoalkeepers(playersImg) {
+      const out = { white: null, blue: null, keeperWhite: null, keeperBlue: null };
+      if (!playersImg || !playersImg.width || !playersImg.height) return out;
+
+      const tileW = 48;
+      const tileH = 48;
+      const cols = Math.floor(playersImg.width / tileW);
+      const rows = Math.floor(playersImg.height / tileH);
+      if (cols < 5 || rows < 2) return out;
+
+      const q = (r, g, b) => ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+      const bgCounts = new Map();
+
+      const sampleBorder = () => {
+        const c = document.createElement("canvas");
+        c.width = playersImg.width;
+        c.height = playersImg.height;
+        const ctx = c.getContext("2d", { willReadFrequently: true });
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(playersImg, 0, 0);
+        const w = c.width;
+        const h = c.height;
+        const img = ctx.getImageData(0, 0, w, h);
+        const d = img.data;
+        const push = (x, y) => {
+          const i = (y * w + x) * 4;
+          const a = d[i + 3];
+          if (a < 10) return;
+          const k = q(d[i], d[i + 1], d[i + 2]);
+          bgCounts.set(k, (bgCounts.get(k) || 0) + 1);
+        };
+        for (let x = 0; x < w; x += 8) {
+          push(x, 0);
+          push(x, 1);
+          push(x, h - 1);
+          push(x, h - 2);
+        }
+        for (let y = 0; y < h; y += 8) {
+          push(0, y);
+          push(1, y);
+          push(w - 1, y);
+          push(w - 2, y);
+        }
+      };
+      sampleBorder();
+
+      const bgSet = new Set(
+        [...bgCounts.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([k]) => k)
+      );
+
+      const cell = COLLAGE_ATLAS.cell;
+      const cc = document.createElement("canvas");
+      cc.width = tileW;
+      cc.height = tileH;
+      const cctx = cc.getContext("2d", { willReadFrequently: true });
+      cctx.imageSmoothingEnabled = false;
+
+      const drawTileClean = (sx, sy, outCtx, dx, dy, dw, dh) => {
+        cctx.clearRect(0, 0, tileW, tileH);
+        cctx.drawImage(playersImg, sx, sy, tileW, tileH, 0, 0, tileW, tileH);
+        const img = cctx.getImageData(0, 0, tileW, tileH);
+        const d = img.data;
+        for (let i = 0; i < d.length; i += 4) {
+          if (d[i + 3] < 10) continue;
+          if (bgSet.has(q(d[i], d[i + 1], d[i + 2]))) d[i + 3] = 0;
+        }
+        cctx.putImageData(img, 0, 0);
+        outCtx.drawImage(cc, dx, dy, dw, dh);
+      };
+
+      const tileStats = Array.from({ length: rows }, () => Array.from({ length: cols }, () => null));
+      const statTile = (r, c) => {
+        if (tileStats[r][c]) return tileStats[r][c];
+        const sx = c * tileW;
+        const sy = r * tileH;
+        cctx.clearRect(0, 0, tileW, tileH);
+        cctx.drawImage(playersImg, sx, sy, tileW, tileH, 0, 0, tileW, tileH);
+        const img = cctx.getImageData(0, 0, tileW, tileH);
+        const d = img.data;
+        let cnt = 0;
+        let sr = 0;
+        let sg = 0;
+        let sb = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          if (d[i + 3] < 10) continue;
+          if (bgSet.has(q(d[i], d[i + 1], d[i + 2]))) continue;
+          cnt++;
+          sr += d[i];
+          sg += d[i + 1];
+          sb += d[i + 2];
+        }
+        const res = cnt
+          ? { cnt, r: sr / cnt, g: sg / cnt, b: sb / cnt }
+          : { cnt: 0, r: 0, g: 0, b: 0 };
+        tileStats[r][c] = res;
+        return res;
+      };
+
+      const strips = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c <= cols - 5; c++) {
+          let minCnt = Infinity;
+          let sumCnt = 0;
+          let sr = 0;
+          let sg = 0;
+          let sb = 0;
+          for (let i = 0; i < 5; i++) {
+            const st = statTile(r, c + i);
+            minCnt = Math.min(minCnt, st.cnt);
+            sumCnt += st.cnt;
+            sr += st.r * st.cnt;
+            sg += st.g * st.cnt;
+            sb += st.b * st.cnt;
+          }
+          if (minCnt < 120 || sumCnt < 900) continue;
+          const ar = sr / Math.max(1, sumCnt);
+          const ag = sg / Math.max(1, sumCnt);
+          const ab = sb / Math.max(1, sumCnt);
+          const lum = (ar + ag + ab) / 3;
+          const blueScore = ab - (ar + ag) / 2;
+          const greenScore = ag - (ar + ab) / 2;
+          strips.push({ row: r, col: c, sumCnt, lum, blueScore, greenScore, ar, ag, ab });
+        }
+      }
+
+      if (!strips.length) return out;
+
+      const pickWhite = strips
+        .slice()
+        .sort((a, b) => (b.lum - a.lum) || (a.blueScore - b.blueScore) || (b.sumCnt - a.sumCnt))[0];
+      const pickBlue = strips
+        .slice()
+        .sort((a, b) => (b.blueScore - a.blueScore) || (b.sumCnt - a.sumCnt) || (b.lum - a.lum))[0];
+
+      const pickAltStrip = (base, pred) => {
+        const cand = strips
+          .filter((s) => {
+            if (!pred(s)) return false;
+            if (s.row === base.row && s.col === base.col) return false;
+            if (Math.abs(s.row - base.row) > 3) return false;
+            const d = Math.abs(s.lum - base.lum) + Math.abs(s.blueScore - base.blueScore) * 0.7;
+            return d < 30;
+          })
+          .sort((a, b) => (b.sumCnt - a.sumCnt) || (Math.abs(a.row - base.row) - Math.abs(b.row - base.row)));
+        return cand[0] || base;
+      };
+
+      const whiteShot = pickAltStrip(pickWhite, () => true);
+      const blueShot = pickAltStrip(pickBlue, () => true);
+
+      const mkPlayerSheet = (run, shot) => {
+        const c = document.createElement("canvas");
+        c.width = cell * 5;
+        c.height = cell * 3;
+        const ctx = c.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, c.width, c.height);
+        for (let i = 0; i < 5; i++) {
+          drawTileClean((run.col + i) * tileW, run.row * tileH, ctx, i * cell, 0, cell, cell);
+        }
+        for (let i = 0; i < 5; i++) {
+          drawTileClean((shot.col + i) * tileW, shot.row * tileH, ctx, i * cell, cell, cell, cell);
+        }
+        drawTileClean(run.col * tileW, run.row * tileH, ctx, 0, cell * 2, cell, cell);
+        return new SpriteSheet(c, cell, cell);
+      };
+
+      const keeperStrips = [];
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c <= cols - 2; c++) {
+          const a = statTile(r, c);
+          const b = statTile(r, c + 1);
+          const minCnt = Math.min(a.cnt, b.cnt);
+          const sumCnt = a.cnt + b.cnt;
+          if (minCnt < 140 || sumCnt < 520) continue;
+          const ar = (a.r * a.cnt + b.r * b.cnt) / Math.max(1, sumCnt);
+          const ag = (a.g * a.cnt + b.g * b.cnt) / Math.max(1, sumCnt);
+          const ab = (a.b * a.cnt + b.b * b.cnt) / Math.max(1, sumCnt);
+          const lum = (ar + ag + ab) / 3;
+          const blueScore = ab - (ar + ag) / 2;
+          const greenScore = ag - (ar + ab) / 2;
+          keeperStrips.push({ row: r, col: c, sumCnt, lum, blueScore, greenScore });
+        }
+      }
+
+      const pickKeeper = keeperStrips
+        .slice()
+        .sort((a, b) => (b.greenScore - a.greenScore) || (b.sumCnt - a.sumCnt) || (b.lum - a.lum))[0];
+
+      const mkKeeperSheet = (s) => {
+        const c = document.createElement("canvas");
+        c.width = cell * 2;
+        c.height = cell * 3;
+        const ctx = c.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, c.width, c.height);
+        for (let i = 0; i < 2; i++) drawTileClean((s.col + i) * tileW, s.row * tileH, ctx, i * cell, 0, cell, cell);
+        for (let i = 0; i < 2; i++) drawTileClean((s.col + i) * tileW, s.row * tileH, ctx, i * cell, cell, cell, cell);
+        for (let i = 0; i < 2; i++) drawTileClean((s.col + i) * tileW, s.row * tileH, ctx, i * cell, cell * 2, cell, cell);
+        return new SpriteSheet(c, cell, cell);
+      };
+
+      out.white = mkPlayerSheet(pickWhite, whiteShot);
+      out.blue = mkPlayerSheet(pickBlue, blueShot);
+      if (pickKeeper) {
+        out.keeperWhite = mkKeeperSheet(pickKeeper);
+        out.keeperBlue = out.keeperWhite;
+      }
+      return out;
+    }
+
+    _startEncounter({ opponent, attacker }) {
+      const attackerTeam = attacker === "rival" ? "rival" : "player";
+      this.encounter = { opponent, attacker: attackerTeam, field: this._snapshotField(), result: null };
+      this.state = "MENU";
+      this.menu.enabled = true;
+      this.menu.setOptions(this._menuOptionsForEncounter({ opponent, attacker: attackerTeam }));
+      const line = opponent === "rival"
+        ? (attackerTeam === "player" ? this._pick(this.lines.encounter) : "¡Te están encarando! ¡Defiende con inteligencia!")
+        : (attackerTeam === "player" ? GAME_TEXTS.ENCOUNTER : "¡Disparo peligroso! ¡El portero debe reaccionar!");
+      this._setDialog(line, { typewriter: true });
+      this.messageTimer = 0;
+    }
+
+    _snapshotField() {
+      const p = this.player;
+      const r = this.rival;
+      return {
+        possession: this.possession,
+        player: { x: p.x, y: p.y, facing: p.facing },
+        rival: { x: r.x, y: r.y, facing: r.facing },
+      };
+    }
+
+    _applyFieldSnapshot(snap, opts = {}) {
+      const p = this.player;
+      const r = this.rival;
+      p.x = snap.player.x;
+      p.y = snap.player.y;
+      p.facing = snap.player.facing;
+      r.x = snap.rival.x;
+      r.y = snap.rival.y;
+      r.facing = snap.rival.facing;
+      if (opts.possession !== false) this._setPossession(snap.possession);
+    }
+
+    _applyKickoffPositions() {
+      const p = this.player;
+      const r = this.rival;
+      p.x = this.kickoff.player.x;
+      p.y = this.kickoff.player.y;
+      p.facing = 1;
+      r.x = this.kickoff.rival.x;
+      r.y = this.kickoff.rival.y;
+      r.facing = -1;
+      this._setPossession("player");
+    }
+
+    _clampFieldPlayers() {
+      const p = this.player;
+      const r = this.rival;
+      p.x = clamp(p.x, 8, 256 - 8 - p.bodySheet.frameW);
+      p.y = clamp(p.y, 8, FIELD_HEIGHT - 8 - p.bodySheet.frameH);
+      r.x = clamp(r.x, 8, 256 - 8 - r.bodySheet.frameW);
+      r.y = clamp(r.y, 8, FIELD_HEIGHT - 8 - r.bodySheet.frameH);
+    }
+
+    _menuOptionsForEncounter({ opponent, attacker }) {
+      const att = attacker === "rival" ? "rival" : "player";
+      if (att === "rival" && opponent === "keeperHome") return ["Despejar", "Coger", "Salir", "Esperar"];
+      if (att === "rival") return ["Entrada", "Bloqueo", "Intercepción"];
+      return ["Regate", "Pase", "Tiro"];
+    }
+
+    _sceneActors() {
+      const sp = this.scenePlayer || this.player;
+      const sr = this.sceneRival || this.rival;
+      const opp = this.encounter?.opponent || "rival";
+      const attacker = this.encounter?.attacker === "rival" ? "rival" : "player";
+
+      if (opp === "keeperAway") return { left: sp, right: this.keeperAway || sr };
+      if (opp === "keeperHome") return { left: this.keeperHome || sp, right: sr };
+      if (attacker === "rival") return { left: sp, right: sr };
+      return { left: sp, right: sr };
     }
 
     _makeFallbackBodySheet() {
