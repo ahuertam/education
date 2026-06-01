@@ -300,6 +300,14 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       color: "#16A085",
       categories: ['mixed_math']
     },
+    {
+      id: 'digilike',
+      icon: <FaDragon />,
+      title: "Digilike",
+      description: "Roguelike de caminos con Digimon: completa nodos, responde el portal y gestiona tu energía.",
+      color: "#22D3EE",
+      categories: ['mixed_math', 'advanced']
+    },
 
     // English Games
     {

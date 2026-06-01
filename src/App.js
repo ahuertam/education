@@ -29,6 +29,7 @@ import GeometriaMasterGame from './components/GeometriaMasterGame';
 import SupportFab from './components/SupportFab';
 import PokemonMathsGame from './components/PokemonMathsGame';
 import TsubasaRpgGame from './components/TsubasaRpgGame';
+import DigilikeGame from './components/DigilikeGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -156,6 +157,10 @@ function App() {
         />;
       case 'tsubasa':
         return <TsubasaRpgGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'digilike':
+        return <DigilikeGame
           onBack={() => setCurrentView('game-selector')}
         />;
       default:

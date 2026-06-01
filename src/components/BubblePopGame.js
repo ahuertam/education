@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
 
@@ -8,6 +8,17 @@ const popAnimation = keyframes`
   0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.4); opacity: 0.8; }
   100% { transform: scale(0); opacity: 0; }
+`;
+
+const riseAnimation = keyframes`
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(0, -140vh, 0); }
+`;
+
+const wobbleAnimation = keyframes`
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(14px, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 `;
 
 const GameContainer = styled.div`
@@ -73,13 +84,24 @@ const ProblemContainer = styled.div`
   border: 2px solid rgba(255, 255, 255, 0.2);
 `;
 
-const Bubble = styled.div.attrs(props => ({
+const BubbleWrapper = styled.div.attrs(props => ({
   style: {
     left: `${props.$left}%`,
-    bottom: `${props.$bottom}%`,
+    bottom: `-10%`,
   }
 }))`
   position: absolute;
+  animation: ${riseAnimation} ${props => props.$riseDuration}s linear forwards;
+  will-change: transform;
+`;
+
+const BubbleWobble = styled.div`
+  animation: ${wobbleAnimation} ${props => props.$wobbleDuration}s ease-in-out infinite;
+  animation-delay: ${props => props.$wobbleDelay}s;
+  will-change: transform;
+`;
+
+const Bubble = styled.div`
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -173,7 +195,7 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
   const [bubbles, setBubbles] = useState([]);
   const [pops, setPops] = useState([]);
   
-  const gameLoopRef = useRef();
+  const gameAreaRef = useRef(null);
   const popSound = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`)); // Using beep as placeholder
   const errorSound = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
 
@@ -239,7 +261,7 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
     };
   };
 
-  const spawnBubble = (problem) => {
+  const spawnBubble = useCallback((problem) => {
     const isCorrect = Math.random() > 0.6; // 40% chance of correct answer
     let number;
     
@@ -251,18 +273,21 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
       if (number < 0 || number === problem.answer) number = problem.answer + 1;
     }
 
-    const baseSpeed = difficulty === 'easy' ? 0.2 : difficulty === 'medium' ? 1.5 : 2.5;
-    const speed = baseSpeed + Math.random() * (difficulty === 'easy' ? 0.3 : 1.5);
+    const baseRise = difficulty === 'easy' ? 12 : difficulty === 'medium' ? 9 : 7;
+    const riseDuration = baseRise + Math.random() * (difficulty === 'easy' ? 5 : difficulty === 'medium' ? 4 : 3);
+
+    const wobbleDuration = 1.8 + Math.random() * 1.2;
+    const wobbleDelay = -Math.random() * wobbleDuration;
 
     return {
       id: Date.now() + Math.random(),
       number,
       left: Math.random() * 90 + 5,
-      bottom: -10,
-      speed: speed,
-      wobbleOffset: Math.random() * 100
+      riseDuration,
+      wobbleDuration,
+      wobbleDelay
     };
-  };
+  }, [difficulty]);
 
   const startGame = () => {
     setScore(0);
@@ -281,37 +306,36 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
   useEffect(() => {
     if (gamePhase !== 'playing') return;
 
-    const loop = setInterval(() => {
+    const spawnEveryMs = difficulty === 'easy' ? 650 : difficulty === 'medium' ? 520 : 450;
+
+    const spawnLoop = setInterval(() => {
       setBubbles(prev => {
-        // Spawn new bubbles more frequently
-        if (prev.length < 8 && Math.random() < 0.15) {
-          return [...prev, spawnBubble(currentProblem)];
-        }
-
-        // Move existing bubbles
-        return prev
-          .map(b => ({
-            ...b,
-            bottom: b.bottom + b.speed,
-            left: b.left + Math.sin((b.bottom + b.wobbleOffset) * 0.05) * 0.2
-          }))
-          .filter(b => b.bottom < 110); // Remove bubbles that go off screen
+        if (prev.length >= 8) return prev;
+        if (Math.random() > 0.75) return prev;
+        return [...prev, spawnBubble(currentProblem)];
       });
-    }, 16);
+    }, spawnEveryMs);
 
-    gameLoopRef.current = loop;
-    return () => clearInterval(loop);
-  }, [gamePhase, currentProblem, difficulty]);
+    return () => clearInterval(spawnLoop);
+  }, [gamePhase, currentProblem, difficulty, spawnBubble]);
 
-  const handleBubbleClick = (bubble) => {
+  const handleBubbleClick = (bubble, e) => {
     if (bubble.number === currentProblem.answer) {
       // Correct
       popSound.current.currentTime = 0;
       popSound.current.play().catch(e => {});
       setScore(s => s + 10);
       
+      const gameRect = gameAreaRef.current?.getBoundingClientRect();
+      const bubbleRect = e.currentTarget.getBoundingClientRect();
+
+      if (gameRect) {
+        const left = ((bubbleRect.left - gameRect.left) / gameRect.width) * 100;
+        const bottom = ((gameRect.bottom - bubbleRect.bottom) / gameRect.height) * 100;
+        setPops(prev => [...prev, { id: Date.now(), left, bottom }]);
+      }
+
       // Show pop effect
-      setPops(prev => [...prev, { id: Date.now(), left: bubble.left, bottom: bubble.bottom }]);
       setTimeout(() => setPops(prev => prev.slice(1)), 500);
 
       // Remove bubble
@@ -330,7 +354,7 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
   };
 
   return (
-    <GameContainer>
+    <GameContainer ref={gameAreaRef}>
       <Header>
         <Button onClick={onBack}><FaArrowLeft /> Salir</Button>
         <Score>Puntos: {score}</Score>
@@ -359,14 +383,18 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
           </ProblemContainer>
 
           {bubbles.map(bubble => (
-            <Bubble 
+            <BubbleWrapper
               key={bubble.id}
               $left={bubble.left}
-              $bottom={bubble.bottom}
-              onClick={() => handleBubbleClick(bubble)}
+              $riseDuration={bubble.riseDuration}
+              onAnimationEnd={() => setBubbles(prev => prev.filter(b => b.id !== bubble.id))}
             >
-              <BubbleNumber>{bubble.number}</BubbleNumber>
-            </Bubble>
+              <BubbleWobble $wobbleDuration={bubble.wobbleDuration} $wobbleDelay={bubble.wobbleDelay}>
+                <Bubble onClick={(e) => handleBubbleClick(bubble, e)}>
+                  <BubbleNumber>{bubble.number}</BubbleNumber>
+                </Bubble>
+              </BubbleWobble>
+            </BubbleWrapper>
           ))}
 
           {pops.map(pop => (
