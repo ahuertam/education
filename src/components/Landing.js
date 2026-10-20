@@ -2,18 +2,19 @@ import React from 'react';
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import Header from './Header';
-import { 
-  FaPlus, 
-  FaMinus, 
-  FaTimes, 
-  FaBrain, 
-  FaBook, 
+import {
+  FaPlus,
+  FaMinus,
+  FaTimes,
+  FaBrain,
+  FaBook,
   FaPalette,
   FaDivide,
   FaCalculator,
   FaGlobe,
   FaPuzzlePiece,
-  FaProjectDiagram
+  FaProjectDiagram,
+  FaKeyboard
 } from 'react-icons/fa';
 
 const LandingContainer = styled.div`
@@ -200,6 +201,13 @@ const Landing = ({ onNavigate }) => {
       title: "Puzzles",
       description: "Puzzles cooperativos tipo Fireboy & Watergirl con niveles procedurales por semilla.",
       color: "#2D9CDB"
+    },
+    {
+      id: 13,
+      icon: <FaKeyboard />,
+      title: "Mecanografía",
+      description: "Aprende a escribir correctamente en la Typer Dungeon. Derrota monstruos escribiendo palabras.",
+      color: "#8B4513"
     }
   ];
 
@@ -223,10 +231,16 @@ const Landing = ({ onNavigate }) => {
       11: 'puzzles'
     };
 
-    if (categories[activityId]) {
+    // Games that open directly without going through game-selector
+    const directGames = {
+      13: 'typerdungeon',
+    };
+
+    if (directGames[activityId]) {
+      onNavigate(directGames[activityId]);
+    } else if (categories[activityId]) {
       onNavigate('game-selector', categories[activityId]);
     } else {
-      // Find the activity by ID to get its title for the alert
       const activity = activities.find(act => act.id === activityId);
       handleActivityClick(activity || { title: "esta actividad" });
     }

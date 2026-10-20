@@ -30,6 +30,7 @@ import SupportFab from './components/SupportFab';
 import PokemonMathsGame from './components/PokemonMathsGame';
 import TsubasaRpgGame from './components/TsubasaRpgGame';
 import DigilikeGame from './components/DigilikeGame';
+import TyperDungeonGame from './components/TyperDungeon/TyperDungeonGame';
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -51,43 +52,43 @@ function App() {
           category={selectedOperation} // We reuse selectedOperation state for category
         />;
       case 'memory':
-        return <MemoryGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <MemoryGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'space':
-        return <SpaceDefenderGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <SpaceDefenderGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'frog':
-        return <FrogJumpGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <FrogJumpGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'bubbles':
-        return <BubblePopGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <BubblePopGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'mathlander':
-        return <MathLanderGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <MathLanderGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'mathsteroids':
-        return <MathsteroidsGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <MathsteroidsGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'monsterfeeder':
-        return <MonsterFeederGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <MonsterFeederGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'carracing':
-        return <CarRacingGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <CarRacingGame
+          onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
         />;
       case 'accenthunter':
@@ -162,6 +163,10 @@ function App() {
       case 'digilike':
         return <DigilikeGame
           onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'typerdungeon':
+        return <TyperDungeonGame
+          onBack={() => setCurrentView('landing')}
         />;
       default:
         return <Landing onNavigate={handleNavigate} />;
