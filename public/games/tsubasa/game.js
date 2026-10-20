@@ -12,9 +12,9 @@
   })();
 
   const BODY_ANIMATIONS = {
-    RUN: { row: 0, frames: 5, headOffsets: [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }] },
-    SHOT: { row: 1, frames: 5, headOffsets: [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }] },
-    IDLE: { row: 2, frames: 1, headOffsets: [{ x: 0, y: 0 }] },
+    RUN:  { row: 0, frames: 5 },
+    SHOT: { row: 1, frames: 5 },
+    IDLE: { row: 2, frames: 1 },
   };
 
   const GAME_TEXTS = {
@@ -42,9 +42,9 @@
   };
 
   const KEEPER_ANIMATIONS = {
-    RUN: { row: 0, frames: 2, headOffsets: [{ x: 0, y: 0 }, { x: 0, y: 0 }] },
-    SHOT: { row: 1, frames: 2, headOffsets: [{ x: 0, y: 0 }, { x: 0, y: 0 }] },
-    IDLE: { row: 0, frames: 1, headOffsets: [{ x: 0, y: 0 }] },
+    RUN:  { row: 0, frames: 2 },
+    SHOT: { row: 1, frames: 2 },
+    IDLE: { row: 0, frames: 1 },
   };
 
   class Input {
@@ -189,12 +189,8 @@
       x,
       y,
       bodySheet,
-      headSheet,
-      headIndex = 0,
-      bodyFrame = 0,
       facing = 1,
       name = "Player",
-      paperDoll = {},
       animations = BODY_ANIMATIONS,
     }) {
       this.x = x;
@@ -208,9 +204,7 @@
       this.hasBall = false;
 
       this.bodySheet = bodySheet;
-      this.headSheet = headSheet;
-      this.headIndex = headIndex;
-      this.bodyFrame = bodyFrame;
+      this.bodyFrame = 0;
       this.animTime = 0;
       this.animRate = 10;
       this.action = null;
@@ -218,18 +212,6 @@
       this.animName = "IDLE";
       this.animFrame = 0;
       this.animations = animations;
-
-      this.paperDoll = {
-        bodyNeckX: 32,
-        bodyNeckY: 16,
-        headNeckX: 12,
-        headNeckY: 22,
-        headOffsetX: 0,
-        headOffsetY: 0,
-        headFlipX: false,
-        headScale: 1,
-        ...paperDoll,
-      };
     }
 
     update(dt) {
@@ -272,77 +254,15 @@
       this.actionTime = 0;
     }
 
-    _poseOffsets() {
-      const anim = this.animations[this.animName] || this.animations.IDLE || BODY_ANIMATIONS.IDLE;
-      const o = anim.headOffsets[this.animFrame] || anim.headOffsets[0] || { x: this.paperDoll.headOffsetX, y: this.paperDoll.headOffsetY };
-      let headOffsetY = o.y;
-      if (this.animName === "RUN") headOffsetY += this.animFrame % 2 === 1 ? 1 : -1;
-      return { headOffsetX: o.x, headOffsetY };
-    }
-
-    _poseAnchors() {
-      const anim = this.animations[this.animName] || this.animations.IDLE || BODY_ANIMATIONS.IDLE;
-      const a = anim.bodyAnchors && (anim.bodyAnchors[this.animFrame] || anim.bodyAnchors[0]);
-      const baseBody = a || { x: this.paperDoll.bodyNeckX, y: this.paperDoll.bodyNeckY };
-      const body = { x: baseBody.x, y: baseBody.y };
-      if (this.animName === "RUN" && this.animFrame % 2 === 1) body.y += 1;
-      return {
-        body,
-        head: { x: this.paperDoll.headNeckX, y: this.paperDoll.headNeckY },
-      };
-    }
-
     draw(ctx) {
       const flipX = this.facing < 0;
       const bx = Math.round(this.x);
       const by = Math.round(this.y);
-      const pose = this._poseOffsets();
-      const anchors = this._poseAnchors();
 
       const bodyW = this.bodySheet.frameW;
-      const bodyAnchorX = flipX ? bodyW - anchors.body.x : anchors.body.x;
-      const bodyAnchorY = anchors.body.y;
-
       const anim = this.animations[this.animName] || this.animations.IDLE || BODY_ANIMATIONS.IDLE;
       const bodyFrameIndex = anim.row * this.bodySheet.columns + this.animFrame;
       this.bodySheet.drawFrame(ctx, bodyFrameIndex, bx, by, { flipX });
-
-      const bodyAx = Math.round(bx + bodyAnchorX);
-      const bodyAy = Math.round(by + bodyAnchorY);
-
-      if (this.headSheet) {
-        const headFlipX = Boolean(this.paperDoll.headFlipX) ? !flipX : flipX;
-        const headW = this.headSheet.frameW;
-        const headH = this.headSheet.frameH;
-        const headOffsetX = flipX ? -pose.headOffsetX : pose.headOffsetX;
-        const headScale = clamp(Number(this.paperDoll.headScale ?? 1), 0.5, 1.5);
-        const headScaleX = clamp(Number(this.paperDoll.headScaleX ?? headScale), 0.5, 2.0);
-        const headScaleY = clamp(Number(this.paperDoll.headScaleY ?? headScale), 0.5, 2.0);
-        const headAnchorX = (headFlipX ? headW - anchors.head.x : anchors.head.x) * headScaleX;
-        const headAnchorY = anchors.head.y * headScaleY;
-        const headDx = bx + bodyAnchorX + headOffsetX - headAnchorX;
-        const headDy = by + bodyAnchorY + pose.headOffsetY - headAnchorY;
-        const headDw = headW * headScaleX;
-        const headDh = headH * headScaleY;
-        this.headSheet.drawFrameTo(ctx, this.headIndex, headDx, headDy, headDw, headDh, { flipX: headFlipX });
-
-        if (DEBUG_ANCHORS) {
-          const headAx = Math.round(headDx + headAnchorX);
-          const headAy = Math.round(headDy + headAnchorY);
-          if (bodyAx === headAx && bodyAy === headAy) {
-            ctx.fillStyle = "#ff00ff";
-            ctx.fillRect(bodyAx, bodyAy, 1, 1);
-          } else {
-            ctx.fillStyle = "#ff0000";
-            ctx.fillRect(bodyAx, bodyAy, 1, 1);
-            ctx.fillStyle = "#00aaff";
-            ctx.fillRect(headAx, headAy, 1, 1);
-          }
-        }
-      } else if (DEBUG_ANCHORS) {
-        ctx.fillStyle = "#ff0000";
-        ctx.fillRect(bodyAx, bodyAy, 1, 1);
-      }
 
       if (this.hasBall) {
         ctx.fillStyle = "#fff";
@@ -646,20 +566,18 @@
       const v = Date.now();
       const playersSrc = `./assets/nuevo3.png?v=${v}`;
       const playersAltSrc = `./assets/players_goalkeepers_spritesheet.png?v=${v}`;
-      const netBreakSrc = `./assets/net_break.png?v=${v}`;
       const uiSrc = `./assets/ui_elements.png?v=${v}`;
 
       await Promise.all([
         this.assets.loadImage("players", playersSrc).catch(() => null),
         this.assets.loadImage("playersAlt", playersAltSrc).catch(() => null),
-        this.assets.loadImage("netBreak", netBreakSrc).catch(() => null),
         this.assets.loadImage("ui", uiSrc).catch(() => null),
       ]);
 
       const playersImg = this.assets.images.get("players");
       const playersAltImg = this.assets.images.get("playersAlt") || null;
-      this.netBreakImage = this.assets.images.get("netBreak") || null;
-      this.netBreakSheet = this.netBreakImage ? new SpriteSheet(this.netBreakImage, 48, 48) : null;
+      this.netBreakImage = null;
+      this.netBreakSheet = null;
       const uiImg = this.assets.images.get("ui") || null;
 
       let sheets = { white: null, blue: null, keeperWhite: null, keeperBlue: null };
@@ -668,6 +586,13 @@
         sheets = this._makeBodySheetsFromUnified(playersImg);
       } catch (e) {
         sheetWarning = e && e.message ? e.message : String(e);
+      }
+      const unifiedOK = sheets.white || sheets.blue;
+      if (!unifiedOK && playersAltImg) {
+        try {
+          const alt = this._makeBodySheetsFromPlayersGoalkeepers(playersAltImg);
+          if (alt.white) sheets = alt;
+        } catch {}
       }
 
       if (playersAltImg) {
@@ -1196,10 +1121,76 @@
         const dy = randInt(-a, a);
         ctx.translate(dx, dy);
       }
-      ctx.fillStyle = "#091425";
-      ctx.fillRect(0, 0, 256, 240);
+      this._drawField(ctx);
       this._drawUi(ctx);
       ctx.restore();
+    }
+
+    _drawField(ctx) {
+      // Grass
+      ctx.fillStyle = "#0d6b2b";
+      ctx.fillRect(0, 0, FIELD_W, FIELD_HEIGHT);
+      // Stripes
+      ctx.fillStyle = "#0c5e25";
+      for (let i = 0; i < 8; i++) ctx.fillRect(i * 32, 0, 16, FIELD_HEIGHT);
+
+      // Markings
+      ctx.strokeStyle = "rgba(255,255,255,0.45)";
+      ctx.lineWidth = 1;
+      const mid = FIELD_W / 2;
+      ctx.beginPath();
+      ctx.moveTo(mid + 0.5, 0);
+      ctx.lineTo(mid + 0.5, FIELD_HEIGHT);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(mid, FIELD_HEIGHT / 2, 14, 0, Math.PI * 2);
+      ctx.stroke();
+      // Penalty boxes
+      ctx.strokeRect(0, FIELD_HEIGHT / 2 - 24, 24, 48);
+      ctx.strokeRect(FIELD_W - 24, FIELD_HEIGHT / 2 - 24, 24, 48);
+      // Goals
+      ctx.strokeStyle = "rgba(255,255,255,0.7)";
+      ctx.strokeRect(0, FIELD_HEIGHT / 2 - 12, 4, 24);
+      ctx.strokeRect(FIELD_W - 4, FIELD_HEIGHT / 2 - 12, 4, 24);
+
+      // NPCs (dots on the pitch)
+      for (const d of this.npcs) {
+        ctx.fillStyle = d.color;
+        ctx.fillRect(Math.round(d.x), Math.round(d.y), 2, 2);
+      }
+
+      // Keepers (idle pose) — 64px wide, anchored near each goal
+      this._drawKeeperAt(ctx, this.keeperHome, 4, FIELD_HEIGHT / 2 - 32);
+      this._drawKeeperAt(ctx, this.keeperAway, FIELD_W - 4 - 64, FIELD_HEIGHT / 2 - 32);
+
+      // Players (the ones you control + the rival)
+      if (this.state === "FIELD" || this.state === "RESOLVE" ||
+          this.state === "MENU" || this.state === "MATH" || this.state === "GOAL_SCENE") {
+        if (this.player && this.player.bodySheet) this.player.draw(ctx);
+        if (this.rival && this.rival.bodySheet) this.rival.draw(ctx);
+      }
+
+      // Ball / shot / pass / net-break on top of players
+      this._drawShot(ctx);
+      this._drawPass(ctx);
+      this._drawNetBreak(ctx);
+    }
+
+    _drawKeeperAt(ctx, k, x, y) {
+      if (!k || !k.bodySheet) return;
+      const prevX = k.x;
+      const prevY = k.y;
+      const prevName = k.animName;
+      const prevFrame = k.animFrame;
+      k.x = x;
+      k.y = y;
+      k.animName = "IDLE";
+      k.animFrame = 0;
+      k.draw(ctx);
+      k.x = prevX;
+      k.y = prevY;
+      k.animName = prevName;
+      k.animFrame = prevFrame;
     }
 
     _drawMiniMap(ctx, rect) {
@@ -1311,10 +1302,10 @@
         this.commentator.draw(ctx, px, py, size);
         ctx.restore();
       }
-      if (DEBUG_ANCHORS && this.player && this.player.headSheet && this.player.headSheet.image) {
+      if (DEBUG_ANCHORS && this.player && this.player.bodySheet) {
         ctx.save();
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(this.player.headSheet.image, 8, 96, 288 * 2, 24 * 2);
+        ctx.drawImage(this.player.bodySheet.image, 8, 96, this.player.bodySheet.image.width, this.player.bodySheet.image.height);
         ctx.restore();
       }
     }
@@ -2080,19 +2071,44 @@
       return new SpriteSheet(c, 256, 256, { columns: 4 });
     }
 
+    _sampleBgColors(img, sampleStep = 6) {
+      // Quantize to 5 bits/channel (32768 buckets) so JPEG/PNG noise averages out.
+      const q = (v) => v >> 3;
+      const key = (r, g, b) => (q(r) << 10) | (q(g) << 5) | q(b);
+      const c = document.createElement("canvas");
+      c.width = img.width;
+      c.height = img.height;
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, 0);
+      const w = c.width;
+      const h = c.height;
+      const data = ctx.getImageData(0, 0, w, h).data;
+      const counts = new Map();
+      const push = (x, y) => {
+        const i = (y * w + x) * 4;
+        if (data[i + 3] < 10) return;
+        const k = key(data[i], data[i + 1], data[i + 2]);
+        counts.set(k, (counts.get(k) ?? 0) + 1);
+      };
+      for (let x = 0; x < w; x += sampleStep) {
+        push(x, 0); push(x, 1); push(x, h - 1); push(x, h - 2);
+      }
+      for (let y = 0; y < h; y += sampleStep) {
+        push(0, y); push(1, y); push(w - 1, y); push(w - 2, y);
+      }
+      const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k]) => k);
+      return { bgSet: new Set(top), key };
+    }
+
     _makeBodySheetsFromUnified(playersImg) {
       const out = { white: null, blue: null, keeperWhite: null, keeperBlue: null };
       if (!playersImg) return out;
 
       const cell = COLLAGE_ATLAS.cell;
-      const chromaTol = 5;
-      const isChromaBg = (r, g, b) =>
-        (Math.abs(r - 64) <= chromaTol && Math.abs(g - 64) <= chromaTol && Math.abs(b - 64) <= chromaTol) ||
-        (Math.abs(r - 85) <= chromaTol && Math.abs(g - 85) <= chromaTol && Math.abs(b - 85) <= chromaTol) ||
-        (Math.abs(r - 79) <= chromaTol && Math.abs(g - 84) <= chromaTol && Math.abs(b - 90) <= chromaTol) ||
-        (Math.abs(r - 46) <= chromaTol && Math.abs(g - 54) <= chromaTol && Math.abs(b - 56) <= chromaTol) ||
-        (Math.abs(r - 66) <= chromaTol && Math.abs(g - 73) <= chromaTol && Math.abs(b - 81) <= chromaTol) ||
-        (Math.abs(r - 61) <= chromaTol && Math.abs(g - 66) <= chromaTol && Math.abs(b - 72) <= chromaTol);
+      const { bgSet, key } = this._sampleBgColors(playersImg);
+      const isBgPixel = (r, g, b, a) => a < 8 || bgSet.has(key(r, g, b));
+
       const quadW = Math.floor(playersImg.width / 2);
       const quadH = Math.floor(playersImg.height / 2);
       const quad = (q) => {
@@ -2126,8 +2142,7 @@
         const img = cctx.getImageData(0, 0, cell, cell);
         const d = img.data;
         for (let i = 0; i < d.length; i += 4) {
-          if (d[i + 3] < 8) continue;
-          if (isChromaBg(d[i], d[i + 1], d[i + 2])) d[i + 3] = 0;
+          if (isBgPixel(d[i], d[i + 1], d[i + 2], d[i + 3])) d[i + 3] = 0;
         }
         cctx.putImageData(img, 0, 0);
         outCtx.drawImage(cc, dx, dy);
@@ -2145,10 +2160,6 @@
         const d = img.data;
         const w = c.width;
         const h = c.height;
-        const isBg = (i) => {
-          if (d[i + 3] < 8) return true;
-          return isChromaBg(d[i], d[i + 1], d[i + 2]);
-        };
         const vis = new Uint8Array(w * h);
         const qx = new Int16Array(w * h);
         const qy = new Int16Array(w * h);
@@ -2158,7 +2169,8 @@
           for (let x0 = 0; x0 < w; x0++) {
             const idx0 = y0 * w + x0;
             if (vis[idx0]) continue;
-            if (isBg(idx0 * 4)) continue;
+            const pi = idx0 * 4;
+            if (isBgPixel(d[pi], d[pi + 1], d[pi + 2], d[pi + 3])) continue;
             let qh = 0;
             let qt = 0;
             qx[qt] = x0;
@@ -2183,7 +2195,8 @@
               const push = (nx, ny) => {
                 const nidx = ny * w + nx;
                 if (vis[nidx]) return;
-                if (isBg(nidx * 4)) return;
+                const npi = nidx * 4;
+                if (isBgPixel(d[npi], d[npi + 1], d[npi + 2], d[npi + 3])) return;
                 vis[nidx] = 1;
                 qx[qt] = nx;
                 qy[qt] = ny;
@@ -2679,20 +2692,6 @@
       return new SpriteSheet(c, cell, cell);
     }
 
-    _makeFallbackHeadSheet() {
-      const c = document.createElement("canvas");
-      c.width = 24 * 12;
-      c.height = 24;
-      const ctx = c.getContext("2d");
-      for (let i = 0; i < 12; i++) {
-        const ox = i * 24;
-        ctx.fillStyle = "#f1c27d";
-        ctx.fillRect(ox + 6, 4, 12, 14);
-        ctx.fillStyle = i % 3 === 1 ? "#111" : i % 3 === 2 ? "#a00" : "#333";
-        ctx.fillRect(ox + 6, 4, 12, 6);
-      }
-      return new SpriteSheet(c, 24, 24);
-    }
   }
 
   const canvas = document.getElementById("game");
