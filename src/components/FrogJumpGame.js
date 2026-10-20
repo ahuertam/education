@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { FaArrowLeft, FaFrog } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 const jumpAnimation = keyframes`
   0% { transform: translateY(0) scale(1); }
@@ -286,7 +287,7 @@ const EnhancedSplash = ({ left }) => (
   </div>
 );
 
-const FrogJumpGame = ({ onBack, operation = 'multiplication' }) => {
+const FrogJumpGame = ({ onBack, operation = 'multiplication', multiplicationConfig = null }) => {
   const [score, setScore] = useState(0);
   const [gamePhase, setGamePhase] = useState('menu');
   const [difficulty, setDifficulty] = useState('easy');
@@ -346,6 +347,16 @@ const FrogJumpGame = ({ onBack, operation = 'multiplication' }) => {
         break;
       case 'multiplication':
       default:
+        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
+          const fromConfig = generateMultiplicationProblem(multiplicationConfig, max);
+          if (fromConfig) {
+            a = fromConfig.a;
+            b = fromConfig.b;
+            answer = fromConfig.answer;
+            operator = '×';
+            break;
+          }
+        }
         a = Math.floor(Math.random() * (max - min + 1)) + min;
         b = Math.floor(Math.random() * (max - min + 1)) + min;
         answer = a * b;

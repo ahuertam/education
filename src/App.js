@@ -31,10 +31,17 @@ import PokemonMathsGame from './components/PokemonMathsGame';
 import TsubasaRpgGame from './components/TsubasaRpgGame';
 import DigilikeGame from './components/DigilikeGame';
 import TyperDungeonGame from './components/TyperDungeon/TyperDungeonGame';
+import MultiplicationConfig from './components/MultiplicationConfig';
+
+const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
   const [selectedOperation, setSelectedOperation] = useState(null);
+  const [multiplicationConfig, setMultiplicationConfig] = useState({
+    tables: DEFAULT_MULT_TABLES,
+    digitMode: 1,
+  });
 
   const handleNavigate = (view, operation = null) => {
     if (operation) setSelectedOperation(operation);
@@ -45,6 +52,13 @@ function App() {
     switch(currentView) {
       case 'landing':
         return <Landing onNavigate={handleNavigate} />;
+      case 'multiplication-config':
+        return <MultiplicationConfig
+          config={multiplicationConfig}
+          onChange={setMultiplicationConfig}
+          onStart={() => setCurrentView('game-selector')}
+          onBack={() => setCurrentView('landing')}
+        />;
       case 'game-selector':
         return <GameSelector 
           onNavigate={handleNavigate} 
@@ -55,41 +69,49 @@ function App() {
         return <MemoryGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'space':
         return <SpaceDefenderGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'frog':
         return <FrogJumpGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'bubbles':
         return <BubblePopGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'mathlander':
         return <MathLanderGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'mathsteroids':
         return <MathsteroidsGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'monsterfeeder':
         return <MonsterFeederGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'carracing':
         return <CarRacingGame
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       case 'accenthunter':
         return <AccentHunterGame 

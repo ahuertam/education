@@ -906,6 +906,10 @@ const generateQuestion = ({ op, cards, usedKeys, maxTries = 260 }) => {
 
 const operationToGameKey = (op) => `pokemonmaths_${op}`;
 
+// Este juego no recibe `multiplicationConfig` a propósito: sus cuentas salen de
+// las energies de las cartas de la API de Pokémon TCG, así que la configuración
+// de tablas/cifras no aplicaría. Por eso tampoco aparece en la categoría
+// 'multiplication' del selector.
 const PokemonMathsGame = ({ onBack, operation }) => {
   const op = normalizeOp(operation);
   const gameKey = operationToGameKey(op);

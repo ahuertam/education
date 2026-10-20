@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 const GameContainer = styled.div`
   width: 100vw;
@@ -117,7 +118,7 @@ const TouchButton = styled.button`
   }
 `;
 
-const MathsteroidsGame = ({ onBack, operation = 'multiplication' }) => {
+const MathsteroidsGame = ({ onBack, operation = 'multiplication', multiplicationConfig = null }) => {
   const canvasRef = useRef(null);
   const [gameState, setGameState] = useState('start'); // start, playing, gameover
   const [score, setScore] = useState(0);
@@ -183,6 +184,16 @@ const MathsteroidsGame = ({ onBack, operation = 'multiplication' }) => {
         break;
       case 'multiplication':
       default:
+        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
+          const fromConfig = generateMultiplicationProblem(multiplicationConfig);
+          if (fromConfig) {
+            a = fromConfig.a;
+            b = fromConfig.b;
+            answer = fromConfig.answer;
+            operator = '×';
+            break;
+          }
+        }
         a = Math.floor(Math.random() * 9) + 2;
         b = Math.floor(Math.random() * 9) + 2;
         answer = a * b;
@@ -194,7 +205,7 @@ const MathsteroidsGame = ({ onBack, operation = 'multiplication' }) => {
       text: `${a} ${operator} ${b} = ?`,
       answer: answer
     };
-  }, [operation]);
+  }, [operation, multiplicationConfig]);
 
   const createAsteroid = (x, y, size, value, safeZone = null) => {
     let vx, vy;
@@ -650,6 +661,13 @@ const MathsteroidsGame = ({ onBack, operation = 'multiplication' }) => {
           <h1>MATHSTEROIDS</h1>
           <p>Usa las flechas para moverte y ESPACIO para disparar.</p>
           <p>Destruye el asteroide con la respuesta correcta.</p>
+          {operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0 && (
+            <p style={{ fontSize: '0.9rem', opacity: 0.8, marginTop: '0.5rem' }}>
+              Tablas: {multiplicationConfig.tables.join(', ')} ·{' '}
+              {multiplicationConfig.digitMode === 1 ? '1 cifra' :
+               multiplicationConfig.digitMode === 2 ? '2 cifras' : '3 cifras'}
+            </p>
+          )}
           <Button onClick={startGame}>INICIAR MISIÓN</Button>
         </MessageOverlay>
       )}

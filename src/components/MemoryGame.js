@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft, FaRedo } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -84,7 +85,7 @@ const CardBack = styled(CardFace)`
   border: 4px solid #a777e3;
 `;
 
-const MemoryGame = ({ onBack, level = 1, operation = 'multiplication' }) => {
+const MemoryGame = ({ onBack, level = 1, operation = 'multiplication', multiplicationConfig = null }) => {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [solved, setSolved] = useState([]);
@@ -118,12 +119,25 @@ const MemoryGame = ({ onBack, level = 1, operation = 'multiplication' }) => {
           result = a3 / b3;
           break;
         case 'multiplication':
-        default:
-          const a4 = Math.floor(Math.random() * (currentLevel + 2)) + 2;
-          const b4 = Math.floor(Math.random() * 9) + 2;
-          problem = `${a4} × ${b4}`;
-          result = a4 * b4;
+        default: {
+          // El nivel marca el tope de tabla (nivel 1 → hasta la del 3), así que
+          // subir de nivel sigue ensanchando el rango. Si el niño solo eligió
+          // tablas por encima de ese tope, generateMultiplicationProblem
+          // devuelve null y caemos al rango por nivel de siempre.
+          const fromConfig = currentOperation === 'multiplication'
+            ? generateMultiplicationProblem(multiplicationConfig, currentLevel + 2)
+            : null;
+          if (fromConfig) {
+            problem = fromConfig.text;
+            result = fromConfig.answer;
+          } else {
+            const a4 = Math.floor(Math.random() * (currentLevel + 2)) + 2;
+            const b4 = Math.floor(Math.random() * 9) + 2;
+            problem = `${a4} × ${b4}`;
+            result = a4 * b4;
+          }
           break;
+        }
       }
 
       const id = i;

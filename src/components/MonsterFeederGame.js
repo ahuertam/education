@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -223,7 +224,7 @@ const StartButton = styled(Button)`
   }
 `;
 
-const MonsterFeederGame = ({ onBack, operation = 'multiplication' }) => {
+const MonsterFeederGame = ({ onBack, operation = 'multiplication', multiplicationConfig = null }) => {
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState('menu'); // menu, playing
   const [currentProblem, setCurrentProblem] = useState(null);
@@ -257,6 +258,16 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication' }) => {
         break;
       case 'multiplication':
       default:
+        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
+          const fromConfig = generateMultiplicationProblem(multiplicationConfig);
+          if (fromConfig) {
+            a = fromConfig.a;
+            b = fromConfig.b;
+            answer = fromConfig.answer;
+            operator = '×';
+            break;
+          }
+        }
         a = Math.floor(Math.random() * (max - min + 1)) + min;
         b = Math.floor(Math.random() * (max - min + 1)) + min;
         answer = a * b;
@@ -268,17 +279,22 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication' }) => {
       text: `${a} ${operator} ${b}`,
       answer
     };
-  }, [operation]);
+  }, [operation, multiplicationConfig]);
 
   const generateFoodItems = useCallback((problem) => {
     const items = [];
     const answers = new Set([problem.answer]);
     
-    // Generate 5 wrong answers
-    while(answers.size < 6) {
-      const offset = Math.floor(Math.random() * 10) - 5;
-      const wrong = problem.answer + offset;
-      if (wrong >= 0 && wrong !== problem.answer && wrong <= 100) {
+    // Generate 5 wrong answers.
+    // The spread scales with the answer: with tables up to 20 and 3-digit
+    // multiplicands the answer can be ~20000, so a fixed ±5 window can never
+    // produce a distinct value and the loop never terminates.
+    const spread = Math.max(5, Math.round(problem.answer * 0.1));
+    let attempts = 0;
+    while (answers.size < 6 && attempts < 100) {
+      attempts++;
+      const wrong = problem.answer + Math.floor(Math.random() * spread * 2) - spread;
+      if (wrong >= 0 && wrong !== problem.answer) {
         answers.add(wrong);
       }
     }
@@ -407,6 +423,13 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication' }) => {
         <MenuOverlay>
           <h1 style={{ color: '#9B59B6', marginBottom: '1rem', fontSize: '2.5rem' }}>🍽️ Alimenta al Monstruo</h1>
           <p style={{ fontSize: '1.2rem', color: '#555' }}>Arrastra la comida correcta a la boca del monstruo</p>
+          {operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0 && (
+            <p style={{ fontSize: '0.9rem', color: '#777', marginTop: '0.5rem' }}>
+              Tablas: {multiplicationConfig.tables.join(', ')} ·{' '}
+              {multiplicationConfig.digitMode === 1 ? '1 cifra' :
+               multiplicationConfig.digitMode === 2 ? '2 cifras' : '3 cifras'}
+            </p>
+          )}
           <StartButton onClick={startGame}>¡Jugar!</StartButton>
         </MenuOverlay>
       )}

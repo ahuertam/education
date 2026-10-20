@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 
 
@@ -187,7 +188,7 @@ const DifficultyButton = styled.button`
   }
 `;
 
-const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
+const BubblePopGame = ({ onBack, operation = 'multiplication', multiplicationConfig = null }) => {
   const [score, setScore] = useState(0);
   const [gamePhase, setGamePhase] = useState('menu');
   const [difficulty, setDifficulty] = useState('easy');
@@ -248,6 +249,16 @@ const BubblePopGame = ({ onBack, operation = 'multiplication' }) => {
         break;
       case 'multiplication':
       default:
+        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
+          const fromConfig = generateMultiplicationProblem(multiplicationConfig, max);
+          if (fromConfig) {
+            a = fromConfig.a;
+            b = fromConfig.b;
+            answer = fromConfig.answer;
+            operator = '×';
+            break;
+          }
+        }
         a = Math.floor(Math.random() * (max - min + 1)) + min;
         b = Math.floor(Math.random() * (max - min + 1)) + min;
         answer = a * b;

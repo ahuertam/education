@@ -239,7 +239,12 @@ const Landing = ({ onNavigate }) => {
     if (directGames[activityId]) {
       onNavigate(directGames[activityId]);
     } else if (categories[activityId]) {
-      onNavigate('game-selector', categories[activityId]);
+      // Multiplicación pasa primero por la pantalla de selección de tablas/cifras
+      if (categories[activityId] === 'multiplication') {
+        onNavigate('multiplication-config', 'multiplication');
+      } else {
+        onNavigate('game-selector', categories[activityId]);
+      }
     } else {
       const activity = activities.find(act => act.id === activityId);
       handleActivityClick(activity || { title: "esta actividad" });

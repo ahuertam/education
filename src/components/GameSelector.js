@@ -178,7 +178,9 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
       title: "PokemonMaths",
       description: `Usa cartas Pokémon para resolver operaciones ${info.action}. Sin repetir preguntas y con ranking local.`,
       color: "#FBBF24",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
+      // Sin 'multiplication': sus cuentas salen de las energies de las cartas, no
+      // de la configuración de tablas/cifras que elegimos antes de entrar.
+      categories: ['addition', 'subtraction', 'division']
     },
     
     // Knowledge Games

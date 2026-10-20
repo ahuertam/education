@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft, FaRocket } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -208,7 +209,7 @@ const DifficultyButton = styled(OptionButton)`
   }
 `;
 
-const SpaceDefenderGame = ({ onBack, operation = 'multiplication' }) => {
+const SpaceDefenderGame = ({ onBack, operation = 'multiplication', multiplicationConfig = null }) => {
   const [score, setScore] = useState(0);
   const [asteroids, setAsteroids] = useState([]);
   const [currentProblem, setCurrentProblem] = useState(null);
@@ -277,6 +278,16 @@ const SpaceDefenderGame = ({ onBack, operation = 'multiplication' }) => {
         break;
       case 'multiplication':
       default:
+        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
+          const fromConfig = generateMultiplicationProblem(multiplicationConfig, max);
+          if (fromConfig) {
+            a = fromConfig.a;
+            b = fromConfig.b;
+            answer = fromConfig.answer;
+            operator = '×';
+            break;
+          }
+        }
         a = Math.floor(Math.random() * (max - min + 1)) + min;
         b = Math.floor(Math.random() * (max - min + 1)) + min;
         answer = a * b;

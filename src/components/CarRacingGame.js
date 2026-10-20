@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaArrowLeft, FaCar } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 const drive = keyframes`
   0% { transform: translateY(0px); }
@@ -221,7 +222,7 @@ const WinMessage = styled.div`
   font-weight: bold;
 `;
 
-const CarRacingGame = ({ onBack, operation = 'multiplication' }) => {
+const CarRacingGame = ({ onBack, operation = 'multiplication', multiplicationConfig = null }) => {
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState('menu'); // menu, playing, finished
   const [currentProblem, setCurrentProblem] = useState(null);
@@ -259,6 +260,16 @@ const CarRacingGame = ({ onBack, operation = 'multiplication' }) => {
         break;
       case 'multiplication':
       default:
+        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
+          const fromConfig = generateMultiplicationProblem(multiplicationConfig);
+          if (fromConfig) {
+            a = fromConfig.a;
+            b = fromConfig.b;
+            answer = fromConfig.answer;
+            operator = '×';
+            break;
+          }
+        }
         a = Math.floor(Math.random() * (max - min + 1)) + min;
         b = Math.floor(Math.random() * (max - min + 1)) + min;
         answer = a * b;
@@ -270,7 +281,7 @@ const CarRacingGame = ({ onBack, operation = 'multiplication' }) => {
       text: `${a} ${operator} ${b}`,
       answer
     };
-  }, [operation]);
+  }, [operation, multiplicationConfig]);
 
   const generateAnswers = useCallback((problem) => {
     const choices = new Set([problem.answer]);
@@ -363,6 +374,13 @@ const CarRacingGame = ({ onBack, operation = 'multiplication' }) => {
         <MenuOverlay>
           <h1 style={{ color: '#E74C3C', marginBottom: '1rem', fontSize: '2.5rem' }}>🏎️ Carrera de Coches</h1>
           <p style={{ fontSize: '1.2rem', color: '#555' }}>¡Responde correctamente para avanzar!</p>
+          {operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0 && (
+            <p style={{ fontSize: '0.9rem', color: '#777', marginTop: '0.5rem' }}>
+              Tablas: {multiplicationConfig.tables.join(', ')} ·{' '}
+              {multiplicationConfig.digitMode === 1 ? '1 cifra' :
+               multiplicationConfig.digitMode === 2 ? '2 cifras' : '3 cifras'}
+            </p>
+          )}
           <StartButton onClick={startGame}>¡Comenzar Carrera!</StartButton>
         </MenuOverlay>
       )}

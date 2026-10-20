@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
 
 const GameContainer = styled.div`
   width: 100vw;
@@ -116,7 +117,7 @@ const TouchButton = styled.button`
   }
 `;
 
-const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
+const MathLanderGame = ({ onBack, operation = 'multiplication', multiplicationConfig = null }) => {
   const canvasRef = useRef(null);
   const [gameState, setGameState] = useState('start'); // start, playing, landed, crashed, gameover
   const [score, setScore] = useState(0);
@@ -178,6 +179,16 @@ const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
         break;
       case 'multiplication':
       default:
+        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
+          const fromConfig = generateMultiplicationProblem(multiplicationConfig);
+          if (fromConfig) {
+            a = fromConfig.a;
+            b = fromConfig.b;
+            answer = fromConfig.answer;
+            operator = '×';
+            break;
+          }
+        }
         a = Math.floor(Math.random() * 9) + 2;
         b = Math.floor(Math.random() * 9) + 2;
         answer = a * b;
@@ -664,6 +675,13 @@ const MathLanderGame = ({ onBack, operation = 'multiplication' }) => {
           <p>Usa las flechas para controlar la nave.</p>
           <p>Aterriza suavemente en la plataforma con la respuesta correcta.</p>
           <p>¡Cuidado con la velocidad y el combustible!</p>
+          {operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0 && (
+            <p style={{ fontSize: '0.9rem', opacity: 0.8, marginTop: '0.5rem' }}>
+              Tablas: {multiplicationConfig.tables.join(', ')} ·{' '}
+              {multiplicationConfig.digitMode === 1 ? '1 cifra' :
+               multiplicationConfig.digitMode === 2 ? '2 cifras' : '3 cifras'}
+            </p>
+          )}
           <Button onClick={startGame}>INICIAR MISIÓN</Button>
         </MessageOverlay>
       )}
