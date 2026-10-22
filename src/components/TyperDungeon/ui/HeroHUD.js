@@ -69,7 +69,7 @@ const FloorBadge = styled.div`
 `;
 
 export default function HeroHUD({ hp, maxHp, floor, totalFloors }) {
-  const pct = Math.max(0, Math.round((hp / maxHp) * 100));
+  const pct = maxHp > 0 ? Math.max(0, Math.round((hp / maxHp) * 100)) : 0;
   return (
     <HUD>
       <Row>

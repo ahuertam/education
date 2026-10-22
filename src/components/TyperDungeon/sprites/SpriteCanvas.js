@@ -2,6 +2,19 @@ import React, { useRef, useEffect } from 'react';
 
 const imgCache = {};
 const frameCache = new Map();
+// Recortar la croma y hacer el trim cuesta un flood-fill por frame. Cacheamos,
+// pero sin tope un piso entero retiene decenas de MB de canvas para toda la
+// sesión. Cada entrada es un canvas del tamaño de su celda.
+const MAX_CACHED_FRAMES = 96;
+const warned = new Set();
+
+function cacheFrame(key, canvas) {
+  frameCache.set(key, canvas);
+  // Map itera en orden de inserción: el primero que sale es el más antiguo.
+  if (frameCache.size > MAX_CACHED_FRAMES) {
+    frameCache.delete(frameCache.keys().next().value);
+  }
+}
 
 function loadImage(src) {
   if (imgCache[src]) return Promise.resolve(imgCache[src]);
@@ -346,9 +359,14 @@ export default function SpriteCanvas({
         clearW, clearH, bgTolerance, trim, trimBgTolerance, trimEdgeThreshold,
         cleanupTolerance,
       });
-      frameCache.set(cacheKey, cached);
+      cacheFrame(cacheKey, cached);
       finalize(cached);
-    }).catch(() => {});
+    }).catch((err) => {
+      // Sin esto el fallo se tragaba y el sprite salía en negro sin dar pistas.
+      if (warned.has(src)) return;
+      warned.add(src);
+      console.warn('[SpriteCanvas] no se pudo cargar', src, err);
+    });
 
     return () => { cancelled = true; };
   }, [

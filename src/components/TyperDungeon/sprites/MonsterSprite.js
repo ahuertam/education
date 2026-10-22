@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import SpriteCanvas from './SpriteCanvas';
+import { MONSTERS_SPRITE } from '../data/sprites';
 
-const SHEET = `${process.env.PUBLIC_URL}/games/mazmorra/monsters.png`;
+const SHEET = MONSTERS_SPRITE.src;
 
 const hurtShake = keyframes`
   0%,100% { transform: translateX(0); filter: brightness(1); }

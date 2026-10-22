@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { DUNGEON_SPRITE, DUNGEON_GRID } from '../data/sprites';
 
@@ -14,14 +14,18 @@ const CELL_H = Math.floor(SHEET_H / ROWS);
 const LABEL_H = DUNGEON_SPRITE.labelH;
 
 const imgCache = new Map();
+// Cacheamos la promesa, no solo el resultado: así un asset que falla no se
+// vuelve a pedir en cada resize, y uno que funciona no re-resuelve.
 function loadSheet(src) {
-  if (imgCache.has(src)) return Promise.resolve(imgCache.get(src));
-  return new Promise((resolve, reject) => {
+  if (imgCache.has(src)) return imgCache.get(src);
+  const p = new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload  = () => { imgCache.set(src, img); resolve(img); };
+    img.onload  = () => resolve(img);
     img.onerror = reject;
     img.src = src;
   });
+  imgCache.set(src, p);
+  return p;
 }
 
 // Draws the cropped dungeon cell onto the canvas, filling it completely
@@ -74,30 +78,46 @@ const Canvas = styled.canvas`
 export default function DungeonBackground({ bgKey, children, className, style }) {
   const wrapperRef = useRef(null);
   const canvasRef  = useRef(null);
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
     const canvas  = canvasRef.current;
     if (!wrapper || !canvas) return;
     let cancelled = false;
+    let lastW = 0, lastH = 0, lastImg = null;
 
     const render = (img) => {
       if (cancelled) return;
       const w = wrapper.offsetWidth  || 1;
       const h = wrapper.offsetHeight || 1;
+      // El ResizeObserver también avisa cuando el tamaño no ha cambiado, y el
+      // ajuste de bgKey repinta aunque el canvas mida igual.
+      if (img && lastImg === img && w === lastW && h === lastH) return;
+      lastImg = img; lastW = w; lastH = h;
       canvas.width  = w;
       canvas.height = h;
-      drawCover(canvas, img, bgKey);
-      if (!ready) setReady(true);
+      if (img) {
+        drawCover(canvas, img, bgKey);
+      } else {
+        // Asset roto: fondo plano en vez de una promesa rechazada suelta y un
+        // canvas en negro sin explicación.
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = FALLBACK_COLOR;
+        ctx.fillRect(0, 0, w, h);
+      }
     };
 
-    loadSheet(SHEET_URL).then(img => { if (!cancelled) render(img); });
+    // El segundo argumento de then es el fallo: sin él el reject de onerror
+    // queda sin manejar y se ve como "Unhandled Promise Rejection" en consola.
+    loadSheet(SHEET_URL).then(render, (err) => {
+      console.warn('[DungeonBackground] no se pudo cargar', SHEET_URL, err);
+      render(null);
+    });
 
     let ro;
     if (typeof ResizeObserver !== 'undefined') {
       ro = new ResizeObserver(() => {
-        loadSheet(SHEET_URL).then(img => { if (!cancelled) render(img); });
+        loadSheet(SHEET_URL).then(render, () => render(null));
       });
       ro.observe(wrapper);
     }
@@ -106,7 +126,7 @@ export default function DungeonBackground({ bgKey, children, className, style })
       cancelled = true;
       if (ro) ro.disconnect();
     };
-  }, [bgKey, ready]);
+  }, [bgKey]);
 
   return (
     <div

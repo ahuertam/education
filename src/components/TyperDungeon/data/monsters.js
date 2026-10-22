@@ -100,13 +100,22 @@ const BOSS_TIER_BY_FLOOR = { 1: 1, 2: 2, 3: 2, 4: 3, 5: 3, 6: 3, 7: 4, 8: 4, 9: 
 
 export function pickMonster(floor) {
   const tier = TIER_BY_FLOOR[Math.min(floor, 10)] ?? 1;
-  const pool = getMonstersByTier(tier);
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pickFrom(tier);
 }
 
 export function pickBossMonster(floor, totalFloors) {
   if (floor >= totalFloors) return MONSTERS.dragon;
   const tier = BOSS_TIER_BY_FLOOR[Math.min(floor, 9)] ?? 2;
+  return pickFrom(tier);
+}
+
+// El tier 5 solo contiene al dragón, y getMonstersByTier lo excluye: sin este
+// respaldo el piso 10 se quedaba sin monstruo, START_BATTLE devolvía el estado
+// sin cambiarlo y la partida se colgaba para siempre en pre_battle.
+function pickFrom(tier) {
   const pool = getMonstersByTier(tier);
-  return pool[Math.floor(Math.random() * pool.length)];
+  if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
+  const fallback = getMonstersByTier(4);
+  const usable = fallback.length > 0 ? fallback : MONSTERS_LIST;
+  return usable[Math.floor(Math.random() * usable.length)];
 }

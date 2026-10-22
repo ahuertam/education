@@ -42,8 +42,21 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
   useEffect(() => {
     setFrame(0);
     if (state === 'hurt') return undefined;
-    const id = setInterval(() => setFrame(f => (f + 1) % totalFrames), speed);
-    return () => clearInterval(id);
+
+    // El interval sigue corriendo con la pestaña oculta y cada tick encola un
+    // setState: el navegador lo ralentiza pero no lo para. Pausamos y reanudamos.
+    const tick = () => setFrame(f => (f + 1) % totalFrames);
+    let id = null;
+    const start = () => { if (id === null && !document.hidden) id = setInterval(tick, speed); };
+    const stop  = () => { if (id !== null) { clearInterval(id); id = null; } };
+    const onVisibility = () => (document.hidden ? stop() : start());
+
+    start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, [state, totalFrames, speed]);
 
   useEffect(() => {
