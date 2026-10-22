@@ -1,3 +1,13 @@
+# Edutika — juegos educativos para Primaria
+
+Web de juegos matemáticos, de lengua y de conocimiento general. 26 minijuegos, en
+español, en <https://edutika.es>.
+
+**La guía del repo está en [`docs/ia.md`](docs/ia.md)**: qué juegos hay, dónde está
+cada componente, cómo se navega entre pantallas y cómo añadir un juego nuevo.
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

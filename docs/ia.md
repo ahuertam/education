@@ -1,92 +1,216 @@
-# IA.md — Índice rápido de juegos (Education)
+# Guía del repo — dónde está cada juego y cada pieza
 
-Este archivo existe para que cualquier agente de IA (o dev) pueda entender **qué juegos hay**, **cómo se navega entre pantallas**, y **dónde tocar** para añadir/modificar juegos, sin tener que recorrer todo el proyecto.
+Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
+navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-## Resumen de arquitectura (launcher)
+Datos a fecha de la última revisión: **26 juegos**, 30 vistas, 34 componentes.
 
-- La app es React (CRA) y monta `App` desde [index.js](file:///Users/home/Desktop/proyects/education/src/index.js).
-- No hay rutas por URL (no se usa `react-router`). La navegación interna se hace con un estado `currentView` y un `switch` en [App.js](file:///Users/home/Desktop/proyects/education/src/App.js#L20-L102).
-- Flujo principal:
-  - `landing` → [Landing.js](file:///Users/home/Desktop/proyects/education/src/components/Landing.js) (selección de categorías).
-  - `game-selector` → [GameSelector.js](file:///Users/home/Desktop/proyects/education/src/components/GameSelector.js) (lista de juegos filtrada por categoría).
-  - `<game id>` → componente del juego correspondiente (renderizado en [App.js](file:///Users/home/Desktop/proyects/education/src/App.js#L29-L101)).
+---
 
-### Categorías (landing)
+## 1. Arranque rápido
 
-El mapping “tarjeta → categoría” está en [Landing.js](file:///Users/home/Desktop/proyects/education/src/components/Landing.js#L131-L150):
+```bash
+npm install
+npm start          # http://localhost:3000
+npm run build      # genera build/
+npm run deploy     # publica build/ en la rama gh-pages
+```
 
-- `addition`, `subtraction`, `multiplication`, `division`
-- `knowledge`, `vocabulary`, `shapes`, `geometria`, `mixed_math`, `english`, `advanced`, `puzzles`
+Despliegue en <https://edutika.es>. La rama `gh-pages` se regenera entera desde
+`build/` en cada `npm run deploy`; el dominio sale de `public/CNAME`, que CRA copia al
+build. **No borres `public/CNAME`**, o el sitio pierde su dominio.
 
-### Catálogo de juegos (selector)
+---
 
-La lista fuente de juegos está en `allGames[]` dentro de [GameSelector.js](file:///Users/home/Desktop/proyects/education/src/components/GameSelector.js#L85-L202).
+## 2. Cómo funciona la navegación
 
-- `id` es la “ruta interna” (valor de `currentView`).
-- `categories[]` determina en qué categoría aparece.
-- Al pulsar un juego: `onNavigate(game.id, category)` (pasa `category` como segundo parámetro).
+**No hay router.** No se usa `react-router`, ni URLs, ni history. Todo pasa por un
+estado `currentView` y un `switch` en [`src/App.js`](../src/App.js).
 
-### Contrato de props por tipo de juego
+```
+Landing  ──►  game-selector  ──►  <juego>
+   │               ▲
+   │               └── MultiplicationConfig ◄─┘  (solo multiplicación)
+   │
+   └──────────►  typerdungeon        (abre directo, sin selector)
+```
 
-En [App.js](file:///Users/home/Desktop/proyects/education/src/App.js#L29-L101):
+- `handleNavigate(view, operation)` fija la vista y, opcionalmente, la categoría.
+- `selectedOperation` se reutiliza como la categoría que filtra el `GameSelector`.
+- Para **volver atrás** desde un juego: `onBack={() => setCurrentView('game-selector')}`.
+  Salvo los que vienen de la landing, que vuelven a `landing`.
 
-- Juegos de matemáticas (suma/resta/multi/div): reciben `operation={selectedOperation}` y `onBack`.
-- Juegos no-matemáticos actuales: reciben solo `onBack` (p. ej. `knowledgetower`, `accenthunter`, `shapegoalkeeper`, `kitchen`, `dragontragon`).
+---
 
-## Juegos existentes (IDs, categorías y archivos clave)
+## 3. Mapa completo: ruta → componente
 
-La columna “ID (view)” debe coincidir simultáneamente con:
-- el `id` de [GameSelector.js](file:///Users/home/Desktop/proyects/education/src/components/GameSelector.js#L85-L202)
-- el `case` del `switch` en [App.js](file:///Users/home/Desktop/proyects/education/src/App.js#L29-L101)
+| `currentView` | Componente | Fichero |
+|---|---|---|
+| `landing` | Landing | [`Landing.js`](../src/components/Landing.js) |
+| `multiplication-config` | MultiplicationConfig | [`MultiplicationConfig.js`](../src/components/MultiplicationConfig.js) |
+| `game-selector` | GameSelector | [`GameSelector.js`](../src/components/GameSelector.js) |
+| `memory` | Memorama Matemático | [`MemoryGame.js`](../src/components/MemoryGame.js) |
+| `space` | Defensor Espacial | [`SpaceDefenderGame.js`](../src/components/SpaceDefenderGame.js) |
+| `frog` | El Salto de la Rana | [`FrogJumpGame.js`](../src/components/FrogJumpGame.js) |
+| `bubbles` | Pop de Burbujas | [`BubblePopGame.js`](../src/components/BubblePopGame.js) |
+| `mathlander` | Math Lander | [`MathLanderGame.js`](../src/components/MathLanderGame.js) |
+| `mathsteroids` | Mathsteroids | [`MathsteroidsGame.js`](../src/components/MathsteroidsGame.js) |
+| `monsterfeeder` | Alimenta al Monstruo | [`MonsterFeederGame.js`](../src/components/MonsterFeederGame.js) |
+| `carracing` | Carrera de Coches | [`CarRacingGame.js`](../src/components/CarRacingGame.js) |
+| `pokemonmaths` | PokemonMaths | [`PokemonMathsGame.js`](../src/components/PokemonMathsGame.js) |
+| `knowledgetower` | Torre del Saber | [`KnowledgeTowerGame.js`](../src/components/KnowledgeTowerGame.js) |
+| `spainrivers` | Ríos de España | [`SpainRiversLocatorGame.js`](../src/components/SpainRiversLocatorGame.js) |
+| `ylahora` | ¿Y la hora? | [`YLaHoraGame.js`](../src/components/YLaHoraGame.js) |
+| `inmnunodefender` | InmnunoDefender | [`InmnunoDefenderGame.js`](../src/components/InmnunoDefenderGame.js) |
+| `sudokumath` | Sudoku Math | [`SudokuMathGame.js`](../src/components/SudokuMathGame.js) |
+| `tsubasa` | RPG Fútbol (Turnos) | [`TsubasaRpgGame.js`](../src/components/TsubasaRpgGame.js) |
+| `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
+| `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
+| `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
+| `tiposverbos` | Tipos de Verbos | [`TiposDeVerbosGame.js`](../src/components/TiposDeVerbosGame.js) |
+| `shapegoalkeeper` | Portero de Formas | [`ShapeGoalkeeperGame.js`](../src/components/ShapeGoalkeeperGame.js) |
+| `geometriaMaster` | Geometría Master | [`GeometriaMasterGame.js`](../src/components/GeometriaMasterGame.js) |
+| `kitchen` | La Cocina | [`KitchenGame.js`](../src/components/KitchenGame.js) |
+| `hanoikitchen` | Hanoi Kitchen | [`HanoiKitchenGame.js`](../src/components/HanoiKitchenGame.js) |
+| `digilike` | Digilike | [`DigilikeGame.js`](../src/components/DigilikeGame.js) |
+| `dragontragon` | Dragón Tragón | [`DragonTragonGame.js`](../src/components/DragonTragonGame.js) |
+| `firewaterpuzzles` | Fuego & Agua (Procedural) | [`FireWaterPuzzlesGame.js`](../src/components/FireWaterPuzzlesGame.js) |
+| `typerdungeon` | Typer Dungeon | [`TyperDungeon/TyperDungeonGame.js`](../src/components/TyperDungeon/TyperDungeonGame.js) |
 
-| Juego | ID (view) | Categorías | Componente | Datos / estilos | Assets |
-|---|---|---|---|---|---|
-| Memorama Matemático | `memory` | `addition`, `subtraction`, `multiplication`, `division` | [MemoryGame.js](file:///Users/home/Desktop/proyects/education/src/components/MemoryGame.js) | — | — |
-| Defensor Espacial | `space` | `addition`, `subtraction`, `multiplication`, `division` | [SpaceDefenderGame.js](file:///Users/home/Desktop/proyects/education/src/components/SpaceDefenderGame.js) | — | `public/beep.mp3`, `public/explosion.mp3`, `public/stars.mp3` |
-| El Salto de la Rana | `frog` | `addition`, `subtraction`, `multiplication`, `division` | [FrogJumpGame.js](file:///Users/home/Desktop/proyects/education/src/components/FrogJumpGame.js) | — | `public/beep.mp3` (y referencia a `splash.mp3`, ver “Detalles”) |
-| Pop de Burbujas | `bubbles` | `addition`, `subtraction`, `multiplication`, `division` | [BubblePopGame.js](file:///Users/home/Desktop/proyects/education/src/components/BubblePopGame.js) | — | `public/beep.mp3` |
-| Math Lander | `mathlander` | `addition`, `subtraction`, `multiplication`, `division` | [MathLanderGame.js](file:///Users/home/Desktop/proyects/education/src/components/MathLanderGame.js) | — | `public/explosion.mp3`, `public/stars.mp3` |
-| Mathsteroids | `mathsteroids` | `addition`, `subtraction`, `multiplication`, `division` | [MathsteroidsGame.js](file:///Users/home/Desktop/proyects/education/src/components/MathsteroidsGame.js) | — | `public/explosion.mp3`, `public/stars.mp3` |
-| Alimenta al Monstruo | `monsterfeeder` | `addition`, `subtraction`, `multiplication`, `division` | [MonsterFeederGame.js](file:///Users/home/Desktop/proyects/education/src/components/MonsterFeederGame.js) | — | `public/moster2.png` |
-| Carrera de Coches | `carracing` | `addition`, `subtraction`, `multiplication`, `division` | [CarRacingGame.js](file:///Users/home/Desktop/proyects/education/src/components/CarRacingGame.js) | — | — |
-| PokemonMaths | `pokemonmaths` | `addition`, `subtraction`, `multiplication`, `division` | [PokemonMathsGame.js](file:///Users/home/Desktop/proyects/education/src/components/PokemonMathsGame.js) | API pública: pokemontcg.io + ranking local en `utils/rankings.js` | — |
-| Torre del Saber | `knowledgetower` | `knowledge` | [KnowledgeTowerGame.js](file:///Users/home/Desktop/proyects/education/src/components/KnowledgeTowerGame.js) | [knowledgeTowerQuestions.json](file:///Users/home/Desktop/proyects/education/src/components/data/knowledgeTowerQuestions.json), [knowledgeTowerCategories.js](file:///Users/home/Desktop/proyects/education/src/components/data/knowledgeTowerCategories.js), [KnowledgeTowerStyles.js](file:///Users/home/Desktop/proyects/education/src/components/styles/KnowledgeTowerStyles.js) | `public/lab2.mp3` |
-| Ríos de España (Mapa) | `spainrivers` | `knowledge` | [SpainRiversLocatorGame.js](file:///Users/home/Desktop/proyects/education/src/components/SpainRiversLocatorGame.js) | [spainRiversData.js](file:///Users/home/Desktop/proyects/education/src/components/data/spainRiversData.js), [SpainRiversMap.js](file:///Users/home/Desktop/proyects/education/src/components/rivers/SpainRiversMap.js) | — |
-| ¿Y la hora? | `ylahora` | `knowledge` | [YLaHoraGame.js](file:///Users/home/Desktop/proyects/education/src/components/YLaHoraGame.js) | — | — |
-| InmnunoDefender | `inmnunodefender` | `knowledge` | [InmnunoDefenderGame.js](file:///Users/home/Desktop/proyects/education/src/components/InmnunoDefenderGame.js) | — | — |
-| Cazador de Acentos | `accenthunter` | `vocabulary` | [AccentHunterGame.js](file:///Users/home/Desktop/proyects/education/src/components/AccentHunterGame.js) | — | `public/lab2.mp3` |
-| Sintaxis | `sintaxis` | `vocabulary` | [SintaxisGame.js](file:///Users/home/Desktop/proyects/education/src/components/SintaxisGame.js) | [sintaxisSentences.js](file:///Users/home/Desktop/proyects/education/src/components/data/sintaxisSentences.js) | — |
-| Tiempos Verbales | `tiemposverbales` | `vocabulary` | [TiemposVerbalesGame.js](file:///Users/home/Desktop/proyects/education/src/components/TiemposVerbalesGame.js) | [tiemposVerbalesLevel1.js](file:///Users/home/Desktop/proyects/education/src/components/data/tiemposVerbalesLevel1.js) | — |
-| Tipos de Verbos | `tiposverbos` | `vocabulary` | [TiposDeVerbosGame.js](file:///Users/home/Desktop/proyects/education/src/components/TiposDeVerbosGame.js) | [verbTypesQuestions.js](file:///Users/home/Desktop/proyects/education/src/components/data/verbTypesQuestions.js) | — |
-| Portero de Formas | `shapegoalkeeper` | `shapes` | [ShapeGoalkeeperGame.js](file:///Users/home/Desktop/proyects/education/src/components/ShapeGoalkeeperGame.js) | [shapeGoalkeeperData.js](file:///Users/home/Desktop/proyects/education/src/components/data/shapeGoalkeeperData.js) | `public/lab2.mp3` |
-| Geometría Master | `geometriaMaster` | `geometria` | [GeometriaMasterGame.js](file:///Users/home/Desktop/proyects/education/src/components/GeometriaMasterGame.js) | [geometriaMasterChannel1.js](file:///Users/home/Desktop/proyects/education/src/components/data/geometriaMasterChannel1.js), [FlappyBonusLevel.js](file:///Users/home/Desktop/proyects/education/src/components/FlappyBonusLevel.js) | — |
-| La Cocina | `kitchen` | `mixed_math` | [KitchenGame.js](file:///Users/home/Desktop/proyects/education/src/components/KitchenGame.js) | — | `public/lab1.mp3` |
-| Hanoi Kitchen | `hanoikitchen` | `mixed_math` | [HanoiKitchenGame.js](file:///Users/home/Desktop/proyects/education/src/components/HanoiKitchenGame.js) | — | — |
-| Dragón Tragón | `dragontragon` | `english` | [DragonTragonGame.js](file:///Users/home/Desktop/proyects/education/src/components/DragonTragonGame.js) | [dragonLessons.json](file:///Users/home/Desktop/proyects/education/src/components/data/dragonLessons.json) | — |
-| Sudoku Math | `sudokumath` | `advanced` | [SudokuMathGame.js](file:///Users/home/Desktop/proyects/education/src/components/SudokuMathGame.js) | — | — |
-| Fuego & Agua (Procedural) | `firewaterpuzzles` | `puzzles` | [FireWaterPuzzlesGame.js](file:///Users/home/Desktop/proyects/education/src/components/FireWaterPuzzlesGame.js) | — | — |
+---
 
-## Assets usados por juegos (carpeta public)
+## 4. Categorías
 
-- Audio: [beep.mp3](file:///Users/home/Desktop/proyects/education/public/beep.mp3), [explosion.mp3](file:///Users/home/Desktop/proyects/education/public/explosion.mp3), [stars.mp3](file:///Users/home/Desktop/proyects/education/public/stars.mp3), [lab1.mp3](file:///Users/home/Desktop/proyects/education/public/lab1.mp3), [lab2.mp3](file:///Users/home/Desktop/proyects/education/public/lab2.mp3)
-- Imagen: [moster2.png](file:///Users/home/Desktop/proyects/education/public/moster2.png)
+Definidas en dos sitios, y ambos hay que tocarlos a la vez:
 
-## Cómo añadir un juego nuevo (mínimo viable)
+1. **Tarjetas de la landing** → arrays `activities` y `categories` en [`Landing.js`](../src/components/Landing.js).
+2. **Juegos de cada categoría** → `categories: [...]` por juego en [`GameSelector.js`](../src/components/GameSelector.js).
 
-1) Crear el componente del juego en `src/components/` (por ejemplo `MyNewGame.js`).
-2) Registrarlo en el catálogo:
-   - Añadir un item en `allGames[]` en [GameSelector.js](file:///Users/home/Desktop/proyects/education/src/components/GameSelector.js#L85-L202) con:
-     - `id` único
-     - `title`, `description`, `icon`, `color`
-     - `categories: []` con una o varias categorías existentes
-3) Cablearlo en el switch:
-   - Importar el componente y añadir `case '<id>'` en [App.js](file:///Users/home/Desktop/proyects/education/src/App.js#L1-L101).
-4) Si hace falta una categoría nueva:
-   - Añadirla en el mapping `categories` de [Landing.js](file:///Users/home/Desktop/proyects/education/src/components/Landing.js#L131-L150).
-   - Añadir el `case` correspondiente en `getCategoryInfo()` de [GameSelector.js](file:///Users/home/Desktop/proyects/education/src/components/GameSelector.js#L58-L81).
+| id landing | Tarjeta | Categoría |
+|---|---|---|
+| 1 | Práctica de Sumas | `addition` |
+| 2 | Práctica de Restas | `subtraction` |
+| 3 | Tablas de Multiplicar | `multiplication` *(pasa antes por la config)* |
+| 4 | División Divertida | `division` |
+| 5 | Conocimientos Generales | `knowledge` |
+| 6 | Vocabulario | `vocabulary` |
+| 7 | Colores y Formas | `shapes` |
+| 12 | Geometría | `geometria` |
+| 8 | Matemáticas Mixtas | `mixed_math` |
+| 9 | Inglés | `english` |
+| 10 | Avanzado | `advanced` |
+| 11 | Puzzles | `puzzles` |
+| 13 | Mecanografía | abre `typerdungeon` directo |
 
-## Detalles / notas útiles
+---
 
-- `FrogJumpGame` referencia `splash.mp3` como placeholder pero no existe actualmente en `public/`: [FrogJumpGame.js](file:///Users/home/Desktop/proyects/education/src/components/FrogJumpGame.js#L298-L300).
-- `MultiplicationSelector.js` parece no usarse (no está enlazado desde `App`/`Landing`/`GameSelector`): [MultiplicationSelector.js](file:///Users/home/Desktop/proyects/education/src/components/MultiplicationSelector.js).
-- Scripts de ejecución y deploy: [package.json](file:///Users/home/Desktop/proyects/education/package.json#L18-L26).
+## 5. Componentes que no son juegos
+
+| Componente | Para qué |
+|---|---|
+| [`Header.js`](../src/components/Header.js) | Cabecera y logo |
+| [`ActivityCard.js`](../src/components/ActivityCard.js) | Cada tarjeta de la landing |
+| [`GameSelector.js`](../src/components/GameSelector.js) | Lista de juegos filtrada por categoría |
+| [`MultiplicationConfig.js`](../src/components/MultiplicationConfig.js) | Elección de tablas y cifras |
+| [`SupportFab.js`](../src/components/SupportFab.js) | Botón de donación Ko-fi |
+| [`FlappyBonusLevel.js`](../src/components/FlappyBonusLevel.js) | Nivel extra del juego Flappy |
+
+---
+
+## 6. Datos y utilidades
+
+| Ruta | Contenido |
+|---|---|
+| [`src/utils/multiplicationProblem.js`](../src/utils/multiplicationProblem.js) | Generador compartido de cuentas de multiplicar |
+| [`src/utils/rankings.js`](../src/utils/rankings.js) | Ranking local en `localStorage` |
+| [`src/components/data/`](../src/components/data/) | Datasets: preguntas de conocimiento, sintaxis, ríos, geometría, formas |
+| [`src/components/styles/`](../src/components/styles/) | Estilos sueltos de juegos grandes |
+| [`src/components/rivers/`](../src/components/rivers/) | Mapa SVG de España y sus ríos |
+| [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/) | Motor de Fuego & Agua |
+| [`src/config/support.js`](../src/config/support.js) | Enlaces de soporte / donación |
+
+---
+
+## 7. Assets
+
+Todo lo estático vive en `public/` y CRA lo copia tal cual a `build/`.
+
+| Ruta | Qué es |
+|---|---|
+| [`public/games/tsubasa/`](../public/games/tsubasa/) | Juego de fútbol completo en **vanilla JS**, cargado en iframe |
+| [`public/games/mazmorra/`](../public/games/mazmorra/) | Los tres spritesheets de Typer Dungeon (1268×832) |
+| `public/*.png`, `public/*.mp3` | Logos, sprites sueltos y efectos de sonido |
+| `public/CNAME` | Dominio de GitHub Pages — **no borrar** |
+
+Rutas dentro del código: siempre con `${process.env.PUBLIC_URL}` delante. Es la
+variable de Create React App; si el proyecto cambia de bundler hay que migrarla a
+`import.meta.env.BASE_URL`.
+
+---
+
+## 8. Configuración de multiplicación
+
+Los juegos de cuentas comparten un generador:
+
+```js
+import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+
+const problema = generateMultiplicationProblem(multiplicationConfig, maxTable);
+```
+
+- `multiplicationConfig` viene de `App.js` y lo rellena `MultiplicationConfig`:
+  `{ tables: number[], digitMode: 1 | 2 | 3 }`.
+- `maxTable` es el tope de dificultad del juego (fácil 9, media 12, difícil 20).
+  **Las tablas por encima del tope se descartan**, de modo que el selector de
+  dificultad de cada juego sigue mandando sobre qué tablas entran.
+- Devuelve `null` si no hay configuración utilizable: el juego cae entonces a su
+  rango `min/max` de siempre.
+
+`PokemonMaths` **no** recibe configuración: sus cuentas salen de las energies de las
+cartas de la API de Pokémon TCG, por eso está fuera de la categoría `multiplication`.
+
+---
+
+## 9. Typer Dungeon
+
+Único juego con estructura modular. Todo bajo
+[`src/components/TyperDungeon/`](../src/components/TyperDungeon/):
+
+```
+TyperDungeonGame.js      selects la escena según state.phase
+data/       monsters.js · words.js · sprites.js
+hooks/      useDungeonMap.js (genera el piso) · useGameState.js (reducer)
+scenes/     MenuScene · DungeonScene · BattleScene · VictoryScene · GameOverScene
+sprites/    SpriteCanvas (recorte de croma + trim + caché) · HeroSprite · MonsterSprite
+ui/         DungeonBackground · HeroHUD · TypingInput · WordBubble
+```
+
+Fases del reducer: `exploring` → `pre_battle` → `battle` → `monster_dying` →
+`stairs_found` → `descend`, más `victory` y `game_over`.
+
+El detalle de diseño está en [`TyperDungeon-plan.md`](TyperDungeon-plan.md).
+
+---
+
+## 10. Añadir un juego
+
+1. Crea `src/components/MiJuegoGame.js` que exporte el componente y acepte `onBack`.
+2. Añade el `case 'miJuego'` en el `switch` de [`src/App.js`](../src/App.js).
+3. Añade la entrada al array de juegos de
+   [`GameSelector.js`](../src/components/GameSelector.js) con sus `categories`.
+4. Si es una categoría nueva, también la tarjeta en
+   [`Landing.js`](../src/components/Landing.js) (arrays `activities` **y** `categories`).
+
+Si el juego necesita datos, déjalos en `src/components/data/` como el resto.
+
+---
+
+## 11. Pendientes conocidos
+
+- [`MultiplicationSelector.js`](../src/components/MultiplicationSelector.js) está
+  muerto: no lo importa nadie. Sobró de la configuración de multiplicación.
+- Hay styled-components copiados entre escenas de Typer Dungeon
+  (`ControlPanel`/`HeroPanel`/`StatsPanel`) y entre `GameOverScene`/`VictoryScene`.
+- `npm run build` emite warnings de `eslint` preexistentes en varios juegos
+  (`useEffect` con dependencias faltantes, imports sin usar). No bloquean el build
+  salvo que se ejecute con `CI=true`, que los convierte en errores.
