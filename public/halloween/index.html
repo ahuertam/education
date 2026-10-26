@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Circo Maldito - CEIP José Iturzaeta</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #0d0b0d;
+            color: #f3e5ab;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 650px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .banner-webview {
+            background: #451a03;
+            border: 2px dashed #f59e0b;
+            color: #fef3c7;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+        .panel {
+            background: #141214;
+            border: 4px double #d97706;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
+            position: relative;
+        }
+        .badge-cash {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #7f1d1d;
+            border: 1px solid #dc2626;
+            color: #fecaca;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        h1 {
+            color: #dc2626;
+            text-align: center;
+            font-size: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            text-shadow: 0 0 8px #7f1d1d;
+        }
+        .sub-header {
+            text-align: center;
+            color: #fbbf24;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .location {
+            display: block;
+            text-align: center;
+            background: #d97706;
+            color: #000;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            width: fit-content;
+            margin: 8px auto 14px auto;
+        }
+        .grid-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            background: #00000066;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #3f3f46;
+            font-size: 13px;
+        }
+        @media(min-width: 500px) {
+            .grid-info {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .info-title {
+            color: #fbbf24;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .highlight-box {
+            background: #451a0366;
+            border: 1px solid #78350f;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+        .game-title {
+            color: #fbbf24;
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .btn-option {
+            background: #1f191f;
+            border: 1px solid #78350f;
+            color: #fef3c7;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+        .btn-option:hover {
+            background: #450a0a;
+            border-color: #dc2626;
+        }
+        .input-name {
+            width: 100%;
+            max-width: 280px;
+            padding: 8px;
+            background: #000;
+            border: 2px solid #fbbf24;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            margin: 10px auto;
+            display: block;
+            font-weight: bold;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #fbbf24;
+            border-radius: 8px;
+            display: block;
+            margin: 10px auto;
+        }
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .btn-action {
+            background: #059669;
+            color: white;
+            font-weight: bold;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-download {
+            background: #d97706;
+            color: black;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- ALERTA NAVEGADOR WHATSAPP -->
+        <div id="webview-alert" class="banner-webview">
+            📱 <strong>Navegador de WhatsApp Detectado:</strong> Las descargas están restringidas por WhatsApp. Toma una <strong>captura de pantalla</strong> a tu pase digital.
+        </div>
+
+        <!-- CARTEL Y DATOS DEL EVENTO -->
+        <div class="panel">
+            <span class="badge-cash">💵 SÓLO EFECTIVO</span>
+            <div class="sub-header">FIESTA DE HALLOWEEN</div>
+            <h1>EL CIRCO MALDITO</h1>
+            <span class="location">📍 CEIP JOSÉ ITURZAETA</span>
+
+            <div class="grid-info">
+                <div>
+                    <span class="info-title">📅 FECHA Y HORA</span>
+                    <p>Viernes 30 de Octubre • Desde las 18:30h</p>
+
+                    <div style="margin-top: 8px;">
+                        <span class="info-title">🎪 ACTIVIDADES</span>
+                        <p>• Pasaje del Terror</p>
+                        <p>• Tren de la Bruja + Talleres</p>
+                    </div>
+
+                    <div class="highlight-box">
+                        💡 <strong>¿Miedosos?:</strong> Pases programados CON LUZ.
+                    </div>
+                </div>
+
+                <div>
+                    <span class="info-title">🎟️ ENTRADAS</span>
+                    <p>• <strong>3€:</strong> Entrada a 1 Actividad</p>
+                    <p>• <strong>5€:</strong> Entrada + Perrito + Bebida</p>
+
+                    <div class="highlight-box" style="border-color: #7f1d1d; background: #450a0a66;">
+                        <span class="info-title" style="color: #fca5a5;">📌 VENTA ANTICIPADA</span>
+                        <p>Días 28 y 29 de Octubre</p>
+                        <p>Horarios: 9:00, 16:00 y 17:00h</p>
+                        <span class="info-title" style="color: #fca5a5;">📌 VENTA EN TAQUILLA</span>
+                        <p>DIA 30</p>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 11px; margin-top: 10px; opacity: 0.8;">
+                Organiza 6.º Curso. Colabora AMPA CEIP José Iturzaeta.
+            </p>
+        </div>
+
+        <!-- PRUEBA DE VALOR INTERACTIVA -->
+        <div class="panel">
+            <!-- PANTALLA DE PREGUNTAS -->
+            <div id="quiz-screen">
+                <div id="quiz-num" style="color: #d97706; font-size: 11px; text-align: center; font-weight: bold; margin-bottom: 4px;"></div>
+                <div id="quiz-title" class="game-title"></div>
+                <p id="quiz-desc" style="text-align: center; font-size: 13px; margin-bottom: 14px;"></p>
+                <div id="quiz-options"></div>
+            </div>
+
+            <!-- PANTALLA DE RESULTADO Y PASE DIGITAL -->
+            <div id="result-screen" class="hidden">
+                <div class="game-title">🎟️ ¡PRUEBA COMPLETADA!</div>
+                <p style="text-align: center; font-size: 12px; margin-bottom: 8px;">Escribe tu nombre para generar tu pase digital:</p>
+                
+                <input type="text" id="playerName" class="input-name" placeholder="Tu Nombre..." oninput="drawCanvas()">
+                
+                <canvas id="ticketCanvas" width="480" height="270"></canvas>
+
+                <div id="screenshot-msg" class="highlight-box hidden" style="text-align: center; font-size: 12px;">
+                    📸 <strong>¡HAZ UNA CAPTURA DE PANTALLA!</strong><br>
+                    Guarda la imagen en tu galería para llevarla al evento.
+                </div>
+
+                <div id="standard-actions" class="action-btns">
+                    <button class="btn-action btn-download" onclick="downloadImage()">💾 Descargar Pase (PNG)</button>
+                    <button class="btn-action" onclick="shareWhatsAppText()">💬 Compartir por WhatsApp</button>
+                </div>
+
+                <button onclick="restartQuiz()" style="background: none; border: none; color: #fbbf24; text-decoration: underline; font-size: 12px; cursor: pointer; display: block; margin: 12px auto 0 auto;">🔄 Repetir Prueba de Valor</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isWebView = false;
+        let score = 0;
+        let currentQuizStep = 0;
+
+        const quizQuestions = [
+            {
+                title: "🔮 PRUEBA 1: El Mimo de Sombras",
+                desc: "Al entrar en el pasillo ves un mimo inmóvil que te observa fijamente en la penumbra. ¿Qué haces?",
+                opts: [
+                    { text: "🛡️ Avanzar mirándole fijamente a los ojos", pts: 35 },
+                    { text: "🧭 Caminar rápido agarrado a tus amigos", pts: 20 },
+                    { text: "👻 Pedir un pase con luz para los más miedosos", pts: 10 }
+                ]
+            },
+            {
+                title: "🔮 PRUEBA 2: La Mesa de la Pitonisa",
+                desc: "La Pitonisa lee tu futuro en la bola de cristal y te da tres opciones para continuar:",
+                opts: [
+                    { text: "🎪 Entrar directo al Pasaje del Terror", pts: 35 },
+                    { text: "🚂 Preferir el Tren de la Bruja y los talleres", pts: 20 },
+                    { text: "🌭 Comprar primero la entrada de 5€ con perrito y bebida", pts: 15 }
+                ]
+            },
+            {
+                title: "🔮 PRUEBA 3: La Salida del Circo",
+                desc: "Llegas al tramo final con sonidos de cadenas y sombras espeluznantes. ¿Cómo sales?",
+                opts: [
+                    { text: "🔥 Cruzar la puerta con paso firme", pts: 30 },
+                    { text: "👥 Esperar al siguiente grupo para salir todos juntos", pts: 20 },
+                    { text: "🚪 Usar la salida de emergencia de arrepentidos", pts: 5 }
+                ]
+            }
+        ];
+
+        function checkWebView() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            isWebView = (ua.indexOf("WhatsApp") > -1) || (ua.indexOf("wv") > -1);
+            if (isWebView) {
+                document.getElementById('webview-alert').style.display = 'block';
+                document.getElementById('standard-actions').classList.add('hidden');
+                document.getElementById('screenshot-msg').classList.remove('hidden');
+            }
+        }
+
+        function loadQuestion() {
+            const q = quizQuestions[currentQuizStep];
+            document.getElementById('quiz-num').innerText = 'DESAFÍO ' + (currentQuizStep + 1) + ' DE ' + quizQuestions.length;
+            document.getElementById('quiz-title').innerText = q.title;
+            document.getElementById('quiz-desc').innerText = q.desc;
+
+            const container = document.getElementById('quiz-options');
+            container.innerHTML = '';
+
+            q.opts.forEach(function(o) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerText = o.text;
+                btn.onclick = function() {
+                    score += o.pts;
+                    currentQuizStep++;
+                    if (currentQuizStep < quizQuestions.length) {
+                        loadQuestion();
+                    } else {
+                        showResult();
+                    }
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            drawCanvas();
+        }
+
+        function restartQuiz() {
+            score = 0;
+            currentQuizStep = 0;
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function getRoleLabel(val) {
+            if (val >= 80) return 'VALIENTE EXTREMO';
+            if (val >= 50) return 'EXPLORADOR CAUTO';
+            return 'ASUSTADIZO CON LUZ';
+        }
+
+        function drawCanvas() {
+            const cvs = document.getElementById('ticketCanvas');
+            const ctx = cvs.getContext('2d');
+            const name = document.getElementById('playerName').value.trim() || 'Superviviente';
+
+            ctx.fillStyle = '#141214';
+            ctx.fillRect(0, 0, cvs.width, cvs.height);
+
+            ctx.strokeStyle = '#d97706';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(8, 8, cvs.width - 16, cvs.height - 16);
+
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'bold 22px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('EL CIRCO MALDITO', cvs.width / 2, 45);
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('CEIP JOSÉ ITURZAETA • HALLOWEEN', cvs.width / 2, 65);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.fillText('PASE: ' + name.toUpperCase(), cvs.width / 2, 115);
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.font = '13px sans-serif';
+            ctx.fillText('NIVEL: ' + getRoleLabel(score) + ' (' + score + '%)', cvs.width / 2, 140);
+
+            ctx.fillStyle = '#a1a1aa';
+            ctx.font = '12px sans-serif';
+            ctx.fillText('Viernes 30 de Octubre | Desde 18:30h', cvs.width / 2, 180);
+            ctx.fillText('Entradas: 3€ / 5€ (Perrito+Bebida) • Efectivo', cvs.width / 2, 205);
+            ctx.fillText('Venta anticipada: Días 22 y 23 (9:00, 16:00, 17:00h)', cvs.width / 2, 225);
+        }
+
+        function downloadImage() {
+            const cvs = document.getElementById('ticketCanvas');
+            const a = document.createElement('a');
+            a.download = 'Pase-Circo-Maldito.png';
+            a.href = cvs.toDataURL();
+            a.click();
+        }
+
+        function shareWhatsAppText() {
+            const name = document.getElementById('playerName').value.trim() || 'Un valiente';
+            const txt = '🎪 *EL CIRCO MALDITO - CEIP JOSÉ ITURZAETA* 🎪\n\nSoy *' + name + '* y mi nivel de valor es *' + getRoleLabel(score) + '* (' + score + '%).\n\n📅 *Fecha:* Viernes 30 de Octubre (18:30h)\n🎟️ *Entradas:* 3€ / 5€ (Perrito + Bebida)\n📌 *Venta Anticipada:* Días 22 y 23 (9:00, 16:00 y 17:00h)\n💵 *Sólo pago en efectivo*\n\n¡Atrévete a entrar!';
+            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(txt), '_blank');
+        }
+
+        window.onload = function() {
+            checkWebView();
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
