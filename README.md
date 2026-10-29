@@ -1,80 +1,144 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. 26 minijuegos, en
-español, en <https://edutika.es>.
+Web de juegos matemáticos, de lengua y de conocimiento general. **26 minijuegos** en
+español, pensados para niños de Primaria.
 
-**La guía del repo está en [`docs/ia.md`](docs/ia.md)**: qué juegos hay, dónde está
-cada componente, cómo se navega entre pantallas y cómo añadir un juego nuevo.
+🌐 **[edutika.es](https://edutika.es)**
+
+![React](https://img.shields.io/badge/React-19-blue)
+![Stack](https://img.shields.io/badge/stack-CRA%20%2B%20Phaser%20%2B%20Matter.js-blueviolet)
+![Licencia](https://img.shields.io/badge/licencia-MIT-green)
+
+> 📖 **La guía del repo está en [`docs/ia.md`](docs/ia.md)**: qué juegos hay, dónde está
+> cada componente, cómo se navega entre pantallas y cómo añadir un juego nuevo.
 
 ---
 
-# Getting Started with Create React App
+## Los juegos
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Agrupados por la categoría desde la que se alcanzan. Un mismo juego puede entrar en
+varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 
-## Available Scripts
+### ➕➖✖️➗ Matemáticas
 
-In the project directory, you can run:
+| Juego | Qué hace |
+|---|---|
+| **Memorama Matemático** | Encuentra las parejas de operaciones y resultados. |
+| **Defensor Espacial** | Destruye asteroides resolviendo operaciones. |
+| **El Salto de la Rana** | Ayuda a la rana a cruzar el estanque. |
+| **Pop de Burbujas** | Explota las burbujas correctas. |
+| **Math Lander** | Aterriza en la respuesta correcta. |
+| **Mathsteroids** | Destruye asteroides con la respuesta correcta. |
+| **Alimenta al Monstruo** | Arrastra la comida correcta. |
+| **Carrera de Coches** | ¡Acelera respondiendo correctamente! |
+| **PokemonMaths** | Usa cartas Pokémon para resolver operaciones, sin repetir preguntas y con ranking local. |
 
-### `npm start`
+### 🧠 Conocimiento general
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Juego | Qué hace |
+|---|---|
+| **Torre del Saber** | Construye la torre más alta respondiendo preguntas de cultura general. |
+| **Ríos de España (Mapa)** | Localiza 8 ríos principales en el mapa. Modo Rápido y modo Orden. |
+| **¿Y la hora?** | Lee la hora y suma o resta 15, 30 y 60 minutos con un reloj grande. |
+| **InmnunoDefender** | Glóbulo blanco contra virus y bacterias, respondiendo preguntas entre oleadas. |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 📚 Lengua y vocabulario
 
-### `npm test`
+| Juego | Qué hace |
+|---|---|
+| **Cazador de Acentos** | Identifica diptongos e hiatos explotando globos. |
+| **Sintaxis** | Detective sintáctico: verbo, sujeto, predicado y complementos (CD y CI). |
+| **Tiempos Verbales** | Reto rápido para elegir la forma verbal correcta. |
+| **Tipos de Verbos** | Clasifica verbos en regulares, irregulares y defectivos. |
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🎨 Formas, color y geometría
 
-### `npm run build`
+| Juego | Qué hace |
+|---|---|
+| **Portero de Formas** | Detén las formas y colores correctos en la portería. |
+| **Geometría Master** | Ejercicios de geometría + bonus tipo Flappy por cada acierto. |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🧩 Mixto, puzzles y avanzado
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Juego | Qué hace |
+|---|---|
+| **La Cocina** | Prepara el antídoto mezclando ingredientes con fracciones y decimales. |
+| **Hanoi Kitchen** | Torre de Hanoi: vierte la cantidad exacta en el caldero. |
+| **Digilike** | Roguelike de caminos: completa nodos, responde el portal y gestiona tu energía. |
+| **Sudoku Math** | Sudoku donde cada número se usa una vez para que las operaciones cuadren. |
+| **RPG Fútbol (Turnos)** | Regate, pase o tiro: resuelve retos matemáticos para subir la probabilidad de éxito. |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 🇬🇧 Inglés
 
-### `npm run eject`
+| Juego | Qué hace |
+|---|---|
+| **Dragón Tragón** | Cómete las palabras correctas para formar la frase en inglés. |
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 🔥 Puzzles
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+| Juego | Qué hace |
+|---|---|
+| **Fuego & Agua (Procedural)** | Fireboy & Watergirl: coop local, puertas, botones y niveles generados por semilla. |
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### ⌨️ Mecanografía
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+| Juego | Qué hace |
+|---|---|
+| **Typer Dungeon** | RPG de tecleo por turnos: explorar, combatir escribiendo y bajar escaleras. Se abre directo desde la portada, sin pasar por el selector. |
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Arranque rápido
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm install
+npm start          # http://localhost:3000
+```
 
-### Code Splitting
+## Scripts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+| Comando | Qué hace |
+|---|---|
+| `npm start` | Servidor de desarrollo con recarga en caliente. |
+| `npm run build` | Build de producción en `build/`. |
+| `npm test` | Tests en modo watch. |
+| `npm run deploy` | Publica `build/` en la rama `gh-pages` (ejecuta `build` antes). |
 
-### Analyzing the Bundle Size
+## Cómo está montado
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
+  estado de `App.js` y un `switch` que decide el componente a pintar.
+- **Un generador compartido** para las cuentas de multiplicar
+  ([`src/utils/multiplicationProblem.js`](src/utils/multiplicationProblem.js)), alimentado
+  por la configuración de tablas y cifras que se elige antes de entrar. El selector de
+  dificultad de cada juego manda sobre qué tablas entran.
+- **Datasets** en [`src/components/data/`](src/components/data/): preguntas de conocimiento,
+  sintaxis, ríos, geometría y formas.
+- **Ranking local** en `localStorage` ([`src/utils/rankings.js`](src/utils/rankings.js)).
+- **Typer Dungeon** es el único juego con estructura modular: escenas, hooks y un reducer
+  de fases (`exploring → pre_battle → battle → monster_dying → stairs_found → descend`).
+- **Recursos** en `public/`: el juego de fútbol va en **vanilla JS** dentro de un iframe y
+  los spritesheets de Typer Dungeon son PNG con recorte de croma.
 
-### Making a Progressive Web App
+## Stack
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- **React 19** + Create React App
+- **Phaser 3** y **Matter.js** para los juegos con física
+- **styled-components** para el estilo de cada juego
+- **react-icons** para la iconografía
+- **Sin backend**: el estado y las puntuaciones viven en el navegador
 
-### Advanced Configuration
+## Despliegue
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+El sitio se publica en <https://edutika.es> con GitHub Pages:
 
-### Deployment
+```bash
+npm run deploy
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+La rama `gh-pages` se regenera entera desde `build/` en cada despliegue. El dominio sale de
+`public/CNAME`, que CRA copia al build — **no lo borres** o el sitio pierde su dominio.
 
-### `npm run build` fails to minify
+## Licencia
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT. Ver [`LICENSE`](LICENSE).
