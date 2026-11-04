@@ -878,15 +878,14 @@ const TiemposVerbalesGame = ({ onBack }) => {
       setPhase('menu');
       return;
     }
+    // Si el item actual ya no encaja con los filtros, se redibuja. Si sigue
+    // encajando no se toca nada: buildOptions baraja el orden y elige otros
+    // distractores, y reconstruirlo aquí un fotograma después de drawNext
+    // movía las respuestas de sitio justo cuando el niño iba a pulsar.
     if (!current || !selectedMoods[current.moodKey] || !selectedVerbs[current.verb]) {
       const d = shuffle(filteredItems.map(x => x.id));
       drawNext(d, filteredItems);
-      return;
     }
-    setOptions(buildOptions(current, filteredItems));
-    setPicked(null);
-    setFeedback(null);
-    setDisabledAnswers(new Set());
   }, [phase, filteredItems, selectedMoods, selectedVerbs, current, drawNext]);
 
   const onPick = useCallback((ans) => {

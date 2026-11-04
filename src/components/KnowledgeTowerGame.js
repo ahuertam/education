@@ -42,6 +42,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
   const engineRef = useRef(null);
   const renderRef = useRef(null);
   const groundRef = useRef(null);
+  const runnerRef = useRef(null);
   const blocksRef = useRef([]);
   const blocksStackedRef = useRef(0);
 
@@ -135,8 +136,15 @@ const KnowledgeTowerGame = ({ onBack }) => {
     setShowAnswerBlocks(true);
   };
 
-  const initPhysics = useCallback(() => {
-    // Clean up any existing physics first
+  // Detiene la física por completo: engine, render Y runner.
+  // Matter.Runner se reprograma con su propio requestAnimationFrame, así que
+  // con solo Engine.clear() el bucle seguía vivo contra un engine desligado:
+  // cada "Jugar otra vez" y cada unmount dejaban un rAF huérfano accumulating.
+  const stopPhysics = useCallback(() => {
+    if (runnerRef.current) {
+      Matter.Runner.stop(runnerRef.current);
+      runnerRef.current = null;
+    }
     if (renderRef.current) {
       Matter.Render.stop(renderRef.current);
       if (renderRef.current.canvas) {
@@ -148,6 +156,11 @@ const KnowledgeTowerGame = ({ onBack }) => {
       Matter.Engine.clear(engineRef.current);
       engineRef.current = null;
     }
+  }, []);
+
+  const initPhysics = useCallback(() => {
+    // Clean up any existing physics first
+    stopPhysics();
 
     if (!canvasRef.current) return;
 
@@ -187,6 +200,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
 
     // Run engine with Runner (more reliable than Engine.run)
     const runner = Matter.Runner.create();
+    runnerRef.current = runner;
     Matter.Runner.run(runner, engine);
     Render.run(render);
     
@@ -371,32 +385,15 @@ const KnowledgeTowerGame = ({ onBack }) => {
   const endGame = () => {
     setGameState('gameover');
     setFeedback({ show: false, isCorrect: false, message: '' });
-    
+
     // Clean up physics
-    if (engineRef.current) {
-      Matter.Engine.clear(engineRef.current);
-    }
-    if (renderRef.current) {
-      Matter.Render.stop(renderRef.current);
-      renderRef.current.canvas.remove();
-      renderRef.current = null;
-    }
+    stopPhysics();
   };
 
   const restartGame = () => {
     // Clean up physics completely
-    if (engineRef.current) {
-      Matter.Engine.clear(engineRef.current);
-      engineRef.current = null;
-    }
-    if (renderRef.current) {
-      Matter.Render.stop(renderRef.current);
-      if (renderRef.current.canvas) {
-        renderRef.current.canvas.remove();
-      }
-      renderRef.current = null;
-    }
-    
+    stopPhysics();
+
     // Reset all state
     blocksRef.current = [];
     setGameState('menu');
@@ -413,24 +410,15 @@ const KnowledgeTowerGame = ({ onBack }) => {
       const timeout = setTimeout(() => {
         initPhysics();
       }, 100);
-      
+
       return () => clearTimeout(timeout);
     }
-    
+
     return () => {
       // Cleanup on unmount or state change
-      if (engineRef.current) {
-        Matter.Engine.clear(engineRef.current);
-      }
-      if (renderRef.current) {
-        Matter.Render.stop(renderRef.current);
-        if (renderRef.current.canvas) {
-          renderRef.current.canvas.remove();
-        }
-        renderRef.current = null;
-      }
+      stopPhysics();
     };
-  }, [gameState, initPhysics]);
+  }, [gameState, initPhysics, stopPhysics]);
 
   return (
     <GameContainer>

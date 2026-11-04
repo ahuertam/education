@@ -968,6 +968,15 @@ const DigilikeGame = ({ onBack }) => {
   const [mapLines, setMapLines] = useState([]);
   const [mapCanvasSize, setMapCanvasSize] = useState({ w: 0, h: 0 });
 
+  // Token de partida: se incrementa al empezar una run nueva. Las peticiones de
+  // enemigo comparan contra él antes de escribir en el estado.
+  const runTokenRef = useRef(0);
+  // Nodos ya creditados en el contador "despejados". El efecto de fin de
+  // batalla depende también de player.hp, así que sin esta guarda el +1 se
+  // aplicaba dos veces al mismo nodo y el contador acababa por superar el
+  // número de nodos del mapa.
+  const clearedCreditedRef = useRef(new Set());
+
   const energyPct = useMemo(() => {
     if (!energy?.max) return 0;
     return clamp(Math.round((energy.cur / energy.max) * 100), 0, 100);
@@ -1099,6 +1108,12 @@ const DigilikeGame = ({ onBack }) => {
     setSeed(nextSeed);
     const rng = createRng(nextSeed);
     rngRef.current = rng;
+    // Cada partida nueva invalida las peticiones de enemigo que sigan en
+    // vuelo: si el niño pulsa "Nueva run" mientras se descarga el Digimon, la
+    // promesa vieja resolvía y pisaba el estado con el enemigo de la partida
+    // anterior.
+    runTokenRef.current += 1;
+    clearedCreditedRef.current.clear();
 
     const map = generateMap({ seed: nextSeed });
     setMapState(map);
@@ -1160,6 +1175,15 @@ const DigilikeGame = ({ onBack }) => {
     });
   };
 
+  // Marca un nodo como despejado y lo cuenta UNA sola vez. markNodeCleared ya
+  // era idempotente, pero el `+1` del contador no lo era.
+  const creditNodeCleared = (nodeId) => {
+    if (clearedCreditedRef.current.has(nodeId)) return;
+    clearedCreditedRef.current.add(nodeId);
+    markNodeCleared(nodeId);
+    setRunMeta((m) => ({ ...m, cleared: m.cleared + 1 }));
+  };
+
   const startNode = () => {
     if (!mapState || !currentNodeId) return;
     const node = mapState.byId[currentNodeId];
@@ -1172,16 +1196,14 @@ const DigilikeGame = ({ onBack }) => {
 
     if (node.kind === 'start') {
       applyEnergy(12);
-      markNodeCleared(node.id);
-      setRunMeta((m) => ({ ...m, cleared: m.cleared + 1 }));
+      creditNodeCleared(node.id);
       ensureQuestion(node.floor);
       return;
     }
 
     if (node.kind === 'rest') {
       applyEnergy(16);
-      markNodeCleared(node.id);
-      setRunMeta((m) => ({ ...m, cleared: m.cleared + 1 }));
+      creditNodeCleared(node.id);
       ensureQuestion(node.floor);
       return;
     }
@@ -1200,6 +1222,7 @@ const DigilikeGame = ({ onBack }) => {
 
     const isBoss = node.kind === 'boss';
     setScreen('battle');
+    const token = runTokenRef.current;
     void (async () => {
       const rng = rngRef.current;
       const sagaBoss = sagaRef.current?.bossFetchName;
@@ -1207,6 +1230,8 @@ const DigilikeGame = ({ onBack }) => {
         ? sagaBoss
         : rngPick(rng, [...STARTERS, 'Greymon', 'Kabuterimon', 'Ikkakumon', 'Garurumon', 'Leomon', 'Ogremon']);
       const digimon = await fetchDigimon(enemyName);
+      // La run pudo cambiar mientras descargábamos: el resultado ya no vale.
+      if (token !== runTokenRef.current) return;
       const tier = levelTier(digimon.level);
       const stats = buildStats({ tier, floor: node.floor, isBoss, rng });
       setBattle({
@@ -1280,8 +1305,7 @@ const DigilikeGame = ({ onBack }) => {
     if (!choice) return;
     setPlayer((p) => (p ? choice.apply(p) : p));
     setLootChoices(null);
-    markNodeCleared(currentNodeId);
-    setRunMeta((m) => ({ ...m, cleared: m.cleared + 1 }));
+    creditNodeCleared(currentNodeId);
     const floor = mapState?.byId?.[currentNodeId]?.floor ?? 0;
     finishNode(floor);
   };
@@ -1341,8 +1365,7 @@ const DigilikeGame = ({ onBack }) => {
     const node = mapState?.byId?.[currentNodeId];
     if (!node) return;
     if (battle.enemy.hp <= 0) {
-      markNodeCleared(node.id);
-      setRunMeta((m) => ({ ...m, cleared: m.cleared + 1 }));
+      creditNodeCleared(node.id);
       setBattle((b) => (b ? appendLog(b, 'Victoria.') : b));
       if (node.kind === 'boss') {
         window.setTimeout(() => setScreen('end'), 650);

@@ -298,7 +298,6 @@ const FrogJumpGame = ({ onBack, operation = 'multiplication', multiplicationConf
   
   const correctSound = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const errorSound = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
-  const splashSound = useRef(new Audio(`${process.env.PUBLIC_URL}/splash.mp3`)); // Placeholder
 
   useEffect(() => {
     errorSound.current.playbackRate = 0.5;

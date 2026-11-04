@@ -250,26 +250,26 @@ const FeedbackPanel = styled.div`
 // Word database with syllables, stressed index, and classification
 const WORDS = [
   // Diptongos (20 total)
-  { syllables: ['ciu', 'dad'], stressedIndex: 1, type: 'diptongo', word: 'ciudad' },
-  { syllables: ['tie', 'rra'], stressedIndex: 0, type: 'diptongo', word: 'tierra' },
-  { syllables: ['vie', 'jo'], stressedIndex: 0, type: 'diptongo', word: 'viejo' },
-  { syllables: ['cau', 'sa'], stressedIndex: 0, type: 'diptongo', word: 'causa' },
-  { syllables: ['bai', 'le'], stressedIndex: 0, type: 'diptongo', word: 'baile' },
-  { syllables: ['pei', 'ne'], stressedIndex: 0, type: 'diptongo', word: 'peine' },
-  { syllables: ['au', 'to'], stressedIndex: 0, type: 'diptongo', word: 'auto' },
-  { syllables: ['eu', 'ro'], stressedIndex: 0, type: 'diptongo', word: 'euro' },
-  { syllables: ['rei', 'no'], stressedIndex: 0, type: 'diptongo', word: 'reino' },
-  { syllables: ['cue', 'va'], stressedIndex: 0, type: 'diptongo', word: 'cueva' },
-  { syllables: ['fue', 'go'], stressedIndex: 0, type: 'diptongo', word: 'fuego' },
-  { syllables: ['puer', 'ta'], stressedIndex: 0, type: 'diptongo', word: 'puerta' },
-  { syllables: ['bue', 'no'], stressedIndex: 0, type: 'diptongo', word: 'bueno' },
-  { syllables: ['rue', 'da'], stressedIndex: 0, type: 'diptongo', word: 'rueda' },
-  { syllables: ['ai', 're'], stressedIndex: 0, type: 'diptongo', word: 'aire' },
-  { syllables: ['seis'], stressedIndex: 0, type: 'diptongo', word: 'seis' },
-  { syllables: ['vein', 'te'], stressedIndex: 0, type: 'diptongo', word: 'veinte' },
-  { syllables: ['nue', 've'], stressedIndex: 0, type: 'diptongo', word: 'nueve' },
-  { syllables: ['cui', 'da', 'do'], stressedIndex: 2, type: 'diptongo', word: 'cuidado' },
-  { syllables: ['lim', 'pio'], stressedIndex: 0, type: 'diptongo', word: 'limpio' },
+  { syllables: ['ciu', 'dad'], syllablesWithAccent: ['ciu', 'dad'], stressedIndex: 1, type: 'diptongo', word: 'ciudad' },
+  { syllables: ['tie', 'rra'], syllablesWithAccent: ['tíe', 'rra'], stressedIndex: 0, type: 'diptongo', word: 'tierra' },
+  { syllables: ['vie', 'jo'], syllablesWithAccent: ['víe', 'jo'], stressedIndex: 0, type: 'diptongo', word: 'viejo' },
+  { syllables: ['cau', 'sa'], syllablesWithAccent: ['cáu', 'sa'], stressedIndex: 0, type: 'diptongo', word: 'causa' },
+  { syllables: ['bai', 'le'], syllablesWithAccent: ['bai', 'le'], stressedIndex: 0, type: 'diptongo', word: 'baile' },
+  { syllables: ['pei', 'ne'], syllablesWithAccent: ['peí', 'ne'], stressedIndex: 0, type: 'diptongo', word: 'peine' },
+  { syllables: ['au', 'to'], syllablesWithAccent: ['au', 'to'], stressedIndex: 0, type: 'diptongo', word: 'auto' },
+  { syllables: ['eu', 'ro'], syllablesWithAccent: ['eu', 'ro'], stressedIndex: 0, type: 'diptongo', word: 'euro' },
+  { syllables: ['rei', 'no'], syllablesWithAccent: ['reí', 'no'], stressedIndex: 0, type: 'diptongo', word: 'reino' },
+  { syllables: ['cue', 'va'], syllablesWithAccent: ['cué', 'va'], stressedIndex: 0, type: 'diptongo', word: 'cueva' },
+  { syllables: ['fue', 'go'], syllablesWithAccent: ['fué', 'go'], stressedIndex: 0, type: 'diptongo', word: 'fuego' },
+  { syllables: ['puer', 'ta'], syllablesWithAccent: ['puér', 'ta'], stressedIndex: 0, type: 'diptongo', word: 'puerta' },
+  { syllables: ['bue', 'no'], syllablesWithAccent: ['bué', 'no'], stressedIndex: 0, type: 'diptongo', word: 'bueno' },
+  { syllables: ['rue', 'da'], syllablesWithAccent: ['rué', 'da'], stressedIndex: 0, type: 'diptongo', word: 'rueda' },
+  { syllables: ['ai', 're'], syllablesWithAccent: ['ai', 're'], stressedIndex: 0, type: 'diptongo', word: 'aire' },
+  { syllables: ['seis'], syllablesWithAccent: ['seis'], stressedIndex: 0, type: 'diptongo', word: 'seis' },
+  { syllables: ['vein', 'te'], syllablesWithAccent: ['veín', 'te'], stressedIndex: 0, type: 'diptongo', word: 'veinte' },
+  { syllables: ['nue', 've'], syllablesWithAccent: ['núe', 've'], stressedIndex: 0, type: 'diptongo', word: 'nueve' },
+  { syllables: ['cui', 'da', 'do'], syllablesWithAccent: ['cui', 'dá', 'do'], stressedIndex: 1, type: 'diptongo', word: 'cuidado' },
+  { syllables: ['lim', 'pio'], syllablesWithAccent: ['lim', 'pio'], stressedIndex: 0, type: 'diptongo', word: 'limpio' },
   
   // Hiatos (20 total)
   { syllables: ['pa', 'is'], syllablesWithAccent: ['pa', 'ís'], stressedIndex: 1, type: 'hiato', word: 'país' },
@@ -469,9 +469,12 @@ const AccentHunterGame = ({ onBack }) => {
   useEffect(() => {
     if (gameState === 'playing') {
       const removeInterval = setInterval(() => {
+        // filter conserva lo que cumple el predicado: aquí se quedan los
+        // globos que aún no han estallado y se retiran los que terminaron su
+        // animación.
         setBalloons(prev => prev.filter(b => !b.isPopping && !b.isDeflating));
       }, 20000);
-      
+
       return () => clearInterval(removeInterval);
     }
   }, [gameState]);
