@@ -1,7 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
-import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+import {
+  generateProblem as makeProblem,
+  SMALL_PROFILE,
+} from '../utils/problemGenerator';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -234,46 +237,11 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication', multiplicatio
   const [draggingId, setDraggingId] = useState(null);
 
   const generateProblem = useCallback(() => {
-    let a, b, answer, operator;
-    const min = 1, max = 9;
-
-    switch(operation) {
-      case 'addition':
-        a = Math.floor(Math.random() * 20) + 1;
-        b = Math.floor(Math.random() * 20) + 1;
-        answer = a + b;
-        operator = '+';
-        break;
-      case 'subtraction':
-        a = Math.floor(Math.random() * 20) + 5;
-        b = Math.floor(Math.random() * a);
-        answer = a - b;
-        operator = '-';
-        break;
-      case 'division':
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = Math.floor(Math.random() * (max - min + 1)) + min;
-        a = b * answer;
-        operator = '÷';
-        break;
-      case 'multiplication':
-      default:
-        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
-          const fromConfig = generateMultiplicationProblem(multiplicationConfig);
-          if (fromConfig) {
-            a = fromConfig.a;
-            b = fromConfig.b;
-            answer = fromConfig.answer;
-            operator = '×';
-            break;
-          }
-        }
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = a * b;
-        operator = '×';
-        break;
-    }
+    const { a, b, answer, operator } = makeProblem({
+      operation,
+      profile: SMALL_PROFILE,
+      multiplicationConfig,
+    });
 
     return {
       text: `${a} ${operator} ${b}`,

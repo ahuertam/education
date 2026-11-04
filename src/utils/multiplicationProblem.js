@@ -40,10 +40,10 @@ export function generateMultiplicationProblem(config, maxTable = Infinity) {
   }
   const { digitMode } = config;
   const pool = config.tables.filter(t => t <= maxTable);
-  if (pool.length === 0) {
-    return null;
-  }
-  const a = pool[Math.floor(Math.random() * pool.length)];
+  // Si ninguna de las tablas elegidas cabe en la dificultad, se usan igual: el
+  // niño pidió esos números y no es plan de darle otros en silencio.
+  const elegidas = pool.length > 0 ? pool : config.tables;
+  const a = elegidas[Math.floor(Math.random() * elegidas.length)];
   const b = randomByDigits(a, digitMode);
   const answer = a * b;
   return {

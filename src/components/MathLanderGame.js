@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
-import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+import {
+  generateProblem as makeProblem,
+  MEDIUM_PROFILE,
+} from '../utils/problemGenerator';
 
 const GameContainer = styled.div`
   width: 100vw;
@@ -155,46 +158,11 @@ const MathLanderGame = ({ onBack, operation = 'multiplication', multiplicationCo
   const LANDING_MAX_ANGLE = 0.8; // More forgiving landing angle (~45 degrees)
 
   const generateProblem = () => {
-    let a, b, answer, operator;
-    const difficulty = 1; // Can be expanded later
-
-    switch(operation) {
-      case 'addition':
-        a = Math.floor(Math.random() * 20) + 1;
-        b = Math.floor(Math.random() * 20) + 1;
-        answer = a + b;
-        operator = '+';
-        break;
-      case 'subtraction':
-        a = Math.floor(Math.random() * 20) + 5;
-        b = Math.floor(Math.random() * a);
-        answer = a - b;
-        operator = '-';
-        break;
-      case 'division':
-        b = Math.floor(Math.random() * 9) + 2;
-        answer = Math.floor(Math.random() * 9) + 1;
-        a = b * answer;
-        operator = '÷';
-        break;
-      case 'multiplication':
-      default:
-        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
-          const fromConfig = generateMultiplicationProblem(multiplicationConfig);
-          if (fromConfig) {
-            a = fromConfig.a;
-            b = fromConfig.b;
-            answer = fromConfig.answer;
-            operator = '×';
-            break;
-          }
-        }
-        a = Math.floor(Math.random() * 9) + 2;
-        b = Math.floor(Math.random() * 9) + 2;
-        answer = a * b;
-        operator = '×';
-        break;
-    }
+    const { a, b, answer, operator } = makeProblem({
+      operation,
+      profile: MEDIUM_PROFILE,
+      multiplicationConfig,
+    });
 
     // Generate distractors
     const answers = new Set([answer]);

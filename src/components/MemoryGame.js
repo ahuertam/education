@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft, FaRedo } from 'react-icons/fa';
-import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+import {
+  generateProblem as makeProblem,
+  memoryProfile,
+} from '../utils/problemGenerator';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -96,49 +99,18 @@ const MemoryGame = ({ onBack, level = 1, operation = 'multiplication', multiplic
     const newCards = [];
     
     for (let i = 0; i < pairsCount; i++) {
-      let problem, result;
-      
-      // Generate problem based on operation
-      switch(currentOperation) {
-        case 'addition':
-          const a1 = Math.floor(Math.random() * (10 * currentLevel)) + 1;
-          const b1 = Math.floor(Math.random() * (10 * currentLevel)) + 1;
-          problem = `${a1} + ${b1}`;
-          result = a1 + b1;
-          break;
-        case 'subtraction':
-          const a2 = Math.floor(Math.random() * (10 * currentLevel)) + currentLevel + 5;
-          const b2 = Math.floor(Math.random() * a2); // Ensure positive result
-          problem = `${a2} - ${b2}`;
-          result = a2 - b2;
-          break;
-        case 'division':
-          const b3 = Math.floor(Math.random() * (5 * currentLevel)) + 2;
-          const a3 = b3 * (Math.floor(Math.random() * 10) + 1); // Ensure clean division
-          problem = `${a3} ÷ ${b3}`;
-          result = a3 / b3;
-          break;
-        case 'multiplication':
-        default: {
-          // El nivel marca el tope de tabla (nivel 1 → hasta la del 3), así que
-          // subir de nivel sigue ensanchando el rango. Si el niño solo eligió
-          // tablas por encima de ese tope, generateMultiplicationProblem
-          // devuelve null y caemos al rango por nivel de siempre.
-          const fromConfig = currentOperation === 'multiplication'
-            ? generateMultiplicationProblem(multiplicationConfig, currentLevel + 2)
-            : null;
-          if (fromConfig) {
-            problem = fromConfig.text;
-            result = fromConfig.answer;
-          } else {
-            const a4 = Math.floor(Math.random() * (currentLevel + 2)) + 2;
-            const b4 = Math.floor(Math.random() * 9) + 2;
-            problem = `${a4} × ${b4}`;
-            result = a4 * b4;
-          }
-          break;
-        }
-      }
+      // El nivel marca el tope de tabla (nivel 1 → hasta la del 3), así que
+      // subir de nivel sigue ensanchando el rango. Si el niño solo eligió
+      // tablas por encima de ese tope, el generador devuelve null y caemos al
+      // rango por nivel de siempre.
+      const { a, b, answer, operator } = makeProblem({
+        operation: currentOperation,
+        profile: memoryProfile(currentLevel),
+        multiplicationConfig,
+        maxTable: currentLevel + 2,
+      });
+      const problem = `${a} ${operator} ${b}`;
+      const result = answer;
 
       const id = i;
       newCards.push({
