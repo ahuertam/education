@@ -120,21 +120,3 @@ export const sintaxisSentences = [
   { id: 's119', tokens: ['La', 'guardabosques', 'protege', 'a', 'los', 'animales', '.'], verb: [2], subject: [0, 1], cd: [3, 4, 5], ci: [] },
   { id: 's120', tokens: ['El', 'pescador', 'ofrece', 'pan', 'a', 'las', 'gaviotas', '.'], verb: [2], subject: [0, 1], cd: [3], ci: [4, 5, 6] }
 ];
-
-const formatFromTokens = (tokens) => tokens.join(' ').replace(/\s+([.,;:!?])/g, '$1');
-
-const textFromIndices = (tokens, indices) => {
-  if (!indices || indices.length === 0) return null;
-  const selected = indices.map((i) => tokens[i]).filter(Boolean);
-  const txt = formatFromTokens(selected);
-  return txt.length > 0 ? txt : null;
-};
-
-export const SINTAXIS_ITEMS = sintaxisSentences.map((s) => {
-  const sentence = formatFromTokens(s.tokens);
-  const subject = textFromIndices(s.tokens, s.subject) || '';
-  const verb = textFromIndices(s.tokens, s.verb) || '';
-  const cd = textFromIndices(s.tokens, s.cd);
-  const ci = textFromIndices(s.tokens, s.ci);
-  return { sentence, subject, verb, cd, ci };
-});

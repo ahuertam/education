@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
-import { 
-  FaGamepad, FaRocket, FaArrowLeft, FaFrog, FaRegCircle, 
-  FaMeteor, FaDragon, FaCar, FaBrain, FaBook, FaPalette, FaFlask, FaGlobe, FaShieldAlt, FaTh, FaMapMarkedAlt, FaClock, FaProjectDiagram, FaHourglassHalf, FaBolt
-} from 'react-icons/fa';
+import { FaArrowLeft } from 'react-icons/fa';
+import { gamesByCategory, gameDescription } from '../config/games';
 
 const SelectorContainer = styled.div`
   min-height: 100vh;
@@ -106,233 +104,8 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
   const info = getCategoryInfo();
 
   // Define all available games
-  const allGames = [
-    // Math Games (available for add/sub/mult/div)
-    {
-      id: 'memory',
-      icon: <FaGamepad />,
-      title: "Memorama Matemático",
-      description: `Encuentra las parejas de operaciones y resultados ${info.action}.`,
-      color: "#4CAF50",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'space',
-      icon: <FaRocket />,
-      title: "Defensor Espacial",
-      description: `Destruye asteroides resolviendo operaciones ${info.action}.`,
-      color: "#FF5722",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'frog',
-      icon: <FaFrog />,
-      title: "El Salto de la Rana",
-      description: `Ayuda a la rana a cruzar el estanque ${info.action}.`,
-      color: "#8BC34A",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'bubbles',
-      icon: <FaRegCircle />,
-      title: "Pop de Burbujas",
-      description: `Explota las burbujas correctas mientras estás ${info.action}.`,
-      color: "#00BCD4",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'mathlander',
-      icon: <FaRocket />,
-      title: "Math Lander",
-      description: `Aterriza en la respuesta correcta ${info.action}.`,
-      color: "#FFFFFF",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'mathsteroids',
-      icon: <FaMeteor />,
-      title: "Mathsteroids",
-      description: `Destruye asteroides con la respuesta correcta ${info.action}.`,
-      color: "#9C27B0",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'monsterfeeder',
-      icon: <FaDragon />,
-      title: "Alimenta al Monstruo",
-      description: `Arrastra la comida correcta ${info.action}.`,
-      color: "#9B59B6",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'carracing',
-      icon: <FaCar />,
-      title: "Carrera de Coches",
-      description: `¡Acelera respondiendo correctamente ${info.action}!`,
-      color: "#E74C3C",
-      categories: ['addition', 'subtraction', 'multiplication', 'division']
-    },
-    {
-      id: 'pokemonmaths',
-      icon: <FaBolt />,
-      title: "PokemonMaths",
-      description: `Usa cartas Pokémon para resolver operaciones ${info.action}. Sin repetir preguntas y con ranking local.`,
-      color: "#FBBF24",
-      // Sin 'multiplication': sus cuentas salen de las energies de las cartas, no
-      // de la configuración de tablas/cifras que elegimos antes de entrar.
-      categories: ['addition', 'subtraction', 'division']
-    },
-    
-    // Knowledge Games
-    {
-      id: 'knowledgetower',
-      icon: <FaBrain />,
-      title: "Torre del Saber",
-      description: "Construye la torre más alta respondiendo preguntas de cultura general.",
-      color: "#2196F3",
-      categories: ['knowledge']
-    },
-    {
-      id: 'spainrivers',
-      icon: <FaMapMarkedAlt />,
-      title: "Ríos de España (Mapa)",
-      description: "Localiza 8 ríos principales en el mapa con clic/tap. Incluye modo Rápido y modo Orden.",
-      color: "#1D4ED8",
-      categories: ['knowledge']
-    },
-    {
-      id: 'ylahora',
-      icon: <FaClock />,
-      title: "¿Y la hora?",
-      description: "Aprende a leer la hora y a sumar/restar 15, 30 y 60 minutos con un reloj grande y rondas rápidas.",
-      color: "#F59E0B",
-      categories: ['knowledge']
-    },
-    {
-      id: 'inmnunodefender',
-      icon: <FaShieldAlt />,
-      title: "InmnunoDefender",
-      description: "Sé un glóbulo blanco y elimina virus y bacterias. Entre oleadas, responde preguntas pisando la respuesta correcta.",
-      color: "#1abc9c",
-      categories: ['knowledge']
-    },
-    {
-      id: 'sudokumath',
-      icon: <FaTh />,
-      title: "Sudoku Math",
-      description: "Puzzle tipo sudoku: usa cada número una sola vez y completa los huecos para que las operaciones sean correctas.",
-      color: "#16A085",
-      categories: ['advanced']
-    },
-    {
-      id: 'tsubasa',
-      icon: <FaGamepad />,
-      title: "RPG Fútbol (Turnos)",
-      description: "Estilo retro: elige Regate/Pase/Tiro y resuelve retos matemáticos para subir la probabilidad de éxito.",
-      color: "#1D4ED8",
-      categories: ['advanced']
-    },
-
-    // Vocabulary Games
-    {
-      id: 'accenthunter',
-      icon: <FaBook />,
-      title: "Cazador de Acentos",
-      description: "Identifica diptongos e hiatos explotando globos.",
-      color: "#795548",
-      categories: ['vocabulary']
-    },
-    {
-      id: 'sintaxis',
-      icon: <FaProjectDiagram />,
-      title: "Sintaxis",
-      description: "Detective sintáctico: encuentra verbo, sujeto, predicado y complementos (CD y CI) en oraciones variadas.",
-      color: "#0EA5E9",
-      categories: ['vocabulary']
-    },
-    {
-      id: 'tiemposverbales',
-      icon: <FaHourglassHalf />,
-      title: "Tiempos Verbales",
-      description: "Reto rápido: elige la forma verbal correcta. Al acertar, se abre un mini “portal” motivador.",
-      color: "#FBBF24",
-      categories: ['vocabulary']
-    },
-    {
-      id: 'tiposverbos',
-      icon: <FaBook />,
-      title: "Tipos de Verbos",
-      description: "Clasifica verbos en regulares, irregulares y defectivos. Si fallas, verás la norma y un ejemplo.",
-      color: "#34D399",
-      categories: ['vocabulary']
-    },
-
-    // Shape Games
-    {
-      id: 'shapegoalkeeper',
-      icon: <FaPalette />,
-      title: "Portero de Formas",
-      description: "Detén las formas y colores correctos en la portería.",
-      color: "#E91E63",
-      categories: ['shapes']
-    },
-    {
-      id: 'geometriaMaster',
-      icon: <FaProjectDiagram />,
-      title: "Geometría Master",
-      description: "Ejercicios de geometría (Canal 1) + bonus tipo Flappy por cada acierto.",
-      color: "#845EF7",
-      categories: ['geometria']
-    },
-
-    // Mixed Math Games
-    {
-      id: 'kitchen',
-      icon: <FaFlask />,
-      title: "La Cocina",
-      description: "Prepara el antídoto mezclando ingredientes con fracciones y decimales.",
-      color: "#607D8B",
-      categories: ['mixed_math']
-    },
-    {
-      id: 'hanoikitchen',
-      icon: <FaFlask />,
-      title: "Hanoi Kitchen",
-      description: "Resuelve el puzzle tipo Torre de Hanoi con gancho y vierte la cantidad exacta al caldero.",
-      color: "#16A085",
-      categories: ['mixed_math']
-    },
-    {
-      id: 'digilike',
-      icon: <FaDragon />,
-      title: "Digilike",
-      description: "Roguelike de caminos con Digimon: completa nodos, responde el portal y gestiona tu energía.",
-      color: "#22D3EE",
-      categories: ['mixed_math', 'advanced']
-    },
-
-    // English Games
-    {
-      id: 'dragontragon',
-      icon: <FaDragon />,
-      title: "Dragón Tragón",
-      description: "Cóme las palabras correctas para formar la frase en inglés.",
-      color: "#E67E22",
-      categories: ['english']
-    },
-
-    {
-      id: 'firewaterpuzzles',
-      icon: <FaGlobe />,
-      title: "Fuego & Agua (Procedural)",
-      description: "Clon tipo Fireboy & Watergirl: coop local, puertas, botones y niveles por semilla.",
-      color: "#2D9CDB",
-      categories: ['puzzles']
-    }
-  ];
-
   // Filter games based on category
-  const games = allGames.filter(game => game.categories.includes(category));
+  const games = gamesByCategory(category);
 
   return (
     <SelectorContainer>
@@ -354,9 +127,9 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         {games.map(game => (
           <ActivityCard
             key={game.id}
-            icon={game.icon}
+            icon={<game.icon />}
             title={game.title}
-            description={game.description}
+            description={gameDescription(game, info.action)}
             color={game.color}
             onClick={() => onNavigate(game.id, category)}
           />

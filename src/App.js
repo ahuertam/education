@@ -1,39 +1,61 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { GlobalStyle } from './GlobalStyles';
 import './App.css';
 import Landing from './components/Landing';
 import GameSelector from './components/GameSelector';
-import MemoryGame from './components/MemoryGame';
-import SpaceDefenderGame from './components/SpaceDefenderGame';
-import FrogJumpGame from './components/FrogJumpGame';
-import BubblePopGame from './components/BubblePopGame';
-import MathLanderGame from './components/MathLanderGame';
-import MathsteroidsGame from './components/MathsteroidsGame';
-import MonsterFeederGame from './components/MonsterFeederGame';
-import CarRacingGame from './components/CarRacingGame';
-import AccentHunterGame from './components/AccentHunterGame';
-import KnowledgeTowerGame from './components/KnowledgeTowerGame';
-import ShapeGoalkeeperGame from './components/ShapeGoalkeeperGame';
-import KitchenGame from './components/KitchenGame';
-import HanoiKitchenGame from './components/HanoiKitchenGame';
-import DragonTragonGame from './components/DragonTragonGame';
-import InmnunoDefenderGame from './components/InmnunoDefenderGame';
-import SudokuMathGame from './components/SudokuMathGame';
-import FireWaterPuzzlesGame from './components/FireWaterPuzzlesGame';
-import SpainRiversLocatorGame from './components/SpainRiversLocatorGame';
-import YLaHoraGame from './components/YLaHoraGame';
-import SintaxisGame from './components/SintaxisGame';
-import TiemposVerbalesGame from './components/TiemposVerbalesGame';
-import TiposDeVerbosGame from './components/TiposDeVerbosGame';
-import GeometriaMasterGame from './components/GeometriaMasterGame';
-import SupportFab from './components/SupportFab';
-import PokemonMathsGame from './components/PokemonMathsGame';
-import TsubasaRpgGame from './components/TsubasaRpgGame';
-import DigilikeGame from './components/DigilikeGame';
-import TyperDungeonGame from './components/TyperDungeon/TyperDungeonGame';
 import MultiplicationConfig from './components/MultiplicationConfig';
+import SupportFab from './components/SupportFab';
+
+// Los juegos se cargan bajo demanda. Con imports estáticos el bundle principal
+// se llevaba los 26 juegos, Phaser y Matter.js: 566 KB comprimidos que un niño
+// tenía que bajar en una tablet del cole antes de ver la primera tarjeta. Así
+// la landing y el selector pesan poco y cada juego baja su trozo al abrirlo.
+const MemoryGame = lazy(() => import('./components/MemoryGame'));
+const SpaceDefenderGame = lazy(() => import('./components/SpaceDefenderGame'));
+const FrogJumpGame = lazy(() => import('./components/FrogJumpGame'));
+const BubblePopGame = lazy(() => import('./components/BubblePopGame'));
+const MathLanderGame = lazy(() => import('./components/MathLanderGame'));
+const MathsteroidsGame = lazy(() => import('./components/MathsteroidsGame'));
+const MonsterFeederGame = lazy(() => import('./components/MonsterFeederGame'));
+const CarRacingGame = lazy(() => import('./components/CarRacingGame'));
+const AccentHunterGame = lazy(() => import('./components/AccentHunterGame'));
+const KnowledgeTowerGame = lazy(() => import('./components/KnowledgeTowerGame'));
+const ShapeGoalkeeperGame = lazy(() => import('./components/ShapeGoalkeeperGame'));
+const KitchenGame = lazy(() => import('./components/KitchenGame'));
+const HanoiKitchenGame = lazy(() => import('./components/HanoiKitchenGame'));
+const DragonTragonGame = lazy(() => import('./components/DragonTragonGame'));
+const InmnunoDefenderGame = lazy(() => import('./components/InmnunoDefenderGame'));
+const SudokuMathGame = lazy(() => import('./components/SudokuMathGame'));
+const FireWaterPuzzlesGame = lazy(() => import('./components/FireWaterPuzzlesGame'));
+const SpainRiversLocatorGame = lazy(() => import('./components/SpainRiversLocatorGame'));
+const YLaHoraGame = lazy(() => import('./components/YLaHoraGame'));
+const SintaxisGame = lazy(() => import('./components/SintaxisGame'));
+const TiemposVerbalesGame = lazy(() => import('./components/TiemposVerbalesGame'));
+const TiposDeVerbosGame = lazy(() => import('./components/TiposDeVerbosGame'));
+const GeometriaMasterGame = lazy(() => import('./components/GeometriaMasterGame'));
+const PokemonMathsGame = lazy(() => import('./components/PokemonMathsGame'));
+const TsubasaRpgGame = lazy(() => import('./components/TsubasaRpgGame'));
+const DigilikeGame = lazy(() => import('./components/DigilikeGame'));
+const TyperDungeonGame = lazy(() => import('./components/TyperDungeon/TyperDungeonGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+
+function LoadingScreen() {
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '2rem',
+      fontFamily: 'Comic Sans MS, sans-serif',
+      color: '#0b2b45',
+      background: 'linear-gradient(135deg, #e0f2f7 0%, #ffffff 100%)',
+    }}>
+      Cargando…
+    </div>
+  );
+}
 
 function App() {
   const [currentView, setCurrentView] = useState('landing');
@@ -60,9 +82,9 @@ function App() {
           onBack={() => setCurrentView('landing')}
         />;
       case 'game-selector':
-        return <GameSelector 
-          onNavigate={handleNavigate} 
-          onBack={() => setCurrentView('landing')} 
+        return <GameSelector
+          onNavigate={handleNavigate}
+          onBack={() => setCurrentView('landing')}
           category={selectedOperation} // We reuse selectedOperation state for category
         />;
       case 'memory':
@@ -114,12 +136,12 @@ function App() {
           multiplicationConfig={multiplicationConfig}
         />;
       case 'accenthunter':
-        return <AccentHunterGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <AccentHunterGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       case 'knowledgetower':
-        return <KnowledgeTowerGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <KnowledgeTowerGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       case 'spainrivers':
         return <SpainRiversLocatorGame
@@ -134,24 +156,24 @@ function App() {
           onBack={() => setCurrentView('game-selector')}
         />;
       case 'shapegoalkeeper':
-        return <ShapeGoalkeeperGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <ShapeGoalkeeperGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       case 'geometriaMaster':
         return <GeometriaMasterGame
           onBack={() => setCurrentView('game-selector')}
         />;
       case 'kitchen':
-        return <KitchenGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <KitchenGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       case 'hanoikitchen':
         return <HanoiKitchenGame
           onBack={() => setCurrentView('game-selector')}
         />;
       case 'dragontragon':
-        return <DragonTragonGame 
-          onBack={() => setCurrentView('game-selector')} 
+        return <DragonTragonGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       case 'sudokumath':
         return <SudokuMathGame
@@ -198,7 +220,9 @@ function App() {
   return (
     <div className="App">
       <GlobalStyle />
-      {renderView()}
+      <Suspense fallback={<LoadingScreen />}>
+        {renderView()}
+      </Suspense>
       {currentView !== 'landing' && currentView !== 'game-selector' && (
         <SupportFab gameId={currentView} operation={selectedOperation} />
       )}

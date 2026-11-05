@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaArrowLeft, FaCar } from 'react-icons/fa';
-import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+import {
+  generateProblem as makeProblem,
+  SMALL_PROFILE,
+} from '../utils/problemGenerator';
 
 const drive = keyframes`
   0% { transform: translateY(0px); }
@@ -236,46 +239,11 @@ const CarRacingGame = ({ onBack, operation = 'multiplication', multiplicationCon
   const opponentInterval = useRef(null);
 
   const generateProblem = useCallback(() => {
-    let a, b, answer, operator;
-    const min = 1, max = 9;
-
-    switch(operation) {
-      case 'addition':
-        a = Math.floor(Math.random() * 20) + 1;
-        b = Math.floor(Math.random() * 20) + 1;
-        answer = a + b;
-        operator = '+';
-        break;
-      case 'subtraction':
-        a = Math.floor(Math.random() * 20) + 5;
-        b = Math.floor(Math.random() * a);
-        answer = a - b;
-        operator = '-';
-        break;
-      case 'division':
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = Math.floor(Math.random() * (max - min + 1)) + min;
-        a = b * answer;
-        operator = '÷';
-        break;
-      case 'multiplication':
-      default:
-        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
-          const fromConfig = generateMultiplicationProblem(multiplicationConfig);
-          if (fromConfig) {
-            a = fromConfig.a;
-            b = fromConfig.b;
-            answer = fromConfig.answer;
-            operator = '×';
-            break;
-          }
-        }
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = a * b;
-        operator = '×';
-        break;
-    }
+    const { a, b, answer, operator } = makeProblem({
+      operation,
+      profile: SMALL_PROFILE,
+      multiplicationConfig,
+    });
 
     return {
       text: `${a} ${operator} ${b}`,

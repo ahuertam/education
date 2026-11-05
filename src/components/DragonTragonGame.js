@@ -112,8 +112,14 @@ const DragonTragonGame = ({ onBack }) => {
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   const [score, setScore] = useState(0);
-  const [streak, setStreak] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
+  // El bucle rAF se reprograma con la MISMA closure de `update`, así que leer
+  // `streak`/`multiplier` del estado devolvía siempre los valores del primer
+  // fotograma: la puntuación se quedaba en 10 por palabra y el multiplicador
+  // nunca pasaba de 1. Estos refs son la fuente de verdad dentro del bucle;
+  // `multiplier` sigue en el estado solo para repintar el HUD.
+  const streakRef = useRef(0);
+  const multiplierRef = useRef(1);
 
   const [allWords, setAllWords] = useState([]); // Pool for distractors
   const [shuffledKeys, setShuffledKeys] = useState([]); // Random order of sentences
@@ -329,11 +335,13 @@ const DragonTragonGame = ({ onBack }) => {
           cloudsRef.current.splice(index, 1);
           
           // Score update
-          const points = 10 * multiplier;
+          const points = 10 * multiplierRef.current;
           setScore(s => s + points);
-          const newStreak = streak + 1;
-          setStreak(newStreak);
-          setMultiplier(1 + Math.floor(newStreak / 5));
+          const newStreak = streakRef.current + 1;
+          streakRef.current = newStreak;
+          const newMultiplier = 1 + Math.floor(newStreak / 5);
+          multiplierRef.current = newMultiplier;
+          setMultiplier(newMultiplier);
 
            if (dragon.body.length === targetWords.length) {
              // Delay slightly then next sentence
@@ -350,7 +358,8 @@ const DragonTragonGame = ({ onBack }) => {
           dragon.body = [];
           
           // Reset Streak & Multiplier
-          setStreak(0);
+          streakRef.current = 0;
+          multiplierRef.current = 1;
           setMultiplier(1);
           
           // Visual feedback could be added here (screen shake etc)

@@ -108,15 +108,21 @@ npm start          # http://localhost:3000
 
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
+- **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 26 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 26 juegos y las
+  13 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
 - **Un generador compartido** para las cuentas de multiplicar
-  ([`src/utils/multiplicationProblem.js`](src/utils/multiplicationProblem.js)), alimentado
+  ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de
   dificultad de cada juego manda sobre qué tablas entran.
 - **Datasets** en [`src/components/data/`](src/components/data/): preguntas de conocimiento,
   sintaxis, ríos, geometría y formas.
 - **Ranking local** en `localStorage` ([`src/utils/rankings.js`](src/utils/rankings.js)).
-- **Typer Dungeon** es el único juego con estructura modular: escenas, hooks y un reducer
-  de fases (`exploring → pre_battle → battle → monster_dying → stairs_found → descend`).
+- **Tres juegos con estructura modular**: Typer Dungeon (escenas, hooks y un reducer de
+  fases `exploring → pre_battle → battle → monster_dying → stairs_found → descend`),
+  Digilike (datos, estilos, lógica pura testeable y capa de red) y Fuego & Agua
+  (generador de niveles con semilla y validación de solubilidad).
 - **Recursos** en `public/`: el juego de fútbol va en **vanilla JS** dentro de un iframe y
   los spritesheets de Typer Dungeon son PNG con recorte de croma.
 

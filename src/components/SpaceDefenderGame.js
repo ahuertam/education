@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft, FaRocket } from 'react-icons/fa';
-import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+import {
+  generateProblem as makeProblem,
+  difficultyProfile,
+  difficultyRanges,
+} from '../utils/problemGenerator';
+import DifficultyTablesHint from './DifficultyTablesHint';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -233,67 +238,23 @@ const SpaceDefenderGame = ({ onBack, operation = 'multiplication', multiplicatio
   }, []);
 
   const generateProblem = () => {
-    let a, b, answer, operator;
-    let min, max, speedMin, speedMax;
-
-    // Set difficulty ranges
+    // La velocidad de los asteroides depende de la dificultad; los rangos de
+    // las cuentas los pone el generador compartido.
+    let speedMin, speedMax;
     switch(difficulty) {
-      case 'hard':
-        min = 10; max = 20; // For multiplication/division factors
-        if (operation === 'addition' || operation === 'subtraction') { min = 20; max = 100; }
-        speedMin = 0.5; speedMax = 0.8;
-        break;
-      case 'medium':
-        min = 5; max = 12;
-        if (operation === 'addition' || operation === 'subtraction') { min = 10; max = 50; }
-        speedMin = 0.3; speedMax = 0.6;
-        break;
+      case 'hard':   speedMin = 0.5; speedMax = 0.8; break;
+      case 'medium': speedMin = 0.3; speedMax = 0.6; break;
       case 'easy':
-      default:
-        min = 1; max = 9;
-        if (operation === 'addition' || operation === 'subtraction') { min = 1; max = 20; }
-        speedMin = 0.1; speedMax = 0.4;
-        break;
+      default:       speedMin = 0.1; speedMax = 0.4; break;
     }
 
-    // Generate numbers based on operation
-    switch(operation) {
-      case 'addition':
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = a + b;
-        operator = '+';
-        break;
-      case 'subtraction':
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (a - min + 1)) + min; // Ensure positive result
-        answer = a - b;
-        operator = '-';
-        break;
-      case 'division':
-        b = Math.floor(Math.random() * (max - min + 1)) + min; // Divisor
-        answer = Math.floor(Math.random() * (max - min + 1)) + min; // Quotient
-        a = b * answer; // Dividend
-        operator = '÷';
-        break;
-      case 'multiplication':
-      default:
-        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
-          const fromConfig = generateMultiplicationProblem(multiplicationConfig, max);
-          if (fromConfig) {
-            a = fromConfig.a;
-            b = fromConfig.b;
-            answer = fromConfig.answer;
-            operator = '×';
-            break;
-          }
-        }
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = a * b;
-        operator = '×';
-        break;
-    }
+    const { base } = difficultyRanges(difficulty);
+    const { a, b, answer, operator } = makeProblem({
+      operation,
+      profile: difficultyProfile(difficulty),
+      multiplicationConfig,
+      maxTable: base.max,
+    });
     
     // Generate 4 numbers: 1 correct + 3 distractors
     const numbers = new Set([answer]);
@@ -552,12 +513,15 @@ const SpaceDefenderGame = ({ onBack, operation = 'multiplication', multiplicatio
           <h2>Selecciona Dificultad</h2>
           <DifficultyButton color="#4CAF50" onClick={() => handleDifficultySelect('easy')}>
             Fácil (1-10)
+            <DifficultyTablesHint multiplicationConfig={multiplicationConfig} difficulty="easy" />
           </DifficultyButton>
           <DifficultyButton color="#FF9800" onClick={() => handleDifficultySelect('medium')}>
             Medio (1-50)
+            <DifficultyTablesHint multiplicationConfig={multiplicationConfig} difficulty="medium" />
           </DifficultyButton>
           <DifficultyButton color="#F44336" onClick={() => handleDifficultySelect('hard')}>
             Difícil (1-100)
+            <DifficultyTablesHint multiplicationConfig={multiplicationConfig} difficulty="hard" />
           </DifficultyButton>
         </DifficultyMenu>
       )}

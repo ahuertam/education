@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { FaArrowLeft, FaFrog } from 'react-icons/fa';
-import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+import {
+  generateProblem as makeProblem,
+  difficultyProfile,
+  difficultyRanges,
+} from '../utils/problemGenerator';
+import DifficultyTablesHint from './DifficultyTablesHint';
 
 const jumpAnimation = keyframes`
   0% { transform: translateY(0) scale(1); }
@@ -298,7 +303,6 @@ const FrogJumpGame = ({ onBack, operation = 'multiplication', multiplicationConf
   
   const correctSound = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const errorSound = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
-  const splashSound = useRef(new Audio(`${process.env.PUBLIC_URL}/splash.mp3`)); // Placeholder
 
   useEffect(() => {
     errorSound.current.playbackRate = 0.5;
@@ -307,62 +311,13 @@ const FrogJumpGame = ({ onBack, operation = 'multiplication', multiplicationConf
   }, []);
 
   const generateProblem = () => {
-    let a, b, answer, operator;
-    let min, max;
-
-    switch(difficulty) {
-      case 'hard':
-        min = 10; max = 20;
-        if (operation === 'addition' || operation === 'subtraction') { min = 20; max = 100; }
-        break;
-      case 'medium':
-        min = 5; max = 12;
-        if (operation === 'addition' || operation === 'subtraction') { min = 10; max = 50; }
-        break;
-      case 'easy':
-      default:
-        min = 1; max = 9;
-        if (operation === 'addition' || operation === 'subtraction') { min = 1; max = 20; }
-        break;
-    }
-
-    switch(operation) {
-      case 'addition':
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = a + b;
-        operator = '+';
-        break;
-      case 'subtraction':
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (a - min + 1)) + min;
-        answer = a - b;
-        operator = '-';
-        break;
-      case 'division':
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = Math.floor(Math.random() * (max - min + 1)) + min;
-        a = b * answer;
-        operator = '÷';
-        break;
-      case 'multiplication':
-      default:
-        if (operation === 'multiplication' && multiplicationConfig && multiplicationConfig.tables && multiplicationConfig.tables.length > 0) {
-          const fromConfig = generateMultiplicationProblem(multiplicationConfig, max);
-          if (fromConfig) {
-            a = fromConfig.a;
-            b = fromConfig.b;
-            answer = fromConfig.answer;
-            operator = '×';
-            break;
-          }
-        }
-        a = Math.floor(Math.random() * (max - min + 1)) + min;
-        b = Math.floor(Math.random() * (max - min + 1)) + min;
-        answer = a * b;
-        operator = '×';
-        break;
-    }
+    const { base } = difficultyRanges(difficulty);
+    const { a, b, answer, operator } = makeProblem({
+      operation,
+      profile: difficultyProfile(difficulty),
+      multiplicationConfig,
+      maxTable: base.max,
+    });
 
     const options = new Set([answer]);
     while(options.size < 3) {
@@ -439,12 +394,15 @@ const FrogJumpGame = ({ onBack, operation = 'multiplication', multiplicationConf
           <p>Ayuda a la rana a cruzar saltando en la respuesta correcta</p>
           <DifficultyButton color="#4CAF50" onClick={() => handleDifficultySelect('easy')}>
             Fácil
+            <DifficultyTablesHint multiplicationConfig={multiplicationConfig} difficulty="easy" />
           </DifficultyButton>
           <DifficultyButton color="#FF9800" onClick={() => handleDifficultySelect('medium')}>
             Medio
+            <DifficultyTablesHint multiplicationConfig={multiplicationConfig} difficulty="medium" />
           </DifficultyButton>
           <DifficultyButton color="#F44336" onClick={() => handleDifficultySelect('hard')}>
             Difícil
+            <DifficultyTablesHint multiplicationConfig={multiplicationConfig} difficulty="hard" />
           </DifficultyButton>
         </DifficultyMenu>
       )}

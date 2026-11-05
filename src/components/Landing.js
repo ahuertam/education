@@ -2,20 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import Header from './Header';
-import {
-  FaPlus,
-  FaMinus,
-  FaTimes,
-  FaBrain,
-  FaBook,
-  FaPalette,
-  FaDivide,
-  FaCalculator,
-  FaGlobe,
-  FaPuzzlePiece,
-  FaProjectDiagram,
-  FaKeyboard
-} from 'react-icons/fa';
+import { CATEGORIES, CATEGORY_NEEDS_CONFIG } from '../config/games';
 
 const LandingContainer = styled.div`
   min-height: 100vh;
@@ -117,138 +104,33 @@ const ManifestoContent = styled.div`
 const Landing = ({ onNavigate }) => {
   const donationUrl = process.env.REACT_APP_DONATION_URL;
 
-  const activities = [
-    {
-      id: 1,
-      icon: <FaPlus />,
-      title: "Práctica de Sumas",
-      description: "Aprende y practica operaciones de suma de manera divertida con ejercicios interactivos.",
-      color: "#4CAF50"
-    },
-    {
-      id: 2,
-      icon: <FaMinus />,
-      title: "Práctica de Restas",
-      description: "Domina las restas con ejercicios progresivos y entretenidos juegos matemáticos.",
-      color: "#FF5722"
-    },
-    {
-      id: 3,
-      icon: <FaTimes />,
-      title: "Tablas de Multiplicar",
-      description: "Memoriza las tablas de multiplicar jugando y practicando de forma interactiva.",
-      color: "#9C27B0"
-    },
-    {
-      id: 4,
-      icon: <FaDivide />,
-      title: "División Divertida",
-      description: "Aprende división paso a paso con explicaciones claras y ejercicios prácticos.",
-      color: "#FF9800"
-    },
-    {
-      id: 5,
-      icon: <FaBrain />,
-      title: "Conocimientos Generales",
-      description: "Expande tu cultura general con preguntas sobre ciencia, historia y geografía.",
-      color: "#2196F3"
-    },
-    {
-      id: 6,
-      icon: <FaBook />,
-      title: "Vocabulario",
-      description: "Enriquece tu vocabulario aprendiendo nuevas palabras y sus significados.",
-      color: "#795548"
-    },
-    {
-      id: 7,
-      icon: <FaPalette />,
-      title: "Colores y Formas",
-      description: "Reconoce colores, formas geométricas y desarrolla habilidades visuales.",
-      color: "#E91E63"
-    },
-    {
-      id: 12,
-      icon: <FaProjectDiagram />,
-      title: "Geometría",
-      description: "Área y perímetro: triángulos, rectángulos, paralelogramos y circunferencias con retos y bonus.",
-      color: "#845EF7"
-    },
-    {
-      id: 8,
-      icon: <FaCalculator />,
-      title: "Matemáticas Mixtas",
-      description: "Combina todas las operaciones matemáticas en desafíos emocionantes.",
-      color: "#607D8B"
-    },
-    {
-      id: 9,
-      icon: <FaGlobe />,
-      title: "Inglés",
-      description: "Aprende inglés formando frases y vocabulario con el Dragón Tragón.",
-      color: "#E67E22"
-    },
-    {
-      id: 10,
-      icon: <FaBrain />,
-      title: "Avanzado",
-      description: "Retos de lógica y matemáticas para subir de nivel con puzzles más difíciles.",
-      color: "#16A085"
-    },
-    {
-      id: 11,
-      icon: <FaPuzzlePiece />,
-      title: "Puzzles",
-      description: "Puzzles cooperativos tipo Fireboy & Watergirl con niveles procedurales por semilla.",
-      color: "#2D9CDB"
-    },
-    {
-      id: 13,
-      icon: <FaKeyboard />,
-      title: "Mecanografía",
-      description: "Aprende a escribir correctamente en la Typer Dungeon. Derrota monstruos escribiendo palabras.",
-      color: "#8B4513"
-    }
-  ];
+  const activities = CATEGORIES;
 
   const handleActivityClick = (activity) => {
     alert(`¡Próximamente disponible: ${activity.title}!`);
   };
 
   const onSelectActivity = (activityId) => {
-    const categories = {
-      1: 'addition',
-      2: 'subtraction',
-      3: 'multiplication',
-      4: 'division',
-      5: 'knowledge',
-      6: 'vocabulary',
-      7: 'shapes',
-      12: 'geometria',
-      8: 'mixed_math',
-      9: 'english',
-      10: 'advanced',
-      11: 'puzzles'
-    };
+    const activity = activities.find(act => act.id === activityId);
 
-    // Games that open directly without going through game-selector
-    const directGames = {
-      13: 'typerdungeon',
-    };
-
-    if (directGames[activityId]) {
-      onNavigate(directGames[activityId]);
-    } else if (categories[activityId]) {
-      // Multiplicación pasa primero por la pantalla de selección de tablas/cifras
-      if (categories[activityId] === 'multiplication') {
-        onNavigate('multiplication-config', 'multiplication');
-      } else {
-        onNavigate('game-selector', categories[activityId]);
-      }
-    } else {
-      const activity = activities.find(act => act.id === activityId);
-      handleActivityClick(activity || { title: "esta actividad" });
+    // Un juego que se abre directamente, sin pasar por el selector.
+    if (activity?.view) {
+      onNavigate(activity.view);
+      return;
     }
+
+    if (activity?.category) {
+      // La multiplicación pasa antes por la pantalla de selección de
+      // tablas y cifras.
+      if (activity.category === CATEGORY_NEEDS_CONFIG) {
+        onNavigate('multiplication-config', activity.category);
+      } else {
+        onNavigate('game-selector', activity.category);
+      }
+      return;
+    }
+
+    handleActivityClick(activity || { title: "esta actividad" });
   };
 
 
@@ -262,7 +144,7 @@ const Landing = ({ onNavigate }) => {
           {activities.slice(0, 6).map(activity => ( // Display first 6 activities in the original grid
             <ActivityCard
               key={activity.id}
-              icon={activity.icon}
+              icon={<activity.icon />}
               title={activity.title}
               description={activity.description}
               color={activity.color}
@@ -277,7 +159,7 @@ const Landing = ({ onNavigate }) => {
           {activities.slice(6).map(activity => (
             <ActivityCard
               key={activity.id}
-              icon={activity.icon}
+              icon={<activity.icon />}
               title={activity.title}
               description={activity.description}
               color={activity.color}
