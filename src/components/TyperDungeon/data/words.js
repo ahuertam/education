@@ -52,6 +52,18 @@ export function getWordDifficultyLevel(difficulty, floor) {
   return Math.min(5, base + floorBonus);
 }
 
+// Tiempo por palabra según lo larga que sea.
+//
+// Las palabras del nivel 1 tienen 3-5 letras y las del 5, unas 15. Con el
+// mismo tiempo para todas, el piso final es imposible de escribir. El tiempo
+// base que elige el niño se aplica a su nivel y crece con las pisos, como en
+// el juego de referencia ("cada enemigo trae un tiempo distinto: más corto al
+// principio, más largo en el jefe").
+export function timeLimitForLevel(base, level) {
+  if (!base || base <= 0) return 0;
+  return Math.round(base * (1 + (level - 1) * 0.22));
+}
+
 export function getWord(difficulty, language, floor, usedWords = new Set()) {
   const level = getWordDifficultyLevel(difficulty, floor);
   const lang = wordsByDifficulty[language] ?? wordsByDifficulty.es;

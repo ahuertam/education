@@ -116,9 +116,10 @@ export default function MenuScene({ dispatch }) {
   const [difficulty, setDifficulty] = useState('normal');
   const [totalFloors, setTotalFloors] = useState(5);
   const [timeLimit, setTimeLimit]   = useState(0);  // seconds; 0 = off
+  const [heroes, setHeroes]         = useState(1);
 
   const handleStart = () => {
-    dispatch({ type: 'START_GAME', config: { language, difficulty, totalFloors, timeLimit } });
+    dispatch({ type: 'START_GAME', config: { language, difficulty, totalFloors, timeLimit, heroes } });
   };
 
   return (
@@ -172,6 +173,27 @@ export default function MenuScene({ dispatch }) {
               <OptionBtn $sel={timeLimit === 12} onClick={() => setTimeLimit(12)}>12 s</OptionBtn>
               <OptionBtn $sel={timeLimit === 15} onClick={() => setTimeLimit(15)}>15 s</OptionBtn>
             </Buttons>
+          </OptionGroup>
+
+          <OptionGroup>
+            <OptionLabel>Héroes</OptionLabel>
+            <Buttons>
+              <OptionBtn $sel={heroes === 1} onClick={() => setHeroes(1)}>
+                En solitario
+              </OptionBtn>
+              <OptionBtn $sel={heroes === 2} onClick={() => setHeroes(2)}>
+                En equipo (2)
+              </OptionBtn>
+              <OptionBtn $sel={heroes === 3} onClick={() => setHeroes(3)}>
+                En equipo (3)
+              </OptionBtn>
+            </Buttons>
+            {heroes > 1 && (
+              <OptionLabel>
+                El monstruo tiene {heroes}× más vida y un único reloj para todo
+                el combate: os repartís el teclado.
+              </OptionLabel>
+            )}
           </OptionGroup>
 
           <StartButton onClick={handleStart}>

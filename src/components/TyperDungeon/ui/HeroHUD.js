@@ -68,7 +68,14 @@ const FloorBadge = styled.div`
   text-transform: uppercase;
 `;
 
-export default function HeroHUD({ hp, maxHp, floor, totalFloors }) {
+const TeamBadge = styled.div`
+  font-size: 0.65rem;
+  color: #ffc857;
+  text-align: right;
+  letter-spacing: 1px;
+`;
+
+export default function HeroHUD({ hp, maxHp, floor, totalFloors, dungeon, team }) {
   const pct = maxHp > 0 ? Math.max(0, Math.round((hp / maxHp) * 100)) : 0;
   return (
     <HUD>
@@ -79,7 +86,11 @@ export default function HeroHUD({ hp, maxHp, floor, totalFloors }) {
         </BarTrack>
         <HpText>{hp}/{maxHp}</HpText>
       </Row>
-      <FloorBadge>Piso {floor} / {totalFloors}</FloorBadge>
+      <FloorBadge>
+        Mazmorra {floor} / {totalFloors}
+        {dungeon ? ` — ${dungeon}` : ''}
+      </FloorBadge>
+      {team > 1 && <TeamBadge>En equipo: {team} héroes</TeamBadge>}
     </HUD>
   );
 }

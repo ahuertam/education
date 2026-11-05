@@ -7,7 +7,7 @@ const HERO_HP = { easy: 15, normal: 10, hard: 7 };
 function buildInitialState() {
   return {
     phase: 'menu',
-    config: { language: 'es', difficulty: 'normal', totalFloors: 5, timeLimit: 0 },
+    config: { language: 'es', difficulty: 'normal', totalFloors: 5, timeLimit: 0, heroes: 1 },
     hero: { hp: 10, maxHp: 10 },
     floor: 1,
     map: [],
@@ -31,13 +31,13 @@ function phaseForRoom(room) {
 function reducer(state, action) {
   switch (action.type) {
     case 'START_GAME': {
-      const { language, difficulty, totalFloors, timeLimit = 0 } = action.config;
+      const { language, difficulty, totalFloors, timeLimit = 0, heroes = 1 } = action.config;
       const map = generateFloor(1, totalFloors);
       const hp = HERO_HP[difficulty] ?? 10;
       return {
         ...buildInitialState(),
         phase: phaseForRoom(map[0]),
-        config: { language, difficulty, totalFloors, timeLimit },
+        config: { language, difficulty, totalFloors, timeLimit, heroes },
         hero: { hp, maxHp: hp },
         floor: 1,
         map,
@@ -51,12 +51,16 @@ function reducer(state, action) {
       if (!monster) return state;
       let word = getWord(state.config.difficulty, state.config.language, state.floor, new Set());
       let usedWords = word ? [word] : [];
+      // En equipo el monstruo tiene más vida: es lo que hace que dos niños
+      // el teclado valga la pena en vez de estorbar.
+      const heroes = state.config.heroes ?? 1;
+      const vida = monster.hp * heroes;
       return {
         ...state,
         phase: 'battle',
         monster,
-        monsterHp: monster.hp,
-        monsterMaxHp: monster.hp,
+        monsterHp: vida,
+        monsterMaxHp: vida,
         currentWord: word ?? '',
         usedWords,
       };

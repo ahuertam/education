@@ -3,6 +3,7 @@ import styled, { keyframes, css } from 'styled-components';
 import HeroSprite from '../sprites/HeroSprite';
 import HeroHUD from '../ui/HeroHUD';
 import DungeonBackground from '../ui/DungeonBackground';
+import { dungeonName } from '../data/dungeons';
 
 const fadeIn = keyframes`
   from { opacity:0; } to { opacity:1; }
@@ -140,6 +141,8 @@ export default function DungeonScene({ state, dispatch }) {
             maxHp={hero.maxHp}
             floor={floor}
             totalFloors={config.totalFloors}
+            dungeon={dungeonName(floor, config.totalFloors)}
+            team={config.heroes ?? 1}
           />
         </StatsPanel>
       </ControlPanel>

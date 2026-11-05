@@ -7,6 +7,8 @@ import TypingInput from '../ui/TypingInput';
 import HeroHUD from '../ui/HeroHUD';
 import DungeonBackground from '../ui/DungeonBackground';
 import { monsterName } from '../data/monsters';
+import { dungeonName } from '../data/dungeons';
+import { getWordDifficultyLevel, timeLimitForLevel } from '../data/words';
 
 const heroAttack = keyframes`
   0%   { transform: translateX(0); }
@@ -55,6 +57,56 @@ const MonsterArea = styled.div`
   gap: 8px;
 `;
 
+// La línea del suelo. Sin ella los sprites flotan en el aire y la escena se
+// siente como un menú con un dibujo, no como una sala.
+const FloorLine = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 88, 40, 0.7) 18%,
+    rgba(168, 130, 70, 0.9) 50%,
+    rgba(120, 88, 40, 0.7) 82%,
+    transparent 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+`;
+
+// La sombra bajo un sprite: es lo que lo planta en el suelo.
+const Sombra = styled.div`
+  width: ${(props) => props.$w}px;
+  height: ${(props) => props.$h}px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.25) 55%,
+    rgba(0, 0, 0, 0) 75%
+  );
+  margin-top: -6px;
+  flex-shrink: 0;
+`;
+
+// El héroe dentro de la sala, no en una barra de la interfaz. Al estar en el
+// mismo plano que el monstruo, y más abajo y a la izquierda, se lee como
+// "tú en primera persona".
+const HeroEnSala = styled.div`
+  position: absolute;
+  left: 20px;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  ${(props) => props.$attacking && css`animation: ${heroAttack} 0.45s ease-in-out;`}
+`;
+
 const MonsterHPBar = styled.div`
   width: ${props => props.$monstW}px;
   height: 8px;
@@ -101,18 +153,6 @@ const ControlPanel = styled.div`
   display: flex;
   align-items: stretch;
   gap: 0;
-`;
-
-const HeroPanel = styled.div`
-  width: 110px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 8px;
-  background: #080501;
-  border-right: 2px solid #5a4020;
-  ${props => props.$attacking && css`animation: ${heroAttack} 0.45s ease-in-out;`}
-  flex-shrink: 0;
 `;
 
 const StatsPanel = styled.div`
@@ -164,18 +204,31 @@ export default function BattleScene({ state, dispatch }) {
   const bgKey = room?.bg ?? 'battle';
   const monstPct = monsterMaxHp > 0 ? Math.max(0, Math.round((monsterHp / monsterMaxHp) * 100)) : 0;
   const isDying = phase === 'monster_dying';
-  const timeLimit = config.timeLimit ?? 0;
+  const heroes = config.heroes ?? 1;
+  const enEquipo = heroes > 1;
+
+  // El tiempo por palabra crece con la longitud de la palabra: las del nivel 1
+  // tienen 3-5 letras y las del 5, unas 15. Con el mismo tiempo para todas, el
+  // piso final es imposible de escribir.
+  const nivelPalabra = getWordDifficultyLevel(config.difficulty, floor);
+  const timeLimit = timeLimitForLevel(config.timeLimit ?? 0, nivelPalabra);
+  // En equipo hay un único reloj para todo el combate. El presupuesto es el
+  // mismo que si cada palabra tuviera su tiempo, pero compartido: eso es lo
+  // que hace que turnarse el teclado tenga gracia.
+  const relojTotal = enEquipo ? timeLimit * (monsterMaxHp || 1) : timeLimit;
 
   const [heroAnim, setHeroAnim] = useState('idle');
   const [monsterAnim, setMonsterAnim] = useState('idle');
   const [flash, setFlash] = useState(null); // { key, color }
   const [typed, setTyped] = useState('');
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [timeLeft, setTimeLeft] = useState(relojTotal);
 
   // Track animation timers in refs so a fast follow-up action can cancel them
   // before the old one fires and snaps the hero/monster back to idle.
   const heroTimerRef    = useRef(null);
   const monsterTimerRef = useRef(null);
+  // Momento en que arrancó el reloj del equipo (0 = todavía no ha empezado).
+  const inicioEquipoRef = useRef(0);
 
   useEffect(() => () => {
     if (heroTimerRef.current)    clearTimeout(heroTimerRef.current);
@@ -242,14 +295,22 @@ export default function BattleScene({ state, dispatch }) {
   // runs the cleanup below, which kills the interval immediately, so a word
   // completed on the same tick as the expiry can't also register a timeout.
   // handleError is stable ([dispatch]) so this effect only restarts per word.
+  //
+  // En equipo no se reinicia en cada palabra: el reloj es del combate entero.
   useEffect(() => {
-    if (timeLimit <= 0 || phase !== 'battle' || isDying) return undefined;
-    setTimeLeft(timeLimit);
-    const start = Date.now();
+    if (relojTotal <= 0 || phase !== 'battle' || isDying) return undefined;
+    if (!enEquipo) {
+      setTimeLeft(relojTotal);
+      inicioEquipoRef.current = Date.now();
+    } else if (!inicioEquipoRef.current) {
+      inicioEquipoRef.current = Date.now();
+      setTimeLeft(relojTotal);
+    }
+    const start = inicioEquipoRef.current;
     let fired = false;
     const id = setInterval(() => {
       const elapsed = (Date.now() - start) / 1000;
-      const remaining = Math.max(0, timeLimit - elapsed);
+      const remaining = Math.max(0, relojTotal - elapsed);
       setTimeLeft(remaining);
       if (remaining > 0 || fired) return;
       fired = true;
@@ -257,9 +318,16 @@ export default function BattleScene({ state, dispatch }) {
       handleError();
     }, TIMER_TICK_MS);
     return () => clearInterval(id);
-  }, [currentWord, timeLimit, phase, isDying, handleError]);
+  }, [currentWord, relojTotal, phase, isDying, handleError, enEquipo]);
 
-  const timerPct = timeLimit > 0 ? Math.max(0, Math.min(100, (timeLeft / timeLimit) * 100)) : 0;
+  // Un combate nuevo pone el reloj del equipo a cero.
+  useEffect(() => {
+    if (phase !== 'battle' || !enEquipo) return;
+    inicioEquipoRef.current = Date.now();
+    setTimeLeft(relojTotal);
+  }, [phase, monster, enEquipo, relojTotal]);
+
+  const timerPct = relojTotal > 0 ? Math.max(0, Math.min(100, (timeLeft / relojTotal) * 100)) : 0;
 
   return (
     <BattleWrapper>
@@ -268,6 +336,13 @@ export default function BattleScene({ state, dispatch }) {
         {flash && <FlashOverlay key={flash.key} $color={flash.color} />}
 
         {isDying && <VictoryBanner>¡VICTORIA!</VictoryBanner>}
+
+        <FloorLine />
+
+        <HeroEnSala $attacking={heroAnim === 'attack'}>
+          <HeroSprite state={heroAnim} size={86} />
+          <Sombra $w={92} $h={13} />
+        </HeroEnSala>
 
         <MonsterArea>
           {!isDying && (
@@ -278,6 +353,7 @@ export default function BattleScene({ state, dispatch }) {
             />
           )}
           <MonsterSprite monster={monster} animState={monsterAnim} />
+          <Sombra $w={monster?.displayW ?? 200} $h={16} />
           <MonsterHPBar $monstW={monster?.displayW ?? 200}>
             <MonsterHPFill $pct={monstPct} />
           </MonsterHPBar>
@@ -285,14 +361,21 @@ export default function BattleScene({ state, dispatch }) {
       </DungeonView>
 
       <ControlPanel>
-        <HeroPanel $attacking={heroAnim === 'attack'}>
-          <HeroSprite state={heroAnim} size={90} />
-        </HeroPanel>
         <StatsPanel>
-          <HeroHUD hp={hero.hp} maxHp={hero.maxHp} floor={floor} totalFloors={config.totalFloors} />
-          {timeLimit > 0 && !isDying && (
+          <HeroHUD
+            hp={hero.hp}
+            maxHp={hero.maxHp}
+            floor={floor}
+            totalFloors={config.totalFloors}
+            dungeon={dungeonName(floor, config.totalFloors)}
+            team={heroes}
+          />
+          {relojTotal > 0 && !isDying && (
             <>
-              <TimerLabel>⏱ {timeLeft.toFixed(1)} s</TimerLabel>
+              <TimerLabel>
+                ⏱ {timeLeft.toFixed(1)} s
+                {enEquipo ? ' — reloj del equipo' : ''}
+              </TimerLabel>
               <TimerTrack><TimerFill $pct={timerPct} /></TimerTrack>
             </>
           )}
