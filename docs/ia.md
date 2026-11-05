@@ -81,10 +81,23 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Definidas en dos sitios, y ambos hay que tocarlos a la vez:
+Todo el catálogo —los 26 juegos y las 13 tarjetas de la landing— está en un
+único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
+repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
-1. **Tarjetas de la landing** → arrays `activities` y `categories` en [`Landing.js`](../src/components/Landing.js).
-2. **Juegos de cada categoría** → `categories: [...]` por juego en [`GameSelector.js`](../src/components/GameSelector.js).
+```js
+// Un juego
+{ id: 'memory', icon: FaGamepad, title: 'Memorama Matemático', color: '#4CAF50',
+  categories: ['addition', 'subtraction', 'multiplication', 'division'],
+  description: (accion) => `Encuentra las parejas de operaciones y resultados ${accion}.` }
+
+// Una tarjeta de la landing
+{ id: 1, icon: FaPlus, title: 'Práctica de Sumas', color: '#4CAF50',
+  category: 'addition', description: 'Aprende y practica operaciones de suma...' }
+```
+
+`description` puede ser un texto fijo o una función de la categoría activa, que
+es lo que cambia la frase ("sumando", "resolviendo"...).
 
 | id landing | Tarjeta | Categoría |
 |---|---|---|
@@ -101,6 +114,10 @@ Definidas en dos sitios, y ambos hay que tocarlos a la vez:
 | 10 | Avanzado | `advanced` |
 | 11 | Puzzles | `puzzles` |
 | 13 | Mecanografía | abre `typerdungeon` directo |
+
+Hay tests que comprueban la coherencia: que todo juego del catálogo tenga su
+vista en `App.js`, que toda vista de juego esté en el catálogo y que cada
+categoría tenga su juego y su tarjeta.
 
 ---
 
@@ -150,21 +167,35 @@ variable de Create React App; si el proyecto cambia de bundler hay que migrarla 
 
 ## 8. Configuración de multiplicación
 
-Los juegos de cuentas comparten un generador:
+Los ocho juegos de cuentas comparten un generador, en
+[`src/utils/problemGenerator.js`](../src/utils/problemGenerator.js):
 
 ```js
-import { generateMultiplicationProblem } from '../utils/multiplicationProblem';
+import { generateProblem as makeProblem, difficultyProfile } from '../utils/problemGenerator';
 
-const problema = generateMultiplicationProblem(multiplicationConfig, maxTable);
+const { a, b, answer, operator } = makeProblem({
+  operation,
+  profile: difficultyProfile(difficulty),
+  multiplicationConfig,
+  maxTable: base.max,
+});
 ```
 
 - `multiplicationConfig` viene de `App.js` y lo rellena `MultiplicationConfig`:
   `{ tables: number[], digitMode: 1 | 2 | 3 }`.
-- `maxTable` es el tope de dificultad del juego (fácil 9, media 12, difícil 20).
-  **Las tablas por encima del tope se descartan**, de modo que el selector de
-  dificultad de cada juego sigue mandando sobre qué tablas entran.
-- Devuelve `null` si no hay configuración utilizable: el juego cae entonces a su
-  rango `min/max` de siempre.
+- `profile` son los rangos de cada juego. Hay cuatro:
+  `difficultyProfile(dificultad)` para los tres juegos con menú de dificultad,
+  `SMALL_PROFILE`, `MEDIUM_PROFILE` y `memoryProfile(nivel)`.
+- `maxTable` es el tope de dificultad (fácil 9, media 12, difícil 20). Las
+  tablas por encima se descartan, así que el selector de dificultad sigue
+  mandando sobre qué tablas entran. **Si ninguna de las tablas elegidas cabe en
+  la dificultad, se usan las elegidas**: el niño pidió esos números.
+- Sin configuración utilizable, el juego cae a su propio rango.
+
+El test de [`problemGenerator.test.js`](../src/utils/problemGenerator.test.js) es
+**diferencial**: mantiene las implementaciones antiguas de cada juego como
+referencia y compara el conjunto de pares (a, b) alcanzables. Si un solo par
+aparece o desaparece, el test falla.
 
 `PokemonMaths` **no** recibe configuración: sus cuentas salen de las energies de las
 cartas de la API de Pokémon TCG, por eso está fuera de la categoría `multiplication`.
@@ -195,22 +226,57 @@ El detalle de diseño está en [`TyperDungeon-plan.md`](TyperDungeon-plan.md).
 ## 10. Añadir un juego
 
 1. Crea `src/components/MiJuegoGame.js` que exporte el componente y acepte `onBack`.
-2. Añade el `case 'miJuego'` en el `switch` de [`src/App.js`](../src/App.js).
-3. Añade la entrada al array de juegos de
-   [`GameSelector.js`](../src/components/GameSelector.js) con sus `categories`.
-4. Si es una categoría nueva, también la tarjeta en
-   [`Landing.js`](../src/components/Landing.js) (arrays `activities` **y** `categories`).
+2. Añade el `case 'miJuego'` en el `switch` de [`src/App.js`](../src/App.js), y
+   el `lazy(() => import(...))` arriba. Los juegos se cargan bajo demanda: sin
+   eso, el bundle principal se lleva los 26 juegos y Phaser.
+3. Añade la entrada del juego en
+   [`src/config/games.js`](../src/config/games.js) con sus `categories`.
+4. Si es una categoría nueva, añade también su tarjeta en `CATEGORIES`, en el
+   mismo fichero.
+
+Son dos ficheros, no cuatro. Los tests de `src/config/games.test.js` avisan si
+se te olvida alguno.
 
 Si el juego necesita datos, déjalos en `src/components/data/` como el resto.
 
 ---
 
-## 11. Pendientes conocidos
+## 11. Estructura de los juegos grandes
 
-- [`MultiplicationSelector.js`](../src/components/MultiplicationSelector.js) está
-  muerto: no lo importa nadie. Sobró de la configuración de multiplicación.
+Tres juegos ya no son un fichero monster:
+
+- **Typer Dungeon** — [`src/components/TyperDungeon/`](../src/components/TyperDungeon/)
+  ```
+  TyperDungeonGame.js      selects la escena según state.phase
+  data/       monsters.js · words.js · sprites.js
+  hooks/      useDungeonMap.js (genera el piso) · useGameState.js (reducer)
+  scenes/     MenuScene · DungeonScene · BattleScene · VictoryScene · GameOverScene
+  sprites/    SpriteCanvas (recorte de croma + trim + caché) · HeroSprite · MonsterSprite
+  ui/         DungeonBackground · HeroHUD · TypingInput · WordBubble
+  ```
+- **Digilike** — [`src/components/digilike/`](../src/components/digilike/)
+  ```
+  data.js     colores, starters, sagas y traducción de niveles
+  styles.js   los 58 styled-components
+  logic.js    generación del mapa, preguntas y stats (funciones puras, testeables)
+  api.js      la búsqueda del Digimon con su caché
+  ```
+  El componente queda en [`DigilikeGame.js`](../src/components/DigilikeGame.js).
+- **Fuego & Agua** — [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/)
+  ```
+  levelGenerator.js · solvability.js · prng.js · seed.js · keymap.js · puzzleScene.js
+  ```
+
+---
+
+## 12. Pendientes conocidos
+
 - Hay styled-components copiados entre escenas de Typer Dungeon
   (`ControlPanel`/`HeroPanel`/`StatsPanel`) y entre `GameOverScene`/`VictoryScene`.
 - `npm run build` emite warnings de `eslint` preexistentes en varios juegos
   (`useEffect` con dependencias faltantes, imports sin usar). No bloquean el build
   salvo que se ejecute con `CI=true`, que los convierte en errores.
+- Las tarjetas de la landing y las del selector son `div` con `onClick`: no
+  tienen `role`, `tabIndex` ni manejo de teclado, así que con teclado no se
+  llega a ningún juego. El patrón correcto ya está en
+  [`SpainRiversMap.js`](../src/components/rivers/SpainRiversMap.js).
