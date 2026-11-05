@@ -546,5 +546,3 @@ export const buildGeometriaMasterChannel1 = (seed, { count = 24 } = {}) => {
   shuffleInPlace(rng, out);
   return out.slice(0, count);
 };
-
-export const GEOMETRIA_MASTER_CHANNEL_1 = buildGeometriaMasterChannel1('default');

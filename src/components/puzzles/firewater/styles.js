@@ -303,13 +303,3 @@ export const GameStage = styled.div`
   min-height: 100vh;
   padding-top: 64px;
 `;
-
-export const CanvasPlaceholder = styled.div`
-  max-width: 1200px;
-  margin: 1rem auto 2rem;
-  padding: 1.25rem;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-`;

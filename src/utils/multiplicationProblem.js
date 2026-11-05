@@ -9,7 +9,7 @@
 //   Si `a >= 10`, `b` se genera según `digitMode`:
 //     1 → 1-9, 2 → 10-99, 3 → 100-999.
 
-export function randomByDigits(a, digitMode) {
+function randomByDigits(a, digitMode) {
   if (a < 10) {
     // Tablas pequeñas: siempre 1 cifra
     return Math.floor(Math.random() * 9) + 1;
