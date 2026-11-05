@@ -37,6 +37,10 @@ const PokemonMathsGame = lazy(() => import('./components/PokemonMathsGame'));
 const TsubasaRpgGame = lazy(() => import('./components/TsubasaRpgGame'));
 const DigilikeGame = lazy(() => import('./components/DigilikeGame'));
 const TyperDungeonGame = lazy(() => import('./components/TyperDungeon/TyperDungeonGame'));
+const ElColgadoGame = lazy(() => import('./components/ElColgadoGame'));
+const RoscoPalabrasGame = lazy(() => import('./components/RoscoPalabrasGame'));
+const JeopardyGame = lazy(() => import('./components/JeopardyGame'));
+const BetYourAnswerGame = lazy(() => import('./components/BetYourAnswerGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -211,6 +215,24 @@ function App() {
       case 'typerdungeon':
         return <TyperDungeonGame
           onBack={() => setCurrentView('landing')}
+        />;
+      case 'colgado':
+        return <ElColgadoGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'roscopalabras':
+        return <RoscoPalabrasGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'jeopardy':
+        return <JeopardyGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'apuesta':
+        return <BetYourAnswerGame
+          onBack={() => setCurrentView('game-selector')}
+          operation={selectedOperation}
+          multiplicationConfig={multiplicationConfig}
         />;
       default:
         return <Landing onNavigate={handleNavigate} />;

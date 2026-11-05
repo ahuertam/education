@@ -75,6 +75,10 @@ Landing  ──►  game-selector  ──►  <juego>
 | `digilike` | Digilike | [`DigilikeGame.js`](../src/components/DigilikeGame.js) |
 | `dragontragon` | Dragón Tragón | [`DragonTragonGame.js`](../src/components/DragonTragonGame.js) |
 | `firewaterpuzzles` | Fuego & Agua (Procedural) | [`FireWaterPuzzlesGame.js`](../src/components/FireWaterPuzzlesGame.js) |
+| `colgado` | El Colgado | [`ElColgadoGame.js`](../src/components/ElColgadoGame.js) |
+| `roscopalabras` | Rosco de Palabras | [`RoscoPalabrasGame.js`](../src/components/RoscoPalabrasGame.js) |
+| `jeopardy` | Jeopardy | [`JeopardyGame.js`](../src/components/JeopardyGame.js) |
+| `apuesta` | Apuesta tu Respuesta | [`BetYourAnswerGame.js`](../src/components/BetYourAnswerGame.js) |
 | `typerdungeon` | Typer Dungeon | [`TyperDungeon/TyperDungeonGame.js`](../src/components/TyperDungeon/TyperDungeonGame.js) |
 
 ---
@@ -141,6 +145,7 @@ categoría tenga su juego y su tarjeta.
 | [`src/utils/multiplicationProblem.js`](../src/utils/multiplicationProblem.js) | Generador compartido de cuentas de multiplicar |
 | [`src/utils/rankings.js`](../src/utils/rankings.js) | Ranking local en `localStorage` |
 | [`src/components/data/`](../src/components/data/) | Datasets: preguntas de conocimiento, sintaxis, ríos, geometría, formas |
+| [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |
 | [`src/components/styles/`](../src/components/styles/) | Estilos sueltos de juegos grandes |
 | [`src/components/rivers/`](../src/components/rivers/) | Mapa SVG de España y sus ríos |
 | [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/) | Motor de Fuego & Agua |

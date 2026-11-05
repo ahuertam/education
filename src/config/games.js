@@ -24,7 +24,7 @@ import {
   FaProjectDiagram, FaCalculator, FaGlobe, FaPuzzlePiece, FaKeyboard,
   FaGamepad, FaRocket, FaFrog, FaRegCircle, FaMeteor, FaDragon, FaCar,
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
-  FaFlask,
+  FaFlask, FaCoins, FaScroll, FaSkull, FaListUl,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -211,6 +211,28 @@ export const GAMES = [
     id: 'tiposverbos', icon: FaBook, title: 'Tipos de Verbos', color: '#34D399',
     categories: ['vocabulary'],
     description: 'Clasifica verbos en regulares, irregulares y defectivos. Si fallas, verás la norma y un ejemplo.',
+  },
+  {
+    id: 'colgado', icon: FaSkull, title: 'El Colgado', color: '#8B4513',
+    categories: ['vocabulary'],
+    description: 'El ahorcado de toda la vida: lee la pista y adivina la palabra letra a letra. Con 7 fallos te cuelgan.',
+  },
+  {
+    id: 'roscopalabras', icon: FaListUl, title: 'Rosco de Palabras', color: '#6D28D9',
+    categories: ['vocabulary'],
+    description: 'Escribe la palabra letra a letra contra el reloj. Cuanto más rápido, más puntos.',
+  },
+
+  // Repaso
+  {
+    id: 'jeopardy', icon: FaScroll, title: 'Jeopardy', color: '#1D4ED8',
+    categories: ['knowledge'],
+    description: 'Tablero de categorías y puntajes al estilo clásico: perfecto para repasar unidades completas.',
+  },
+  {
+    id: 'apuesta', icon: FaCoins, title: 'Apuesta tu Respuesta', color: '#B45309',
+    categories: ['addition', 'subtraction', 'multiplication', 'division'],
+    description: 'Apuesta una, dos o tres veces tus puntos antes de responder. Si aciertas, ganas el triple; si fallas, lo pierdes.',
   },
 
   // Formas y geometría

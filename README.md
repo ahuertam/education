@@ -1,7 +1,7 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **26 minijuegos** en
-español, pensados para niños de Primaria.
+Web de juegos matemáticos, de lengua y de conocimiento general. **30 minijuegos**
+en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
 
@@ -31,6 +31,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Mathsteroids** | Destruye asteroides con la respuesta correcta. |
 | **Alimenta al Monstruo** | Arrastra la comida correcta. |
 | **Carrera de Coches** | ¡Acelera respondiendo correctamente! |
+| **Apuesta tu Respuesta** | Apuesta una, dos o tres veces tus puntos antes de responder. |
 | **PokemonMaths** | Usa cartas Pokémon para resolver operaciones, sin repetir preguntas y con ranking local. |
 
 ### 🧠 Conocimiento general
@@ -41,12 +42,15 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Ríos de España (Mapa)** | Localiza 8 ríos principales en el mapa. Modo Rápido y modo Orden. |
 | **¿Y la hora?** | Lee la hora y suma o resta 15, 30 y 60 minutos con un reloj grande. |
 | **InmnunoDefender** | Glóbulo blanco contra virus y bacterias, respondiendo preguntas entre oleadas. |
+| **Jeopardy** | Tablero de categorías y puntajes al estilo clásico para repasar unidades. |
 
 ### 📚 Lengua y vocabulario
 
 | Juego | Qué hace |
 |---|---|
 | **Cazador de Acentos** | Identifica diptongos e hiatos explotando globos. |
+| **El Colgado** | El ahorcado de toda la vida: lee la pista y adivina la palabra letra a letra. |
+| **Rosco de Palabras** | Escribe la palabra letra a letra contra el reloj. |
 | **Sintaxis** | Detective sintáctico: verbo, sujeto, predicado y complementos (CD y CI). |
 | **Tiempos Verbales** | Reto rápido para elegir la forma verbal correcta. |
 | **Tipos de Verbos** | Clasifica verbos en regulares, irregulares y defectivos. |
