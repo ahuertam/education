@@ -24,7 +24,8 @@ import {
   FaProjectDiagram, FaCalculator, FaGlobe, FaPuzzlePiece, FaKeyboard,
   FaGamepad, FaRocket, FaFrog, FaRegCircle, FaMeteor, FaDragon, FaCar,
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
-  FaFlask, FaCoins, FaScroll, FaSkull, FaListUl,
+  FaFlask, FaCoins, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
+  FaRulerHorizontal, FaCubes,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -97,6 +98,16 @@ export const CATEGORIES = [
     id: 13, icon: FaKeyboard, title: 'Mecanografía', color: '#8B4513',
     view: 'typerdungeon',
     description: 'Aprende a escribir correctamente en la Typer Dungeon. Derrota monstruos escribiendo palabras.',
+  },
+  {
+    id: 14, icon: FaChartPie, title: 'Fracciones', color: '#C026D3',
+    category: 'fracciones',
+    description: 'Representa, compara y suma fracciones con modelos visuales de barra y círculo.',
+  },
+  {
+    id: 15, icon: FaRulerHorizontal, title: 'Números', color: '#0284C7',
+    category: 'numeros',
+    description: 'Sentido numérico: rectas numéricas, valor posicional y comparación de números.',
   },
 ];
 
@@ -189,6 +200,33 @@ export const GAMES = [
     id: 'tsubasa', icon: FaGamepad, title: 'RPG Fútbol (Turnos)', color: '#1D4ED8',
     categories: ['advanced'],
     description: 'Estilo retro: elige Regate/Pase/Tiro y resuelve retos matemáticos para subir la probabilidad de éxito.',
+  },
+
+  // Facciones y sentido numérico
+  //
+  // Estos cuatro juegos son la versión jugable de las apps del Math Learning
+  // Center (Fractions, Partial Product Finder, Number Line y Number Pieces).
+  // Las apps son exploratorias; aquí cada una es una ronda con puntos, racha
+  // y explicación de por qué la respuesta es la que es.
+  {
+    id: 'tallerfracciones', icon: FaChartPie, title: 'Taller de Fracciones', color: '#C026D3',
+    categories: ['fracciones'],
+    description: 'Lee, compara y suma fracciones con barras y círculos.',
+  },
+  {
+    id: 'productosparciales', icon: FaThLarge, title: 'Buscador de Productos Parciales', color: '#F97316',
+    categories: ['multiplication', 'mixed_math'],
+    description: 'Multiplica con el modelo del rectángulo: las decenas por un lado y las unidades por otro.',
+  },
+  {
+    id: 'rectanumerica', icon: FaRulerHorizontal, title: 'La Recta Numérica', color: '#0284C7',
+    categories: ['numeros'],
+    description: 'Sitúa, salta y ordena números en una recta que cambia de escala.',
+  },
+  {
+    id: 'basediez', icon: FaCubes, title: 'Base Diez', color: '#7C3AED',
+    categories: ['numeros'],
+    description: 'Lee, descompone y compara números con piezas de base diez.',
   },
 
   // Vocabulario

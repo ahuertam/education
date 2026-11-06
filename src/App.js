@@ -41,6 +41,10 @@ const ElColgadoGame = lazy(() => import('./components/ElColgadoGame'));
 const RoscoPalabrasGame = lazy(() => import('./components/RoscoPalabrasGame'));
 const JeopardyGame = lazy(() => import('./components/JeopardyGame'));
 const BetYourAnswerGame = lazy(() => import('./components/BetYourAnswerGame'));
+const TallerFraccionesGame = lazy(() => import('./components/FraccionesGame'));
+const ProductosParcialesGame = lazy(() => import('./components/ProductosParcialesGame'));
+const RectaNumericaGame = lazy(() => import('./components/RectaNumericaGame'));
+const BaseDiezGame = lazy(() => import('./components/BaseDiezGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -233,6 +237,23 @@ function App() {
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
           multiplicationConfig={multiplicationConfig}
+        />;
+      case 'tallerfracciones':
+        return <TallerFraccionesGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'productosparciales':
+        return <ProductosParcialesGame
+          onBack={() => setCurrentView('game-selector')}
+          multiplicationConfig={multiplicationConfig}
+        />;
+      case 'rectanumerica':
+        return <RectaNumericaGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'basediez':
+        return <BaseDiezGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       default:
         return <Landing onNavigate={handleNavigate} />;

@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **26 juegos**, 30 vistas, 34 componentes.
+Datos a fecha de la última revisión: **35 juegos**, 38 vistas, 42 componentes.
 
 ---
 
@@ -64,6 +64,10 @@ Landing  ──►  game-selector  ──►  <juego>
 | `inmnunodefender` | InmnunoDefender | [`InmnunoDefenderGame.js`](../src/components/InmnunoDefenderGame.js) |
 | `sudokumath` | Sudoku Math | [`SudokuMathGame.js`](../src/components/SudokuMathGame.js) |
 | `tsubasa` | RPG Fútbol (Turnos) | [`TsubasaRpgGame.js`](../src/components/TsubasaRpgGame.js) |
+| `tallerfracciones` | Taller de Fracciones | [`FraccionesGame.js`](../src/components/FraccionesGame.js) |
+| `productosparciales` | Buscador de Productos Parciales | [`ProductosParcialesGame.js`](../src/components/ProductosParcialesGame.js) |
+| `rectanumerica` | La Recta Numérica | [`RectaNumericaGame.js`](../src/components/RectaNumericaGame.js) |
+| `basediez` | Base Diez | [`BaseDiezGame.js`](../src/components/BaseDiezGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -85,7 +89,7 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Todo el catálogo —los 26 juegos y las 13 tarjetas de la landing— está en un
+Todo el catálogo —los 35 juegos y las 15 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -118,6 +122,8 @@ es lo que cambia la frase ("sumando", "resolviendo"...).
 | 10 | Avanzado | `advanced` |
 | 11 | Puzzles | `puzzles` |
 | 13 | Mecanografía | abre `typerdungeon` directo |
+| 14 | Fracciones | `fracciones` |
+| 15 | Números | `numeros` |
 
 Hay tests que comprueban la coherencia: que todo juego del catálogo tenga su
 vista en `App.js`, que toda vista de juego esté en el catálogo y que cada
@@ -144,6 +150,7 @@ categoría tenga su juego y su tarjeta.
 |---|---|
 | [`src/utils/multiplicationProblem.js`](../src/utils/multiplicationProblem.js) | Generador compartido de cuentas de multiplicar |
 | [`src/utils/rankings.js`](../src/utils/rankings.js) | Ranking local en `localStorage` |
+| [`src/utils/matematicas.js`](../src/utils/matematicas.js) | Fracciones, modelo de área y valor posicional (funciones puras, con test) |
 | [`src/components/data/`](../src/components/data/) | Datasets: preguntas de conocimiento, sintaxis, ríos, geometría, formas |
 | [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |
 | [`src/components/styles/`](../src/components/styles/) | Estilos sueltos de juegos grandes |

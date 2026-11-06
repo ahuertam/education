@@ -1,6 +1,6 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **30 minijuegos**
+Web de juegos matemáticos, de lengua y de conocimiento general. **35 minijuegos**
 en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
@@ -33,6 +33,15 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Carrera de Coches** | ¡Acelera respondiendo correctamente! |
 | **Apuesta tu Respuesta** | Apuesta una, dos o tres veces tus puntos antes de responder. |
 | **PokemonMaths** | Usa cartas Pokémon para resolver operaciones, sin repetir preguntas y con ranking local. |
+| **Buscador de Productos Parciales** | Multiplica con el modelo del rectángulo: las decenas por un lado y las unidades por otro. |
+
+### 🍕 Fracciones y números
+
+| Juego | Qué hace |
+|---|---|
+| **Taller de Fracciones** | Lee, compara y suma fracciones con barras y círculos. |
+| **La Recta Numérica** | Sitúa, salta y ordena números en una recta que cambia de escala. |
+| **Base Diez** | Lee, descompone y compara números con piezas de base diez. |
 
 ### 🧠 Conocimiento general
 
@@ -113,9 +122,9 @@ npm start          # http://localhost:3000
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
 - **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
-  y cada juego baja su trozo al abrirlo, en vez de bajar los 26 de golpe.
-- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 26 juegos y las
-  13 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 35 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 35 juegos y las
+  15 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de
@@ -123,6 +132,10 @@ npm start          # http://localhost:3000
 - **Datasets** en [`src/components/data/`](src/components/data/): preguntas de conocimiento,
   sintaxis, ríos, geometría y formas.
 - **Ranking local** en `localStorage` ([`src/utils/rankings.js`](src/utils/rankings.js)).
+- **Cuatro juegos salidos de las apps del Math Learning Center** (Fractions, Partial Product
+  Finder, Number Line y Number Pieces): allí son herramientas para explorar; aquí son
+  rondas con puntos, racha y explicación de por qué la respuesta es la que es. La lógica
+  compartida está en [`src/utils/matematicas.js`](src/utils/matematicas.js).
 - **Tres juegos con estructura modular**: Typer Dungeon (escenas, hooks y un reducer de
   fases `exploring → pre_battle → battle → monster_dying → stairs_found → descend`),
   Digilike (datos, estilos, lógica pura testeable y capa de red) y Fuego & Agua

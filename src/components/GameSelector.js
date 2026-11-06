@@ -96,6 +96,10 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         return { title: 'Avanzado', action: 'desafiando' };
       case 'puzzles':
         return { title: 'Puzzles', action: 'resolviendo' };
+      case 'fracciones':
+        return { title: 'Fracciones', action: 'fraccionando' };
+      case 'numeros':
+        return { title: 'Números', action: 'contando' };
       default:
         return { title: 'Selecciona un Juego', action: 'jugando' };
     }
