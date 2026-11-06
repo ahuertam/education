@@ -265,6 +265,18 @@ const ModalText = styled.div`
   margin-bottom: 14px;
 `;
 
+// Reproducir un sonido sin que rompa el juego: en algunos navegadores y en
+// las pruebas play() no devuelve una promesa, y un fallo de audio no puede
+// tumbar una partida.
+const sonar = (audio) => {
+  try {
+    const p = audio.play();
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+  } catch (e) {
+    // sin audio, seguimos
+  }
+};
+
 function shuffle(array) {
   const a = array.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -295,67 +307,94 @@ function isCloseInt(n) {
   return Math.abs(n - r) < 1e-9;
 }
 
-const EASY_TEMPLATES = [
-  {
-    id: 't1',
-    pool: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    equations: [
-      { kind: 'simple2', a: 'A', op: '+', b: 'B', res: 17 },
-      { kind: 'simple2', a: 'C', op: '×', b: 'D', res: 24 },
-      { kind: 'simple2', a: 'E', op: '-', b: 'F', res: 1 },
-      { kind: 'simple2', a: 'G', op: '+', b: 'H', res: 13 },
-      { kind: 'simple2', a: 'I', op: '-', b: 'J', res: 6 },
-      { kind: 'simple2', a: 'K', op: '+', b: 'L', res: 10 }
-    ],
-    solution: { A: 12, B: 5, C: 8, D: 3, E: 7, F: 6, G: 11, H: 2, I: 10, J: 4, K: 9, L: 1 }
-  },
-  {
-    id: 't2',
-    pool: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    equations: [
-      { kind: 'simple2', a: 'A', op: '÷', b: 'B', res: 4 },
-      { kind: 'simple2', a: 'C', op: '+', b: 'D', res: 15 },
-      { kind: 'simple2', a: 'E', op: '×', b: 'F', res: 20 },
-      { kind: 'simple2', a: 'G', op: '-', b: 'H', res: 3 },
-      { kind: 'simple2', a: 'I', op: '+', b: 'J', res: 13 },
-      { kind: 'simple2', a: 'K', op: '×', b: 'L', res: 7 }
-    ],
-    solution: { A: 12, B: 3, C: 11, D: 4, E: 10, F: 2, G: 9, H: 6, I: 8, J: 5, K: 7, L: 1 }
-  }
-];
-
 const LETTERS = 'ABCDEFGHIJKL'.split('');
 
-const HARD_TEMPLATES = [
-  {
-    id: 'h1',
-    pool: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    equations: [
-      { kind: 'paren3', a: 'A', op1: '+', b: 'B', op2: '×', c: 'C', res: 44 },
-      { kind: 'paren3', a: 'D', op1: '×', b: 'E', op2: '-', c: 'F', res: 65 },
-      { kind: 'paren3', a: 'G', op1: '+', b: 'H', op2: '÷', c: 'I', res: 6 },
-      { kind: 'paren3', a: 'J', op1: '-', b: 'K', op2: '×', c: 'L', res: 45 }
-    ],
-    solution: { A: 10, B: 1, C: 4, D: 9, E: 8, F: 7, G: 12, H: 6, I: 3, J: 11, K: 2, L: 5 }
-  }
-];
+// Las parejas (fácil) y los tríos (difícil) de letras que forman las
+// operaciones. Cada letra sale en una sola operación, así que lo que ata las
+// cuentas entre sí es la regla de "cada número se usa una vez".
+const PARES = [['A', 'B'], ['C', 'D'], ['E', 'F'], ['G', 'H'], ['I', 'J'], ['K', 'L']];
+const TRIOS = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I'], ['J', 'K', 'L']];
 
-function buildPuzzle(difficulty) {
-  const templates = difficulty === 'hard' ? HARD_TEMPLATES : EASY_TEMPLATES;
-  const template = templates[Math.floor(Math.random() * templates.length)];
-  const pool = shuffle(template.pool);
-  const eqs = template.equations;
+const OPS_SIMPLE = ['+', '-', '×'];
+const OPS_IZQ = ['+', '-'];
+const OPS_DER = ['+', '-', '×', '÷'];
+
+// El resultado tiene que ser un entero que se pueda escribir en la caja: sin
+// negativos y sin decimales, y no más de dos cifras.
+const RESULTADO_VALIDO = (n) => n !== null && Number.isInteger(n) && n >= 0 && n <= 99;
+
+// Evalúa una operación de dos y de tres números. En las de tres se evalúa de
+// izquierda a derecha, que es como se muestran en pantalla: "( A + B ) × C".
+const evaluar = (a, op, b, op2, c) => {
+  const izq = evalOp(a, op, b);
+  if (izq === null) return null;
+  if (op2 === undefined) return izq;
+  return evalOp(izq, op2, c);
+};
+
+// Arma una partida: reparte 1..12 entre las letras y escribe las operaciones
+// con esos mismos números. Así la partida **siempre tiene solución** —la que
+// sale de ese reparto— en vez de depender de una plantilla guardada.
+export function buildPuzzle(difficulty) {
+  const pool = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  const solution = {};
+  LETTERS.forEach((letra, i) => { solution[letra] = pool[i]; });
+
+  const equations = [];
+  if (difficulty === 'hard') {
+    for (const [a, b, c] of TRIOS) {
+      let elegido = null;
+      for (let intento = 0; intento < 40 && !elegido; intento++) {
+        const op1 = OPS_IZQ[Math.floor(Math.random() * OPS_IZQ.length)];
+        const op2 = OPS_DER[Math.floor(Math.random() * OPS_DER.length)];
+        const res = evaluar(solution[a], op1, solution[b], op2, solution[c]);
+        if (RESULTADO_VALIDO(res)) elegido = { kind: 'paren3', a, op1, b, op2, c, res };
+      }
+      // Si ninguna combinación sale limpia (poco probable), la suma siempre
+      // sirve: 12 + 12 + 12 es un entero de dos cifras.
+      equations.push(
+        elegido || { kind: 'paren3', a, op1: '+', b, op2: '+', c, res: solution[a] + solution[b] + solution[c] }
+      );
+    }
+  } else {
+    for (const [a, b] of PARES) {
+      let elegido = null;
+      for (let intento = 0; intento < 40 && !elegido; intento++) {
+        const op = OPS_SIMPLE[Math.floor(Math.random() * OPS_SIMPLE.length)];
+        const res = evaluar(solution[a], op, solution[b]);
+        if (RESULTADO_VALIDO(res)) elegido = { kind: 'simple2', a, op, b, res };
+      }
+      equations.push(
+        elegido || { kind: 'simple2', a, op: '+', b, res: solution[a] + solution[b] }
+      );
+    }
+  }
+
   const slots = {};
   for (const k of LETTERS) slots[k] = null;
   return {
-    templateId: template.id,
+    templateId: 'generada',
     difficulty,
     pool,
-    equations: eqs,
+    equations,
+    solution,
     slots,
     createdAt: Date.now()
   };
 }
+
+// Cuánto vale una operación con lo que hay puesto ahora mismo.
+export const valorEcuacion = (eq, slots) => {
+  if (eq.kind === 'simple2') return evalOp(slots[eq.a], eq.op, slots[eq.b]);
+  const izq = evalOp(slots[eq.a], eq.op1, slots[eq.b]);
+  return izq === null ? null : evalOp(izq, eq.op2, slots[eq.c]);
+};
+
+// Cómo se escribe una operación con los números que hay puestos ahora mismo.
+const describirEcuacion = (eq, slots) => {
+  if (eq.kind === 'simple2') return `${slots[eq.a]} ${eq.op} ${slots[eq.b]}`;
+  return `(${slots[eq.a]} ${eq.op1} ${slots[eq.b]}) ${eq.op2} ${slots[eq.c]}`;
+};
 
 const SudokuMathGame = ({ onBack }) => {
   const [difficulty, setDifficulty] = useState('easy');
@@ -380,7 +419,7 @@ const SudokuMathGame = ({ onBack }) => {
     if (audioRef.current.unlocked) return;
     audioRef.current.unlocked = true;
     const bgm = bgmRef.current;
-    bgm.play().catch(() => {});
+    sonar(bgm);
   };
 
   useEffect(() => {
@@ -425,7 +464,7 @@ const SudokuMathGame = ({ onBack }) => {
     unlockAudio();
     setPuzzle(prev => ({ ...prev, slots: { ...prev.slots, [slot]: null } }));
     placeSoundRef.current.currentTime = 0;
-    placeSoundRef.current.play().catch(() => {});
+    sonar(placeSoundRef.current);
   };
 
   const placeNumber = (slot) => {
@@ -438,7 +477,7 @@ const SudokuMathGame = ({ onBack }) => {
     setPuzzle(prev => ({ ...prev, slots: { ...prev.slots, [slot]: selectedNumber } }));
     setSelectedNumber(null);
     placeSoundRef.current.currentTime = 0;
-    placeSoundRef.current.play().catch(() => {});
+    sonar(placeSoundRef.current);
   };
 
   const validate = () => {
@@ -448,7 +487,7 @@ const SudokuMathGame = ({ onBack }) => {
       if (puzzle.slots[k] === null || typeof puzzle.slots[k] !== 'number') {
         setStatus('Faltan huecos por rellenar.');
         wrongSoundRef.current.currentTime = 0;
-        wrongSoundRef.current.play().catch(() => {});
+        sonar(wrongSoundRef.current);
         return;
       }
     }
@@ -459,37 +498,57 @@ const SudokuMathGame = ({ onBack }) => {
       if (used.has(v)) {
         setStatus('Hay números repetidos. Cada número solo se puede usar una vez.');
         wrongSoundRef.current.currentTime = 0;
-        wrongSoundRef.current.play().catch(() => {});
+        sonar(wrongSoundRef.current);
         return;
       }
       used.add(v);
     }
 
-    for (const eq of puzzle.equations) {
-      let out = null;
-      if (eq.kind === 'simple2') {
-        const a = puzzle.slots[eq.a];
-        const b = puzzle.slots[eq.b];
-        out = evalOp(a, eq.op, b);
-      } else if (eq.kind === 'paren3') {
-        const a = puzzle.slots[eq.a];
-        const b = puzzle.slots[eq.b];
-        const c = puzzle.slots[eq.c];
-        const left = evalOp(a, eq.op1, b);
-        out = left === null ? null : evalOp(left, eq.op2, c);
-      }
+    // Se revisa operación por operación y se dice cuál falla y por qué: un
+    // "alguna operación no cuadra" deja al niño pensando que la partida es
+    // imposible, cuando lo que falla es una casilla concreta.
+    for (let i = 0; i < puzzle.equations.length; i++) {
+      const eq = puzzle.equations[i];
+      const out = valorEcuacion(eq, puzzle.slots);
       if (out === null || !isCloseInt(out) || Math.round(out) !== eq.res) {
-        setStatus('Alguna operación no cuadra. Revisa los huecos.');
+        const hecho = describirEcuacion(eq, puzzle.slots);
+        const obtenu = out === null || !isCloseInt(out) ? 'no da un número entero' : `da ${Math.round(out)}`;
+        setStatus(`La ${i + 1}.ª operación no cuadra: ${hecho} ${obtenu}, y el resultado pone ${eq.res}.`);
         wrongSoundRef.current.currentTime = 0;
-        wrongSoundRef.current.play().catch(() => {});
+        sonar(wrongSoundRef.current);
         return;
       }
     }
 
     setStatus(null);
     correctSoundRef.current.currentTime = 0;
-    correctSoundRef.current.play().catch(() => {});
+    sonar(correctSoundRef.current);
     setShowWin(true);
+  };
+
+  // La pista rellena una casilla de la primera operación que no cuadra. La
+  // partida se genera con su solución, así que el valor siempre es el bueno.
+  const darPista = () => {
+    unlockAudio();
+    const { solution, slots, equations } = puzzle;
+    let letra = null;
+    for (const eq of equations) {
+      const letras = [eq.a, eq.b, eq.c].filter(Boolean);
+      const out = valorEcuacion(eq, slots);
+      const falla = out === null || !isCloseInt(out) || Math.round(out) !== eq.res;
+      if (!falla) continue;
+      letra = letras.find((l) => slots[l] === null) || letras[0];
+      break;
+    }
+    if (!letra) {
+      // Si todas cuadran, se ayuda con la primera casilla vacía.
+      letra = Object.keys(slots).find((k) => slots[k] === null);
+    }
+    if (!letra) return;
+    setPuzzle(prev => ({ ...prev, slots: { ...prev.slots, [letra]: solution[letra] } }));
+    setStatus(`Pista: en la casilla ${letra} va el ${solution[letra]}.`);
+    placeSoundRef.current.currentTime = 0;
+    sonar(placeSoundRef.current);
   };
 
   return (
@@ -534,6 +593,7 @@ const SudokuMathGame = ({ onBack }) => {
             {poolAvailable.map(n => (
               <NumberTile
                 key={n}
+                aria-label={`Número ${n}`}
                 $selected={selectedNumber === n}
                 onClick={() => {
                   unlockAudio();
@@ -546,6 +606,7 @@ const SudokuMathGame = ({ onBack }) => {
           </NumbersGrid>
           <FooterRow>
             <SmallButton onClick={validate}>Comprobar</SmallButton>
+            <SmallButton onClick={darPista}>💡 Pista</SmallButton>
             <SmallButton onClick={() => resetPuzzle()}>Nuevo</SmallButton>
             <SmallButton onClick={() => {
               unlockAudio();
@@ -553,7 +614,7 @@ const SudokuMathGame = ({ onBack }) => {
               setStatus(null);
             }}>Cancelar selección</SmallButton>
           </FooterRow>
-          <Status>
+          <Status role="status" aria-live="polite">
             Modo: {difficulty === 'hard' ? 'Difícil (paréntesis)' : 'Fácil'} · Tiempo: {Math.floor(elapsed / 1000)}s{status ? ` · ${status}` : ''}
           </Status>
         </Panel>
@@ -568,11 +629,11 @@ const SudokuMathGame = ({ onBack }) => {
               <EquationRow key={`${puzzle.createdAt}_${idx}`}>
                 {eq.kind === 'simple2' ? (
                   <>
-                    <Blank $active={selectedNumber !== null} onClick={() => placeNumber(eq.a)}>
+                    <Blank aria-label={`Hueco ${eq.a}`} $active={selectedNumber !== null} onClick={() => placeNumber(eq.a)}>
                       {puzzle.slots[eq.a] ?? ''}
                     </Blank>
                     <Token>{eq.op}</Token>
-                    <Blank $active={selectedNumber !== null} onClick={() => placeNumber(eq.b)}>
+                    <Blank aria-label={`Hueco ${eq.b}`} $active={selectedNumber !== null} onClick={() => placeNumber(eq.b)}>
                       {puzzle.slots[eq.b] ?? ''}
                     </Blank>
                     <Token>=</Token>
@@ -581,16 +642,16 @@ const SudokuMathGame = ({ onBack }) => {
                 ) : (
                   <>
                     <Token>(</Token>
-                    <Blank $active={selectedNumber !== null} onClick={() => placeNumber(eq.a)}>
+                    <Blank aria-label={`Hueco ${eq.a}`} $active={selectedNumber !== null} onClick={() => placeNumber(eq.a)}>
                       {puzzle.slots[eq.a] ?? ''}
                     </Blank>
                     <Token>{eq.op1}</Token>
-                    <Blank $active={selectedNumber !== null} onClick={() => placeNumber(eq.b)}>
+                    <Blank aria-label={`Hueco ${eq.b}`} $active={selectedNumber !== null} onClick={() => placeNumber(eq.b)}>
                       {puzzle.slots[eq.b] ?? ''}
                     </Blank>
                     <Token>)</Token>
                     <Token>{eq.op2}</Token>
-                    <Blank $active={selectedNumber !== null} onClick={() => placeNumber(eq.c)}>
+                    <Blank aria-label={`Hueco ${eq.c}`} $active={selectedNumber !== null} onClick={() => placeNumber(eq.c)}>
                       {puzzle.slots[eq.c] ?? ''}
                     </Blank>
                     <Token>=</Token>
