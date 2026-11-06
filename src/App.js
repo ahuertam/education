@@ -40,11 +40,14 @@ const TyperDungeonGame = lazy(() => import('./components/TyperDungeon/TyperDunge
 const ElColgadoGame = lazy(() => import('./components/ElColgadoGame'));
 const RoscoPalabrasGame = lazy(() => import('./components/RoscoPalabrasGame'));
 const JeopardyGame = lazy(() => import('./components/JeopardyGame'));
-const BetYourAnswerGame = lazy(() => import('./components/BetYourAnswerGame'));
 const TallerFraccionesGame = lazy(() => import('./components/FraccionesGame'));
 const ProductosParcialesGame = lazy(() => import('./components/ProductosParcialesGame'));
 const RectaNumericaGame = lazy(() => import('./components/RectaNumericaGame'));
 const BaseDiezGame = lazy(() => import('./components/BaseDiezGame'));
+const TablaNumerosGame = lazy(() => import('./components/TablaNumerosGame'));
+const DineroGame = lazy(() => import('./components/DineroGame'));
+const GeoboardGame = lazy(() => import('./components/GeoboardGame'));
+const PatronesGame = lazy(() => import('./components/PatronesGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -232,12 +235,6 @@ function App() {
         return <JeopardyGame
           onBack={() => setCurrentView('game-selector')}
         />;
-      case 'apuesta':
-        return <BetYourAnswerGame
-          onBack={() => setCurrentView('game-selector')}
-          operation={selectedOperation}
-          multiplicationConfig={multiplicationConfig}
-        />;
       case 'tallerfracciones':
         return <TallerFraccionesGame
           onBack={() => setCurrentView('game-selector')}
@@ -253,6 +250,22 @@ function App() {
         />;
       case 'basediez':
         return <BaseDiezGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'tablanumeros':
+        return <TablaNumerosGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'dinero':
+        return <DineroGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'geoboard':
+        return <GeoboardGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'patrones':
+        return <PatronesGame
           onBack={() => setCurrentView('game-selector')}
         />;
       default:

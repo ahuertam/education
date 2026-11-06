@@ -24,8 +24,8 @@ import {
   FaProjectDiagram, FaCalculator, FaGlobe, FaPuzzlePiece, FaKeyboard,
   FaGamepad, FaRocket, FaFrog, FaRegCircle, FaMeteor, FaDragon, FaCar,
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
-  FaFlask, FaCoins, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
-  FaRulerHorizontal, FaCubes,
+  FaFlask, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
+  FaRulerHorizontal, FaCubes, FaThumbtack, FaShapes, FaTable, FaCoins,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -107,7 +107,7 @@ export const CATEGORIES = [
   {
     id: 15, icon: FaRulerHorizontal, title: 'Números', color: '#0284C7',
     category: 'numeros',
-    description: 'Sentido numérico: rectas numéricas, valor posicional y comparación de números.',
+    description: 'Sentido numérico: rectas numéricas, valor posicional, tablas y dinero.',
   },
 ];
 
@@ -228,6 +228,26 @@ export const GAMES = [
     categories: ['numeros'],
     description: 'Lee, descompone y compara números con piezas de base diez.',
   },
+  {
+    id: 'tablanumeros', icon: FaTable, title: 'La Tabla de Números', color: '#0E7490',
+    categories: ['numeros'],
+    description: 'Lee una rejilla de números, prever el siguiente y descubrir de cuánto en cuánto avanza.',
+  },
+  {
+    id: 'dinero', icon: FaCoins, title: 'Dinero en euros', color: '#CA8A04',
+    categories: ['numeros'],
+    description: 'Suma monedas y billetes, calcula el cambio y combina piezas para pagar.',
+  },
+  {
+    id: 'geoboard', icon: FaThumbtack, title: 'El Geoboard', color: '#B45309',
+    categories: ['geometria'],
+    description: 'Tira gomas entre clavos: mide el área, el borde y construye figuras.',
+  },
+  {
+    id: 'patrones', icon: FaShapes, title: 'Bloques de Patrones', color: '#15803D',
+    categories: ['geometria', 'shapes'],
+    description: 'Cuenta piezas de patrón y descubre cuántas piezas forman cada una.',
+  },
 
   // Vocabulario
   {
@@ -266,11 +286,6 @@ export const GAMES = [
     id: 'jeopardy', icon: FaScroll, title: 'Jeopardy', color: '#1D4ED8',
     categories: ['knowledge'],
     description: 'Tablero de categorías y puntajes al estilo clásico: perfecto para repasar unidades completas.',
-  },
-  {
-    id: 'apuesta', icon: FaCoins, title: 'Apuesta tu Respuesta', color: '#B45309',
-    categories: ['addition', 'subtraction', 'multiplication', 'division'],
-    description: 'Apuesta una, dos o tres veces tus puntos antes de responder. Si aciertas, ganas el triple; si fallas, lo pierdes.',
   },
 
   // Formas y geometría

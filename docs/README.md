@@ -7,6 +7,12 @@ Todo lo que no sea el `README.md` de la raíz vive aquí.
 - **[`ia.md`](ia.md)** — la guía del repo. Qué juegos hay, cómo se navega, dónde está
   cada componente, cómo añadir uno nuevo y qué hay pendiente. **Empieza por aquí.**
 
+## De dónde salen los juegos
+
+- [`mlc.md`](mlc.md) — cómo se han traducido las apps del Math Learning Center
+  (Fractions, Number Line, Geoboard, Money Pieces...) a juegos de rondas, qué se
+  ha descartado y por qué, y los detalles de castellano que no se tocan.
+
 ## Planes de diseño
 
 Documentos de trabajo que recogieron el diseño de cada juego. Describen el porqué;

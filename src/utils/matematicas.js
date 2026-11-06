@@ -66,3 +66,31 @@ export const redondear = (n, orden) => {
   const paso = 10 ** orden;
   return Math.round(n / paso) * paso;
 };
+
+// --- Geoboard -------------------------------------------------------------
+
+/**
+ * Área de un polígono por la fórmula del cordón. Con los vértices en la
+ * rejilla y lados recto, el resultado siempre es un número entero de casillas.
+ */
+export const areaPoligono = (puntos) => {
+  if (puntos.length < 3) return 0;
+  let suma = 0;
+  for (let i = 0; i < puntos.length; i++) {
+    const [x1, y1] = puntos[i];
+    const [x2, y2] = puntos[(i + 1) % puntos.length];
+    suma += x1 * y2 - x2 * y1;
+  }
+  return Math.abs(suma) / 2;
+};
+
+/** Perímetro de un polígono: la suma de la longitud de los lados. */
+export const perimetroPoligono = (puntos) => {
+  let total = 0;
+  for (let i = 0; i < puntos.length; i++) {
+    const [x1, y1] = puntos[i];
+    const [x2, y2] = puntos[(i + 1) % puntos.length];
+    total += Math.hypot(x2 - x1, y2 - y1);
+  }
+  return total;
+};

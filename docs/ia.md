@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **35 juegos**, 38 vistas, 42 componentes.
+Datos a fecha de la última revisión: **38 juegos**, 41 vistas, 46 componentes.
 
 ---
 
@@ -68,6 +68,10 @@ Landing  ──►  game-selector  ──►  <juego>
 | `productosparciales` | Buscador de Productos Parciales | [`ProductosParcialesGame.js`](../src/components/ProductosParcialesGame.js) |
 | `rectanumerica` | La Recta Numérica | [`RectaNumericaGame.js`](../src/components/RectaNumericaGame.js) |
 | `basediez` | Base Diez | [`BaseDiezGame.js`](../src/components/BaseDiezGame.js) |
+| `tablanumeros` | La Tabla de Números | [`TablaNumerosGame.js`](../src/components/TablaNumerosGame.js) |
+| `dinero` | Dinero en euros | [`DineroGame.js`](../src/components/DineroGame.js) |
+| `geoboard` | El Geoboard | [`GeoboardGame.js`](../src/components/GeoboardGame.js) |
+| `patrones` | Bloques de Patrones | [`PatronesGame.js`](../src/components/PatronesGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -82,14 +86,13 @@ Landing  ──►  game-selector  ──►  <juego>
 | `colgado` | El Colgado | [`ElColgadoGame.js`](../src/components/ElColgadoGame.js) |
 | `roscopalabras` | Rosco de Palabras | [`RoscoPalabrasGame.js`](../src/components/RoscoPalabrasGame.js) |
 | `jeopardy` | Jeopardy | [`JeopardyGame.js`](../src/components/JeopardyGame.js) |
-| `apuesta` | Apuesta tu Respuesta | [`BetYourAnswerGame.js`](../src/components/BetYourAnswerGame.js) |
 | `typerdungeon` | Typer Dungeon | [`TyperDungeon/TyperDungeonGame.js`](../src/components/TyperDungeon/TyperDungeonGame.js) |
 
 ---
 
 ## 4. Categorías
 
-Todo el catálogo —los 35 juegos y las 15 tarjetas de la landing— está en un
+Todo el catálogo —los 38 juegos y las 15 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -141,6 +144,7 @@ categoría tenga su juego y su tarjeta.
 | [`MultiplicationConfig.js`](../src/components/MultiplicationConfig.js) | Elección de tablas y cifras |
 | [`SupportFab.js`](../src/components/SupportFab.js) | Botón de donación Ko-fi |
 | [`FlappyBonusLevel.js`](../src/components/FlappyBonusLevel.js) | Nivel extra del juego Flappy |
+| [`ui/JuegoBase.js`](../src/components/ui/JuegoBase.js) | Marco común de los juegos de rondas: barra, tarjeta, opciones, feedback y pantalla final |
 
 ---
 

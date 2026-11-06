@@ -1,4 +1,4 @@
-// Tests de los cuatro juegos nuevos.
+// Tests de los juegos nuevos.
 //
 // No basta con que se rendericen: El Colgado y Rosco tienen el dataset de
 // palabras, y ahí es donde se cuelan las palabras imposibles de acertar.
@@ -7,7 +7,6 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import ElColgadoGame from './ElColgadoGame';
 import RoscoPalabrasGame from './RoscoPalabrasGame';
 import JeopardyGame from './JeopardyGame';
-import BetYourAnswerGame from './BetYourAnswerGame';
 import { PALABRAS_AHORCADO } from './data/ahorcadoPalabras';
 
 const TECLADO = 'abcdefghijklmnopqrstuvwxyzñ'.split('');
@@ -120,37 +119,5 @@ describe('Jeopardy', () => {
     // Da igual si se acierta o se falla: la casilla queda marcada.
     fireEvent.click(opciones[0]);
     expect(casilla).toBeDisabled();
-  });
-});
-
-describe('Apuesta tu Respuesta', () => {
-  it('pide apuesta antes de mostrar las opciones', () => {
-    render(<BetYourAnswerGame onBack={() => {}} />);
-    fireEvent.click(screen.getByText('Jugar'));
-    expect(screen.getByText('¿Cuánto apuestas?')).toBeTruthy();
-    expect(screen.getByText(/Tranquila/)).toBeTruthy();
-  });
-
-  it('tras apostar aparecen las opciones y el reloj', () => {
-    render(<BetYourAnswerGame onBack={() => {}} />);
-    fireEvent.click(screen.getByText('Jugar'));
-    fireEvent.click(screen.getByText(/Valiente/));
-    expect(screen.getByText('Elige la respuesta')).toBeTruthy();
-    expect(screen.getByText(/s · Apuesta x3/)).toBeTruthy();
-  });
-
-  it('acertar con la apuesta x3 da 150 puntos', () => {
-    render(<BetYourAnswerGame onBack={() => {}} />);
-    fireEvent.click(screen.getByText('Jugar'));
-    fireEvent.click(screen.getByText(/Valiente/));
-
-    // La cuenta se lee en pantalla y se calcula la respuesta.
-    const enunciado = screen.getAllByText(/= \?/).map((n) => n.textContent).pop();
-    const [a, , b] = enunciado.split(' ');
-    const cuenta = Number(a) * Number(b);
-    const botones = screen.getAllByRole('button').filter((b) => /^\d+$/.test(b.textContent));
-    fireEvent.click(botones.find((b) => Number(b.textContent) === cuenta));
-
-    expect(screen.getByText(/Ganaste 150 puntos/)).toBeTruthy();
   });
 });

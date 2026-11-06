@@ -1,6 +1,7 @@
 import {
   mcd, mcm, simplificar, sonEquivalentes, compararFracciones, formatearFraccion,
   partesEnDiez, productosParciales, baseDiez, componerBaseDiez, redondear,
+  areaPoligono, perimetroPoligono,
 } from './matematicas';
 
 describe('fracciones', () => {
@@ -70,5 +71,32 @@ describe('base diez', () => {
     expect(redondear(42, 1)).toBe(40);
     expect(redondear(248, 2)).toBe(200);
     expect(redondear(261, 2)).toBe(300);
+  });
+});
+
+describe('geoboard', () => {
+  it('calcula el área de un rectángulo', () => {
+    expect(areaPoligono([[0, 0], [4, 0], [4, 3], [0, 3]])).toBe(12);
+  });
+
+  it('calcula el área de una figura en L', () => {
+    // 4×3 menos el hueco de 2×1 = 12 - 2 = 10
+    const enL = [[0, 0], [4, 0], [4, 2], [2, 2], [2, 3], [0, 3]];
+    expect(areaPoligono(enL)).toBe(10);
+  });
+
+  it('el perímetro es la suma de los lados', () => {
+    expect(perimetroPoligono([[0, 0], [4, 0], [4, 3], [0, 3]])).toBe(14);
+    const enL = [[0, 0], [4, 0], [4, 2], [2, 2], [2, 3], [0, 3]];
+    expect(perimetroPoligono(enL)).toBe(14);
+  });
+
+  it('una figura sin cerrar no tiene área', () => {
+    expect(areaPoligono([[0, 0], [2, 0]])).toBe(0);
+    expect(areaPoligono([[0, 0]])).toBe(0);
+  });
+
+  it('un triángulo sí cuenta como figura', () => {
+    expect(areaPoligono([[0, 0], [2, 0], [2, 2]])).toBe(2);
   });
 });

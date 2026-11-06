@@ -1,6 +1,6 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **35 minijuegos**
+Web de juegos matemáticos, de lengua y de conocimiento general. **38 minijuegos**
 en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
@@ -11,6 +11,8 @@ en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 > 📖 **La guía del repo está en [`docs/ia.md`](docs/ia.md)**: qué juegos hay, dónde está
 > cada componente, cómo se navega entre pantallas y cómo añadir un juego nuevo.
+> Los juegos salidos de las apps del Math Learning Center se cuentan en
+> [`docs/mlc.md`](docs/mlc.md).
 
 ---
 
@@ -31,7 +33,6 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Mathsteroids** | Destruye asteroides con la respuesta correcta. |
 | **Alimenta al Monstruo** | Arrastra la comida correcta. |
 | **Carrera de Coches** | ¡Acelera respondiendo correctamente! |
-| **Apuesta tu Respuesta** | Apuesta una, dos o tres veces tus puntos antes de responder. |
 | **PokemonMaths** | Usa cartas Pokémon para resolver operaciones, sin repetir preguntas y con ranking local. |
 | **Buscador de Productos Parciales** | Multiplica con el modelo del rectángulo: las decenas por un lado y las unidades por otro. |
 
@@ -42,6 +43,8 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Taller de Fracciones** | Lee, compara y suma fracciones con barras y círculos. |
 | **La Recta Numérica** | Sitúa, salta y ordena números en una recta que cambia de escala. |
 | **Base Diez** | Lee, descompone y compara números con piezas de base diez. |
+| **La Tabla de Números** | Lee una rejilla de números, prevé el siguiente y descubre de cuánto en cuánto avanza. |
+| **Dinero en euros** | Suma monedas y billetes, calcula el cambio y combina piezas para pagar. |
 
 ### 🧠 Conocimiento general
 
@@ -70,6 +73,8 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 |---|---|
 | **Portero de Formas** | Detén las formas y colores correctos en la portería. |
 | **Geometría Master** | Ejercicios de geometría + bonus tipo Flappy por cada acierto. |
+| **El Geoboard** | Tira gomas entre clavos: mide el área, el borde y construye figuras. |
+| **Bloques de Patrones** | Cuenta piezas de patrón y descubre cuántas piezas forman cada una. |
 
 ### 🧩 Mixto, puzzles y avanzado
 
@@ -122,8 +127,8 @@ npm start          # http://localhost:3000
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
 - **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
-  y cada juego baja su trozo al abrirlo, en vez de bajar los 35 de golpe.
-- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 35 juegos y las
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 38 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 38 juegos y las
   15 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
@@ -132,10 +137,12 @@ npm start          # http://localhost:3000
 - **Datasets** en [`src/components/data/`](src/components/data/): preguntas de conocimiento,
   sintaxis, ríos, geometría y formas.
 - **Ranking local** en `localStorage` ([`src/utils/rankings.js`](src/utils/rankings.js)).
-- **Cuatro juegos salidos de las apps del Math Learning Center** (Fractions, Partial Product
-  Finder, Number Line y Number Pieces): allí son herramientas para explorar; aquí son
-  rondas con puntos, racha y explicación de por qué la respuesta es la que es. La lógica
-  compartida está en [`src/utils/matematicas.js`](src/utils/matematicas.js).
+- **Ocho juegos salidos de las apps del Math Learning Center** (Fractions, Partial Product
+  Finder, Number Line, Number Pieces, Geoboard, Pattern Shapes, Number Chart y Money
+  Pieces): allí son herramientas para explorar; aquí son rondas con puntos, racha y
+  explicación de por qué la respuesta es la que es. La lógica compartida está en
+  [`src/utils/matematicas.js`](src/utils/matematicas.js) y el marco de la interfaz en
+  [`src/components/ui/JuegoBase.js`](src/components/ui/JuegoBase.js).
 - **Tres juegos con estructura modular**: Typer Dungeon (escenas, hooks y un reducer de
   fases `exploring → pre_battle → battle → monster_dying → stairs_found → descend`),
   Digilike (datos, estilos, lógica pura testeable y capa de red) y Fuego & Agua
