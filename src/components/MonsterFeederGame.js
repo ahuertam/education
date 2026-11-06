@@ -6,6 +6,32 @@ import {
   SMALL_PROFILE,
 } from '../utils/problemGenerator';
 
+// La hoja public/moster2.png mide 361×300: cuatro columnas y tres filas de
+// celdas de 90,25 × 100 px, con fondo transparente.
+//
+//   fila 0 → el monstruo: idle, open, happy, sad
+//   fila 1 → manzana, plátano, galleta, galleta
+//   fila 2 → donut, helado, donut, pizza
+//
+// La celda se recorta a su tamaño natural y luego se amplía 1,5× por CSS, que
+// es lo que la deja con el tamaño que tenía en pantalla (135 × 150).
+const CELDA_W = 90.25;
+const CELDA_H = 100;
+const ESCALA = 1.5;
+
+// Las seis comidas que se usan, en orden de lectura de la hoja. Se saltan la
+// segunda galleta y el donut azul para que las seis sean distintas.
+export const COMIDAS = [
+  { col: 0, row: 1 }, // manzana
+  { col: 1, row: 1 }, // plátano
+  { col: 2, row: 1 }, // galleta
+  { col: 0, row: 2 }, // donut
+  { col: 1, row: 2 }, // helado
+  { col: 3, row: 2 }, // pizza
+];
+
+export { CELDA_W, CELDA_H };
+
 const GameContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
@@ -62,7 +88,7 @@ const Score = styled.div`
 
 const ProblemDisplay = styled.div`
   position: absolute;
-  top: 15%;
+  top: 6%;
   left: 50%;
   transform: translateX(-50%);
   font-size: 3rem;
@@ -87,28 +113,29 @@ const MonsterContainer = styled.div`
 `;
 
 const MonsterSprite = styled.img`
-  width: 135px;
-  height: 150px;
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  width: ${CELDA_W}px;
+  height: ${CELDA_H}px;
   object-fit: none;
   object-position: ${props => {
-    // Image is 548x455, 4 columns x 3 rows
-    // Each sprite: ~137px wide x ~152px tall
-    // Crop more from right and bottom
     const col = {
       idle: 0,
       open: 1,
       happy: 2,
       sad: 3
     }[props.$state] || 0;
-    return `${-col * 137}px 0px`;
+    return `${-col * CELDA_W}px 0px`;
   }};
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+  transform: translateX(-50%) scale(${ESCALA});
+  transform-origin: center bottom;
+  image-rendering: auto;
 `;
 
 const FoodContainer = styled.div`
   position: absolute;
-  bottom: 50%;
+  bottom: 42%;
   left: 0;
   right: 0;
   display: flex;
@@ -120,8 +147,10 @@ const FoodContainer = styled.div`
 `;
 
 const FoodSpriteWrapper = styled.div`
-  width: 135px;
-  height: 145px;
+  --celda-w: clamp(92px, 13vw, 135px);
+  --celda-h: calc(var(--celda-w) * ${(CELDA_H / CELDA_W).toFixed(4)});
+  width: var(--celda-w);
+  height: var(--celda-h);
   cursor: ${props => props.$isDragging ? 'grabbing' : 'grab'};
   user-select: none;
   transition: transform 0.2s, opacity 0.2s;
@@ -129,41 +158,31 @@ const FoodSpriteWrapper = styled.div`
   filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
   position: relative;
   opacity: ${props => props.$isDragging ? 0.5 : 1};
-  overflow: hidden;
-  
+
   &:hover {
     transform: scale(1.15) rotate(5deg);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
 `;
 
-const FoodSprite = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: none;
-  object-position: ${props => {
-    // Image is 548x455, 4 columns x 3 rows
-    // Each sprite: ~137px wide x ~152px tall
-    // Row 1 (y=-152): apple, banana, cookie, cookie2
-    // Row 2 (y=-304): donut, ice cream, donut2, pizza
-    // Adjust to crop a bit from top and bottom
-    const positions = [
-      '0px -156px',       // apple
-      '-137px -156px',    // banana
-      '-274px -156px',    // cookie
-      '0px -308px',       // donut
-      '-137px -308px',    // ice cream
-      '-274px -308px',    // donut2
-      '-411px -308px',    // pizza
-      '-411px -156px'     // cookie2
-    ];
-    return positions[props.$foodType % positions.length];
+// La comida se recorta con la misma hoja que el monstruo, pero como fondo
+// escalado: así la casilla se dibuja al tamaño que toque en cada pantalla y
+// las seis caben siempre en una fila.
+const FoodSprite = styled.div`
+  --celda-w: clamp(92px, 13vw, 135px);
+  --celda-h: calc(var(--celda-w) * ${(CELDA_H / CELDA_W).toFixed(4)});
+  width: var(--celda-w);
+  height: var(--celda-h);
+  background-image: url(${process.env.PUBLIC_URL}/moster2.png);
+  background-repeat: no-repeat;
+  background-size: calc(var(--celda-w) * 4) calc(var(--celda-h) * 3);
+  background-position: ${props => {
+    const comida = COMIDAS[props.$foodType % COMIDAS.length];
+    return `calc(var(--celda-w) * ${-comida.col}) calc(var(--celda-h) * ${-comida.row})`;
   }};
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
   pointer-events: none;
 `;
 
@@ -190,10 +209,10 @@ const Feedback = styled.div`
   position: absolute;
   top: 40%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(${props => props.show ? 1 : 0});
+  transform: translate(-50%, -50%) scale(${props => props.$show ? 1 : 0});
   font-size: 4rem;
   font-weight: bold;
-  color: ${props => props.isCorrect ? '#2ECC71' : '#E74C3C'};
+  color: ${props => props.$isCorrect ? '#2ECC71' : '#E74C3C'};
   text-shadow: 0 4px 8px rgba(0,0,0,0.3);
   z-index: 20;
   transition: transform 0.3s ease;
@@ -301,18 +320,17 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication', multiplicatio
     setTimeout(() => setMonsterState('idle'), 300);
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const item = foodItems.find(f => f.id === draggingId);
-    
+  // Resuelve la respuesta: acierta, falla y programa la siguiente ronda. Lo
+  // usan tanto el arrastre con ratón como el de dedo, que antes tenían la
+  // lógica duplicada y podían divergir.
+  const resolveAnswer = useCallback((item) => {
     if (!item) return;
 
     if (item.isCorrect) {
-      // Correct answer
       setMonsterState('happy');
       setFeedback({ show: true, isCorrect: true });
       setScore(s => s + 10);
-      
+
       setTimeout(() => {
         setFeedback({ show: false, isCorrect: false });
         setMonsterState('idle');
@@ -321,11 +339,10 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication', multiplicatio
         setFoodItems(generateFoodItems(newProblem));
       }, 1500);
     } else {
-      // Wrong answer
       setMonsterState('sad');
       setFeedback({ show: true, isCorrect: false });
       setScore(s => Math.max(0, s - 2));
-      
+
       setTimeout(() => {
         setFeedback({ show: false, isCorrect: false });
         setMonsterState('idle');
@@ -333,6 +350,11 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication', multiplicatio
     }
 
     setDraggingId(null);
+  }, [generateProblem, generateFoodItems]);
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    resolveAnswer(foodItems.find(f => f.id === draggingId));
   };
 
   const handleDragOver = (e) => {
@@ -352,32 +374,7 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication', multiplicatio
       setMonsterState('idle');
       return;
     }
-
-    // Trigger drop logic
-    if (item.isCorrect) {
-      setMonsterState('happy');
-      setFeedback({ show: true, isCorrect: true });
-      setScore(s => s + 10);
-      
-      setTimeout(() => {
-        setFeedback({ show: false, isCorrect: false });
-        setMonsterState('idle');
-        const newProblem = generateProblem();
-        setCurrentProblem(newProblem);
-        setFoodItems(generateFoodItems(newProblem));
-      }, 1500);
-    } else {
-      setMonsterState('sad');
-      setFeedback({ show: true, isCorrect: false });
-      setScore(s => Math.max(0, s - 2));
-      
-      setTimeout(() => {
-        setFeedback({ show: false, isCorrect: false });
-        setMonsterState('idle');
-      }, 1500);
-    }
-
-    setDraggingId(null);
+    resolveAnswer(item);
   };
 
   return (
@@ -428,18 +425,17 @@ const MonsterFeederGame = ({ onBack, operation = 'multiplication', multiplicatio
                 onTouchStart={(e) => handleTouchStart(e, item)}
                 onTouchEnd={(e) => handleTouchEnd(e, item)}
               >
-                <FoodSprite 
-                  src={`${process.env.PUBLIC_URL}/moster2.png`}
+                <FoodSprite
                   $foodType={item.foodType}
-                  alt="Food"
+                  aria-hidden="true"
                 />
                 <FoodNumber>{item.number}</FoodNumber>
               </FoodSpriteWrapper>
             ))}
           </FoodContainer>
 
-          <Feedback show={feedback.show} isCorrect={feedback.isCorrect}>
-            {feedback.isCorrect ? '¡Correcto! 😋' : '¡Ups! 😢'}
+          <Feedback $show={feedback.show} $isCorrect={feedback.isCorrect}>
+            {feedback.show ? (feedback.isCorrect ? '¡Correcto! 😋' : '¡Ups! 😢') : ''}
           </Feedback>
         </>
       )}
