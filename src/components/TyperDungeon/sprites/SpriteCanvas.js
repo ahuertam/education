@@ -319,7 +319,7 @@ function drawToOutput(ctx, cached, dw, dh, trim) {
 
 export default function SpriteCanvas({
   src, sx, sy, sw, sh, dw, dh,
-  style, className,
+  style, className, label = 'Sprite',
   clearW = 0, clearH = 0, pad = 0, trim = false,
   bgTolerance = 60, trimBgTolerance = 60, trimEdgeThreshold = 0.6,
   cleanupTolerance = 22,
@@ -383,6 +383,11 @@ export default function SpriteCanvas({
       height={dh}
       style={{ imageRendering: 'pixelated', display: 'block', ...style }}
       className={className}
+      // Un sprite dibujado en un canvas es invisible para un lector de
+      // pantalla: sin rol ni nombre, el niño no sabe que tiene delante al
+      // monstruo ni cuál es su héroe.
+      role="img"
+      aria-label={label}
     />
   );
 }

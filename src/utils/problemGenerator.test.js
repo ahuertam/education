@@ -49,11 +49,6 @@ const collect = (fn, iterations = 4000) => {
   return seen;
 };
 
-const sameSet = (a, b) => {
-  if (a.size !== b.size) return false;
-  for (const v of a) if (!b.has(v)) return false;
-  return true;
-};
 
 // --- Implementaciones de referencia (las antiguas, copiadas tal cual) ------
 
@@ -248,9 +243,10 @@ describe('generateProblem con la configuración de multiplicación', () => {
     });
     expect(r.operator).toBe('×');
     expect(r.answer).toBe(r.a * r.b);
-    if (maxTable !== Infinity) {
-      expect(r.a).toBeLessThanOrEqual(maxTable);
-    }
+    // La tabla usada sale de las elegidas; si el tope deja alguna dentro, sale
+    // de las que caben en la dificultad.
+    const caben = config.tables.filter((t) => t <= maxTable);
+    expect(caben.length ? caben : config.tables).toContain(r.a);
   });
 
   it('cae al rango del juego si la configuración no es utilizable', () => {

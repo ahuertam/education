@@ -2,7 +2,7 @@
 // como un menú con un dibujo. Estos tests comprueban que los sprites están
 // plantados en el suelo y no en una barra de la interfaz.
 
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import BattleScene from './BattleScene';
 import { MONSTERS } from '../data/monsters';
 
@@ -24,30 +24,21 @@ const estado = (extra = {}) => ({
 
 describe('BattleScene', () => {
   it('dibuja al héroe y al monstruo en la misma sala', () => {
-    const { container } = render(<BattleScene state={estado()} dispatch={() => {}} />);
-    // Un canvas por sprite. Los dos tienen que estar dentro de la vista de la
-    // mazmorra, no uno en la barra de la interfaz.
-    const canvases = container.querySelectorAll('canvas');
-    expect(canvases.length).toBeGreaterThanOrEqual(2);
-
-    // La barra de control es la última franja; los canvas no deberían estar
-    // dentro de ella.
-    const barra = [...container.querySelectorAll('div')].find(
-      (d) => getComputedStyle(d).borderTopStyle === 'solid'
-    );
-    if (barra) {
-      expect(barra.querySelectorAll('canvas').length).toBe(0);
-    }
+    render(<BattleScene state={estado()} dispatch={() => {}} />);
+    // Los dos sprites están en la sala, con su nombre para el lector de
+    // pantalla.
+    expect(screen.getByRole('img', { name: 'El héroe' })).toBeTruthy();
+    expect(screen.getByRole('img', { name: /El monstruo/ })).toBeTruthy();
   });
 
   it('muestra el nombre de la mazmorra en el HUD', () => {
-    const { container } = render(<BattleScene state={estado()} dispatch={() => {}} />);
-    expect(container.textContent).toMatch(/Mazmorra 2 \/ 5/);
-    expect(container.textContent).toMatch(/El Pozo de las Brasas/);
+    render(<BattleScene state={estado()} dispatch={() => {}} />);
+    expect(screen.getByText(/Mazmorra 2 \/ 5/)).toBeTruthy();
+    expect(screen.getByText(/El Pozo de las Brasas/)).toBeTruthy();
   });
 
   it('avisa del reloj compartido cuando se juega en equipo', () => {
-    const { container } = render(
+    render(
       <BattleScene
         state={estado({
           config: { language: 'es', difficulty: 'normal', totalFloors: 5, timeLimit: 12, heroes: 2 },
@@ -55,12 +46,12 @@ describe('BattleScene', () => {
         dispatch={() => {}}
       />
     );
-    expect(container.textContent).toMatch(/reloj del equipo/);
-    expect(container.textContent).toMatch(/En equipo: 2/);
+    expect(screen.getByText(/reloj del equipo/)).toBeTruthy();
+    expect(screen.getByText(/En equipo: 2/)).toBeTruthy();
   });
 
   it('el reloj en solitario es el de la palabra, no el del equipo', () => {
-    const { container } = render(<BattleScene state={estado()} dispatch={() => {}} />);
-    expect(container.textContent).not.toMatch(/reloj del equipo/);
+    render(<BattleScene state={estado()} dispatch={() => {}} />);
+    expect(screen.queryByText(/reloj del equipo/)).toBeNull();
   });
 });

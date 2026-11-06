@@ -81,6 +81,7 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
     <Wrapper $hurt={hurt}>
       <SpriteCanvas
         src={SHEET}
+        label="El héroe"
         sx={sx} sy={rowY + srcInsetTop}
         sw={FRAME_W} sh={FRAME_H - srcInsetTop}
         dw={size} dh={croppedH}

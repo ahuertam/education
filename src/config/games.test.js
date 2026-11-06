@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import GameSelector from '../components/GameSelector';
 import { GAMES, CATEGORIES, gamesByCategory, gameDescription } from './games';
 
@@ -25,9 +25,10 @@ describe('catálogo de juegos', () => {
       expect(g.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
       expect(g.icon).toBeTruthy();
       expect(typeof g.description === 'string' || typeof g.description === 'function').toBe(true);
-      // Un juego directo no tiene categoría; el resto, al menos una.
-      if (!g.direct) expect(g.categories.length).toBeGreaterThan(0);
     }
+    // Un juego directo no tiene categoría; el resto, al menos una.
+    const sinCategoria = GAMES.filter((g) => !g.direct && g.categories.length === 0);
+    expect(sinCategoria.map((g) => g.id)).toEqual([]);
   });
 
   it('todo juego del catálogo tiene su vista en App.js', () => {
@@ -60,14 +61,15 @@ describe('catálogo de juegos', () => {
   });
 
   it('toda actividad de la landing tiene al menos un juego', () => {
-    for (const c of CATEGORIES) {
-      if (c.view) {
-        // Un juego que se abre directo: no necesita categoría.
-        expect(GAMES.some((g) => g.id === c.view)).toBe(true);
-        continue;
-      }
-      expect(gamesByCategory(c.category).length).toBeGreaterThan(0);
-    }
+    // Las que abren un juego directo necesitan que ese juego exista.
+    const directas = CATEGORIES.filter((c) => c.view);
+    const sinJuego = directas.filter((c) => !GAMES.some((g) => g.id === c.view));
+    expect(sinJuego.map((c) => c.title)).toEqual([]);
+
+    // Y las que llevan a una categoría, al menos un juego en ella.
+    const conCategoria = CATEGORIES.filter((c) => !c.view);
+    const vacias = conCategoria.filter((c) => gamesByCategory(c.category).length === 0);
+    expect(vacias.map((c) => c.title)).toEqual([]);
   });
 
   it('los juegos directos no salen en el selector', () => {
@@ -114,25 +116,25 @@ describe('el selector de juegos', () => {
     render(<GameSelector category={category} onNavigate={() => {}} />);
 
   it('enseña los juegos de la categoría', () => {
-    const { getByText } = montar('multiplication');
+    montar('multiplication');
     for (const g of gamesByCategory('multiplication')) {
-      expect(getByText(g.title)).toBeTruthy();
+      expect(screen.getByText(g.title)).toBeTruthy();
     }
   });
 
   it('enseña el icono de cada juego', () => {
-    const { container } = montar('knowledge');
-    // Cada tarjeta lleva un svg del icono.
-    expect(container.querySelectorAll('svg').length).toBeGreaterThan(0);
+    montar('knowledge');
+    // Cada tarjeta lleva un icono, que es un svg dentro de la tarjeta.
+    expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
   });
 
   it('no enseña juegos de otra categoría', () => {
-    const { queryByText } = montar('puzzles');
-    expect(queryByText('Torre del Saber')).toBeNull();
+    montar('puzzles');
+    expect(screen.queryByText('Torre del Saber')).toBeNull();
   });
 
   it('PokemonMaths no aparece en multiplicación', () => {
-    const { queryByText } = montar('multiplication');
-    expect(queryByText('PokemonMaths')).toBeNull();
+    montar('multiplication');
+    expect(screen.queryByText('PokemonMaths')).toBeNull();
   });
 });

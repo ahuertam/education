@@ -47,6 +47,7 @@ export default function MonsterSprite({ monster, animState = 'idle' }) {
     <Wrapper $hurt={prevAnim === 'hurt'} $dead={prevAnim === 'dead'}>
       <SpriteCanvas
         src={SHEET}
+        label={`El monstruo${monster.name?.es ? ` ${monster.name.es}` : ''}`}
         sx={monster.x} sy={monster.y}
         sw={monster.w} sh={monster.h}
         dw={monster.displayW} dh={displayH}
