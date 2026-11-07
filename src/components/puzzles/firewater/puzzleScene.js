@@ -327,6 +327,10 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
       this.laserGraphics = this.add.graphics();
       this.laserSegments = [];
 
+      // Las flechas mueven al personaje de agua: sin esto, la página hace
+      // scroll mientras se juega y el juego se va de la pantalla.
+      this.input.keyboard.addCapture('UP,DOWN,LEFT,RIGHT,SPACE');
+
       this.input.keyboard.on('keydown', (e) => {
         const list = this.keyIndex.get(e.key);
         if (!list) return;
@@ -348,8 +352,14 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
         }
       });
 
-      this.cameras.main.startFollow(this.fire, true, 0.08, 0.08);
+      // La cámara sigue a los DOS personajes: hay niveles de hasta 7000 px de
+      // ancho y siguiendo solo al de fuego el otro se salía de la pantalla.
+      this.followTarget = { x: this.fire.x, y: this.fire.y };
+      this.cameras.main.startFollow(this.followTarget, true, 0.08, 0.08);
       this.cameras.main.setDeadzone(220, 120);
+      // Y se aleja un poco en los niveles anchos para que quepan los dos.
+      const anchoNivel = this.level.size?.width || 2400;
+      this.cameras.main.setZoom(Math.max(0.6, Math.min(1, 1100 / anchoNivel)));
     }
 
     tryInteract(playerName) {
@@ -476,6 +486,12 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
     update() {
       if (this.isPausedExternally) return;
       if (!this.fire?.body || !this.water?.body) return;
+
+      // El punto que sigue la cámara va entre los dos personajes.
+      if (this.followTarget) {
+        this.followTarget.x = (this.fire.x + this.water.x) / 2;
+        this.followTarget.y = (this.fire.y + this.water.y) / 2;
+      }
 
       for (const mp of this.movingPlatforms || []) {
         const axis = mp.getData('axis') || 'x';

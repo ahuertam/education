@@ -29,4 +29,58 @@ describe('FireWater procedural level', () => {
       expect(v.ok).toBe(true);
     }
   });
+
+  // El test de antes miraba cinco semillas y por eso el juego fallaba en
+  // uno de cada once niveles: el generador tiraba niveles que el validador
+  // rechazaba (por ejemplo, con las escaleras encima del jugador) y el niño
+  // se encontraba un cartel rojo en vez del juego.
+  test('todos los niveles de un barrido son válidos', () => {
+    const dificultades = ['easy', 'medium', 'hard'];
+    const fallos = [];
+
+    for (let i = 0; i < 300; i++) {
+      for (const dificultad of dificultades) {
+        const seed = `barrido-${i}-${dificultad}`;
+        const lvl = generateLevel({ seed, difficulty: dificultad });
+        const v = validateLevel(lvl);
+        if (!v.ok) fallos.push(`${seed}: ${v.reasons.join(', ')}`);
+      }
+    }
+
+    expect(fallos.slice(0, 8)).toEqual([]);
+    expect(fallos.length).toBe(0);
+  }, 60000);
+
+  test('las salidas tienen suelo debajo y las gemas están en hueco libre', () => {
+    const fallos = [];
+
+    for (let i = 0; i < 60; i++) {
+      const lvl = generateLevel({ seed: `salidas-${i}`, difficulty: 'medium' });
+      const v = validateLevel(lvl);
+      if (v.reasons.some((r) => r.startsWith('exit_unsupported'))) {
+        fallos.push(`salidas-${i}: una salida sin suelo`);
+      }
+      if (v.reasons.some((r) => r.startsWith('collectible_blocked'))) {
+        fallos.push(`salidas-${i}: una gema dentro de un muro`);
+      }
+    }
+
+    expect(fallos.slice(0, 8)).toEqual([]);
+  }, 60000);
+
+  test('ninguna puerta se queda sin botón', () => {
+    const fallos = [];
+
+    for (let i = 0; i < 60; i++) {
+      const lvl = generateLevel({ seed: `puertas-${i}`, difficulty: 'hard' });
+      const botones = new Set(lvl.buttons.map((b) => b.doorId));
+      for (const puerta of lvl.doors) {
+        if ((puerta.activation || 'button') === 'button' && !botones.has(puerta.id)) {
+          fallos.push(`puertas-${i}: ${puerta.id} sin botón`);
+        }
+      }
+    }
+
+    expect(fallos.slice(0, 8)).toEqual([]);
+  }, 60000);
 });

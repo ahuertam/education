@@ -3,7 +3,7 @@ import { Container, GameStage } from './puzzles/firewater/styles';
 import StartScreen from './puzzles/firewater/StartScreen';
 import HudBar from './puzzles/firewater/HudBar';
 import GameCanvas from './puzzles/firewater/GameCanvas';
-import { CompleteOverlay, PauseOverlay } from './puzzles/firewater/Overlays';
+import { CompleteOverlay, DeathOverlay, PauseOverlay } from './puzzles/firewater/Overlays';
 import { loadKeymap, saveKeymap } from './puzzles/firewater/keymap';
 import { createRandomSeed, normalizeSeed } from './puzzles/firewater/seed';
 
@@ -64,7 +64,10 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
 
   const onRequestPause = useCallback(() => setPhase('paused'), []);
   const onResume = () => setPhase('playing');
-  const onDeath = useCallback(() => setPhase('paused'), []);
+  // Morir no es pausar: antes salia el cartel de "Pausa" y el niño se
+  // quedaba sin saber que habia muerto (y sin poder volver a morir, porque
+  // la escena se quedaba bloqueada).
+  const onDeath = useCallback(() => setPhase('dead'), []);
   const onComplete = useCallback(() => setPhase('complete'), []);
 
   const difficultyLabel = difficulty === 'easy' ? 'Fácil' : difficulty === 'medium' ? 'Medio' : 'Difícil';
@@ -117,6 +120,14 @@ const FireWaterPuzzlesGame = ({ onBack }) => {
           onRestart={restartSame}
           onNewLevel={newSeed}
           onBackToSetup={exitToSetup}
+          onExit={onBack}
+        />
+      )}
+
+      {phase === 'dead' && (
+        <DeathOverlay
+          onRestart={restartSame}
+          onNewLevel={newSeed}
           onExit={onBack}
         />
       )}

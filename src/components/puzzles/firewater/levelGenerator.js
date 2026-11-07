@@ -376,6 +376,12 @@ export function generateLevel({ seed, difficulty }) {
     water: { x: 200, y: groundY - 120 }
   };
 
+  // Zona que ocupan los dos personajes al aparecer (unos 40×60 cada uno).
+  // Nada puede colocarse encima: si el nivel nace con una escalera o una
+  // plataforma encima del jugador, no se puede ni empezar, y el validador
+  // tiraba el nivel entero por eso.
+  const zonaSpawn = { x: 90, y: groundY - 170, w: 140, h: 100 };
+
   const hazardsList = [];
   const doors = [];
   const buttons = [];
@@ -495,22 +501,55 @@ export function generateLevel({ seed, difficulty }) {
     });
   }
   for (const p of endPlatforms) {
+    // La pasarela del final es imprescindible: es el suelo de las salidas.
+    // Si tryPlace la rechaza por una plataforma que se cruza, se coloca
+    // igual y las salidas se quedan sobre ella.
+    if (p.id === 'gate_path') {
+      occupancy.platforms.push(toRect(p));
+      platforms.push(p);
+      continue;
+    }
     if (tryPlace(toRect(p), occupancy.platforms, 10)) platforms.push(p);
   }
 
+  // Una puerta no puede caer encima de una plataforma (la pasarela del final
+  // es el camino a la salida y una puerta encima lo tapa) ni encima de los
+  // personajes.
+  const sitioLibrePara = (rect) => {
+    if (rectsOverlap(rect, zonaSpawn, 8)) return false;
+    for (const p of occupancy.platforms) if (rectsOverlap(rect, p, 14)) return false;
+    for (const d of occupancy.doors) if (rectsOverlap(rect, d, 14)) return false;
+    return true;
+  };
+
   const mainDoor = { id: 'door_main', x: gateX, y: gateY - 10, w: 84, h: 98, open: false, activation: 'button' };
-  if (tryPlace(toRect(mainDoor), occupancy.doors, 14)) doors.push(mainDoor);
+  if (sitioLibrePara(toRect(mainDoor))) {
+    tryPlace(toRect(mainDoor), occupancy.doors, 14);
+    doors.push(mainDoor);
+  }
 
   if (cfg.extraDoor) {
     const door2 = { id: 'door_side', x: gateX + 180, y: gateY - 10, w: 84, h: 98, open: false, activation: 'button' };
-    if (tryPlace(toRect(door2), occupancy.doors, 14)) doors.push(door2);
+    if (sitioLibrePara(toRect(door2))) {
+      tryPlace(toRect(door2), occupancy.doors, 14);
+      doors.push(door2);
+    }
   }
 
   const ensureButtonForDoor = (door, idx) => {
     const btnW = 70;
     const btnH = 14;
-    for (let i = 0; i < 16; i += 1) {
-      const x = rngInt(rng, 360, gateX - 460);
+    // El botón no puede estar ni encima de los personajes ni pegado a la
+    // puerta, y las escaleras que suben hasta elshelf se colocan a su
+    // izquierda: por eso el botón empieza en 460 y no antes (una escalera
+    // en 215 caia justo encima del jugador de agua).
+    const minX = 460;
+    const maxX = gateX - 460;
+    const rango = Math.max(0, maxX - minX);
+    for (let i = 0; i < 40; i += 1) {
+      // La x se va rotando en vez de sortearla siempre del mismo rango: si
+      // no, los 40 intentos caian en los mismos huecos ocupados.
+      const x = minX + (rango > 0 ? (i * 137) % rango : 0);
       const prevOccPlatforms = occupancy.platforms.length;
       const prevOccButtons = occupancy.buttons.length;
       const prevOccCrates = occupancy.crates.length;
@@ -518,7 +557,7 @@ export function generateLevel({ seed, difficulty }) {
       const prevButtons = buttons.length;
       const prevCrates = crates.length;
 
-      const shelfMode = rng() < 0.55;
+      const shelfMode = rng() < 0.55 && rango > 0;
       let buttonY = safeButtonY({ groundY, groundH, buttonH: btnH });
       const extraPlatforms = [];
 
@@ -539,7 +578,9 @@ export function generateLevel({ seed, difficulty }) {
           });
         }
 
-        let okPlatforms = tryPlace(toRect(shelf), occupancy.platforms, 10);
+        // Ni el shelf ni sus escaleras pueden pisar la zona de aparicion.
+        const pisaSpawn = [shelf, ...steps].some((p) => rectsOverlap(toRect(p), zonaSpawn, 8));
+        let okPlatforms = !pisaSpawn && tryPlace(toRect(shelf), occupancy.platforms, 10);
         for (const st of steps) okPlatforms = okPlatforms && tryPlace(toRect(st), occupancy.platforms, 10);
         if (!okPlatforms) {
           occupancy.platforms.length = prevOccPlatforms;
@@ -587,15 +628,21 @@ export function generateLevel({ seed, difficulty }) {
 
       platforms.push(...extraPlatforms);
       buttons.push(btn);
-      return;
+      return true;
     }
+    return false;
   };
 
   for (let i = 0; i < doors.length; i += 1) {
-    ensureButtonForDoor(doors[i], i);
+    // Si no se encuentra sitio para el boton, la puerta se quita: una puerta
+    // sin boton deja el nivel sin poder terminar, y es mejor que no exista.
+    if (!ensureButtonForDoor(doors[i], i)) {
+      doors.splice(i, 1);
+      i -= 1;
+    }
   }
 
-  const width = Math.max(2400, Math.floor(gateX + 900));
+  const width = Math.max(gateX + 700, 2400);
   platforms.unshift({ id: 'ground', x: width / 2, y: groundY, w: width, h: groundH, kind: 'solid' });
 
   const topY = Math.max(140, groundTop(groundY, groundH) - 620);
@@ -792,6 +839,18 @@ export function generateLevel({ seed, difficulty }) {
     }
   }
 
+  // La salida tiene que quedar encima de la pasarela del final (gate_path),
+  // no flotando al final del mapa: antes se colocaba a una distancia fija
+  // del ancho del nivel, y si el ancho no llegaba la salida se quedaba en el
+  // aire, sin suelo debajo.
+  // La pasarela va centrada en gateX + 260 y mide 720 de ancho: su borde
+  // derecho está en gateX + 620.
+  const finPasarela = gateX + 260 + 360;
+  const exits = {
+    fire: { x: finPasarela - 210, y: gateY - 40, w: 56, h: 86 },
+    water: { x: finPasarela - 120, y: gateY - 40, w: 56, h: 86 }
+  };
+
   const gemCount = difficulty === 'hard' ? rngInt(rng, 10, 16) : difficulty === 'medium' ? rngInt(rng, 8, 12) : rngInt(rng, 6, 10);
   for (let i = 0; i < gemCount; i += 1) {
     const owner = i % 2 === 0 ? 'fire' : 'water';
@@ -799,14 +858,16 @@ export function generateLevel({ seed, difficulty }) {
     const x = rngInt(rng, 320, width - 520);
     const gem = { id: `gem_${owner}_${i}`, x, y: laneY, w: 18, h: 18, owner, kind: 'gem' };
     const overlapsHazard = hazardsList.some(hz => rectsOverlap(toRect(gem), toRect(hz), 16));
-    if (overlapsHazard) continue;
+    // Una gema dentro de un muro no se puede coger: el nivel no se termina
+    // nunca. Las calles (lanes) ya estan colocadas en esas alturas, asi que
+    // hay que comprobarlo.
+    const overlapsSolid = platforms.some(p => rectsOverlap(toRect(gem), toRect(p), 6));
+    // Y una gema encima de la salida estorba: el personaje llega y no la
+    // puede coger.
+    const overlapsExit = [exits.fire, exits.water].some(ex => rectsOverlap(toRect(gem), toRect(ex), 10));
+    if (overlapsHazard || overlapsSolid || overlapsExit) continue;
     collectibles.push(gem);
   }
-
-  const exits = {
-    fire: { x: width - 260, y: gateY - 40, w: 56, h: 86 },
-    water: { x: width - 180, y: gateY - 40, w: 56, h: 86 }
-  };
 
   return {
     seed,

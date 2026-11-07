@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { generateLevel } from './levelGenerator';
 import { validateLevel } from './solvability';
+import { normalizeSeed } from './seed';
 
 const wrapperStyle = {
   maxWidth: 1200,
@@ -27,12 +28,18 @@ const GameCanvas = ({ seed, difficulty, keymap, paused, onPause, onRestart, onDe
   const [error, setError] = useState(null);
 
   const level = useMemo(() => {
-    const lvl = generateLevel({ seed, difficulty });
-    const validation = validateLevel(lvl);
-    if (!validation.ok) {
-      return { lvl, validation };
+    // Si el nivel que sale con la seed no pasa el validador, se prueba con
+    // otras semillas antes de rendirse: antes el niño se encontraba un
+    // cartel rojo en vez del juego.
+    const base = normalizeSeed(seed);
+    for (let intento = 0; intento < 12; intento++) {
+      const semilla = intento === 0 ? base : `${base}~${intento}`;
+      const lvl = generateLevel({ seed: semilla, difficulty });
+      const validation = validateLevel(lvl);
+      if (validation.ok) return { lvl, validation: null };
     }
-    return { lvl, validation: null };
+    const lvl = generateLevel({ seed: base, difficulty });
+    return { lvl, validation: validateLevel(lvl) };
   }, [seed, difficulty]);
 
   useEffect(() => {

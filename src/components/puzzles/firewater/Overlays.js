@@ -21,6 +21,25 @@ export const PauseOverlay = ({ onResume, onRestart, onNewLevel, onBackToSetup, o
   );
 };
 
+export const DeathOverlay = ({ onRestart, onNewLevel, onExit }) => {
+  return (
+    <OverlayShade>
+      <OverlayCard>
+        <OverlayTitle>¡Has muerto!</OverlayTitle>
+        <Muted>
+          Uno de los dos se ha metido en la lava. Vuelve a empezar el nivel con
+          la misma seed o prueba con otro.
+        </Muted>
+        <ButtonRow>
+          <Button $variant="primary" onClick={onRestart}>Reiniciar</Button>
+          <Button onClick={onNewLevel}>Nuevo nivel</Button>
+          <Button onClick={onExit}>Salir</Button>
+        </ButtonRow>
+      </OverlayCard>
+    </OverlayShade>
+  );
+};
+
 export const CompleteOverlay = ({ onNext, onRepeat, onChangeSeed, onExit }) => {
   return (
     <OverlayShade>

@@ -88,8 +88,8 @@ export function validateLevel(level) {
   }
 
   const exitRects = [
-    { x: level.exits.fire.x, y: level.exits.fire.y, w: level.exits.fire.w, h: level.exits.fire.h },
-    { x: level.exits.water.x, y: level.exits.water.y, w: level.exits.water.w, h: level.exits.water.h }
+    { id: 'fire', x: level.exits.fire.x, y: level.exits.fire.y, w: level.exits.fire.w, h: level.exits.fire.h },
+    { id: 'water', x: level.exits.water.x, y: level.exits.water.y, w: level.exits.water.w, h: level.exits.water.h }
   ];
   for (const hz of level.hazards) {
     for (const ex of exitRects) {
@@ -146,6 +146,32 @@ export function validateLevel(level) {
 
   const buttonDoorsCount = level.doors.filter(d => (d.activation || 'button') === 'button').length;
   if (level.crates.length < buttonDoorsCount) reasons.push('not_enough_crates');
+
+  // Una gema dentro de un muro no se puede coger: el nivel no se termina
+  // nunca aunque el resto este bien.
+  for (const col of collectibleRects) {
+    for (const solid of solids) {
+      if (rectsOverlapWithPadding(col.rect, solid.rect, 4)) {
+        reasons.push(`collectible_blocked:${col.id}:${solid.id}`);
+        break;
+      }
+    }
+  }
+
+  // La salida necesita suelo debajo: si no, los personajes se quedan
+  // flotando al final del mapa y no hay manera de llegar.
+  for (const ex of exitRects) {
+    let conSuelo = false;
+    for (const p of level.platforms) {
+      const top = p.y - p.h / 2;
+      const bottom = p.y + p.h / 2;
+      const cubreX = Math.abs(ex.x - p.x) * 2 < ex.w + p.w;
+      const pegadaAlSuelo =
+        top >= ex.y + ex.h / 2 - 46 && bottom <= ex.y + ex.h / 2 + 46;
+      if (cubreX && pegadaAlSuelo) { conSuelo = true; break; }
+    }
+    if (!conSuelo) reasons.push(`exit_unsupported:${ex.id}`);
+  }
 
   return { ok: reasons.length === 0, reasons };
 }
