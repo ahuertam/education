@@ -70,10 +70,12 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
   const scale    = size / FRAME_W;
   const displayH = Math.round(FRAME_H * scale);
   const sx       = frame * FRAME_W;
-  // Crop the top of the source frame to skip the label area entirely.
-  // Also wipe a strip across the top of the tmp canvas in case any bg
-  // variation slips through.
-  const srcInsetTop = Math.round(FRAME_H * 0.08);
+  // Cada frame del heroe lleva una banda de cuadriculado arriba (el titulo
+  // "HERO", hasta la fila 30) y otra abajo (el nombre del frame, desde la
+  // 243). Hay que quitar las dos: si queda un resto, el recorte no encuentra
+  // el fondo por el borde y el cuadriculado se queda pegado al dibujo.
+  const srcInsetTop = 31;
+  const srcInsetBottom = 27;
   const croppedH    = Math.round(displayH * 0.85);
   const clearH      = Math.max(8, Math.round(croppedH * 0.06));
 
@@ -83,11 +85,11 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
         src={SHEET}
         label="El héroe"
         sx={sx} sy={rowY + srcInsetTop}
-        sw={FRAME_W} sh={FRAME_H - srcInsetTop}
+        sw={FRAME_W} sh={FRAME_H - srcInsetTop - srcInsetBottom}
         dw={size} dh={croppedH}
         clearW={size} clearH={clearH}
         bgTolerance={35}
-        cleanupTolerance={18}
+        cleanupTolerance={35}
       />
     </Wrapper>
   );

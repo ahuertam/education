@@ -83,14 +83,17 @@ function removeBackground(ctx, w, h, tolerance = 50, cleanupTolerance = 20) {
     return r > 220 && g > 220 && b > 220 && Math.abs(r - g) < 30 && Math.abs(g - b) < 30 && Math.abs(r - b) < 30;
   }
 
+  // Un pixel es de fondo si esta cerca del color del panel. Los blancos y los
+  // grises claros **no** se cuentan: el blanco de verdad es parte del dibujo
+  // (la armadura del heroe, el hueso de un esqueleto) y borrarlo dejaba
+  // agujeros y manchas en los sprites.
   function isBgPixel(pi) {
     if (d[pi + 3] < alphaMin) return false;
     const r = d[pi];
     const g = d[pi + 1];
     const b = d[pi + 2];
     const dist = Math.abs(r - br) + Math.abs(g - bg) + Math.abs(b - bb);
-    if (dist <= maxDist) return true;
-    return isArtifactColor(r, g, b);
+    return dist <= maxDist;
   }
 
   const visited = new Uint8Array(w * h);
@@ -145,7 +148,7 @@ function removeBackground(ctx, w, h, tolerance = 50, cleanupTolerance = 20) {
     const g = d[pi + 1];
     const b = d[pi + 2];
     const dist = Math.abs(r - br) + Math.abs(g - bg) + Math.abs(b - bb);
-    if (dist > maxDist && !isArtifactColor(r, g, b)) continue;
+    if (dist > maxDist) continue;
 
     d[pi + 3] = 0;
 
@@ -322,7 +325,7 @@ export default function SpriteCanvas({
   style, className, label = 'Sprite',
   clearW = 0, clearH = 0, pad = 0, trim = false,
   bgTolerance = 60, trimBgTolerance = 60, trimEdgeThreshold = 0.6,
-  cleanupTolerance = 22,
+  cleanupTolerance = 35,
   srcInsetTop = 0, srcInsetRight = 0, srcInsetBottom = 0, srcInsetLeft = 0,
 }) {
   const canvasRef = useRef(null);

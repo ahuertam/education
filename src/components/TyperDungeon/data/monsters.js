@@ -1,83 +1,89 @@
-// Monsters definition with sprite coordinates in monsters.png (1268×832).
-// Coordinates are estimates — adjust x/y/w/h in the browser with DevTools.
-// scale = displayW / w (aspect ratio is preserved).
+// Monstruos de monsters.png (1268×832).
+//
+// La hoja es un cartel de concepto: cada figura está sobre un panel gris y
+// tiene el nombre escrito debajo. Los rectángulos de abajo se han medido
+// sobre la imagen real (el contorno de cada figura), no a ojo: con ellos el
+// recorte encuentra el fondo por el borde y el sprite sale limpio, con el
+// dibujo pegado al borde y sin restos de panel.
+//
+// displayW es el ancho en pantalla; la altura sale de la proporción real.
 
 export const MONSTERS = {
   goblin: {
     key: 'goblin',
     name: { es: 'Goblin', en: 'Goblin' },
     // Lesser — top-left of monsters.png
-    x: 10, y: 45, w: 169, h: 199,
+    x: 11, y: 88, w: 128, h: 137,
     displayW: 160, tier: 1, hp: 3, damage: 1,
   },
   slime: {
     key: 'slime',
     name: { es: 'Moho gelatinoso', en: 'Slime Mold' },
-    x: 205, y: 65, w: 169, h: 179,
+    x: 184, y: 131, w: 162, h: 99,
     displayW: 160, tier: 1, hp: 2, damage: 1,
   },
   skeleton: {
     key: 'skeleton',
     name: { es: 'Esqueleto', en: 'Skeleton' },
-    x: 385, y: 40, w: 189, h: 199,
+    x: 370, y: 52, w: 165, h: 175,
     displayW: 170, tier: 1, hp: 4, damage: 1,
   },
   gnoll: {
     key: 'gnoll',
     name: { es: 'Gnoll', en: 'Gnoll' },
     // Intermediate — top-right of monsters.png
-    x: 648, y: 40, w: 179, h: 214,
+    x: 674, y: 46, w: 167, h: 191,
     displayW: 180, tier: 2, hp: 5, damage: 1,
   },
   gazer: {
     key: 'gazer',
     name: { es: 'Gazer', en: 'Gazer' },
-    x: 838, y: 55, w: 194, h: 199,
+    x: 883, y: 54, w: 165, h: 153,
     displayW: 180, tier: 2, hp: 5, damage: 2,
   },
   ogre: {
     key: 'ogre',
     name: { es: 'Ogro', en: 'Ogre' },
-    x: 1055, y: 40, w: 179, h: 214,
+    x: 1098, y: 44, w: 159, h: 194,
     displayW: 185, tier: 2, hp: 6, damage: 2,
   },
   minotaur: {
     key: 'minotaur',
     name: { es: 'Minotauro', en: 'Minotaur' },
     // Greater — middle section
-    x: 5, y: 335, w: 194, h: 244,
+    x: 12, y: 321, w: 227, h: 226,
     displayW: 210, tier: 3, hp: 8, damage: 2,
   },
   medusa: {
     key: 'medusa',
     name: { es: 'Medusa', en: 'Medusa' },
-    x: 210, y: 335, w: 184, h: 244,
+    x: 282, y: 330, w: 112, h: 217,
     displayW: 200, tier: 3, hp: 7, damage: 2,
   },
   beholder: {
     key: 'beholder',
     name: { es: 'Contemplador', en: 'Beholder' },
-    x: 415, y: 340, w: 189, h: 239,
+    x: 430, y: 331, w: 201, h: 177,
     displayW: 200, tier: 3, hp: 9, damage: 3,
   },
   lich: {
     key: 'lich',
     name: { es: 'Lich', en: 'Lich' },
     // Elite — bottom section
-    x: 5, y: 590, w: 134, h: 229,
+    x: 56, y: 604, w: 164, h: 222,
     displayW: 180, tier: 4, hp: 12, damage: 3,
   },
   ettin: {
     key: 'ettin',
     name: { es: 'Ettin', en: 'Ettin' },
-    x: 330, y: 570, w: 269, h: 249,
+    x: 457, y: 594, w: 345, h: 234,
     displayW: 240, tier: 4, hp: 14, damage: 3,
   },
   dragon: {
     key: 'dragon',
     name: { es: 'Dragón Rojo', en: 'Red Dragon' },
     // Elite boss — right side of the sheet (large)
-    x: 648, y: 340, w: 574, h: 464,
+    x: 837, y: 351, w: 431, h: 479,
     displayW: 380, tier: 5, hp: 20, damage: 4,
   },
 };

@@ -53,7 +53,7 @@ export default function MonsterSprite({ monster, animState = 'idle' }) {
         dw={monster.displayW} dh={displayH}
         trim={true}
         bgTolerance={35}
-        cleanupTolerance={18}
+        cleanupTolerance={35}
       />
     </Wrapper>
   );
