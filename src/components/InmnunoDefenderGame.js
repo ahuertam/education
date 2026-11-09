@@ -283,6 +283,7 @@ const InmnunoDefenderGame = ({ onBack }) => {
     canvas.width = Math.floor(window.innerWidth * dpr);
     canvas.height = Math.floor(window.innerHeight * dpr);
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
 
@@ -540,6 +541,7 @@ const InmnunoDefenderGame = ({ onBack }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     const w = window.innerWidth;
     const h = window.innerHeight;
 
