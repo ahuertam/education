@@ -18,6 +18,9 @@ Todo lo que no sea el `README.md` de la raíz vive aquí.
 Documentos de trabajo que recogieron el diseño de cada juego. Describen el porqué;
 el código es la foto del qué.
 
+- [`plan-de-choque.md`](plan-de-choque.md) — el diagnóstico y el arreglo de los
+  cinco juegos que estaban rotos (sprices, recortes y niveles imposibles), con
+  lo que queda pendiente.
 - [`TyperDungeon-plan.md`](TyperDungeon-plan.md) — diseño de la mazmorra de
   mecanografía: bucle de combate, los tres spritesheets, escalado por piso.
 - [`digilike.md`](digilike.md) — plan del roguelike educativo con Digimon: nodos,
