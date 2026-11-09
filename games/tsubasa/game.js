@@ -35,7 +35,12 @@
   const PENALTY_AWAY_X = 200;
   const PENALTY_HOME_X = 56;
 
-  const COLLAGE_ATLAS = {
+  // Que tan lejos puede estar un pixel del fondo para seguir siendo fondo.
+// Medido sobre la hoja real: con 30 el fondo entra entero y el dibujo conserva
+// casi todos sus pixeles.
+const BG_TOLERANCIA = 30;
+
+const COLLAGE_ATLAS = {
     cell: 64,
     playerFrames: 5,
     keeperFrames: 2,
@@ -588,11 +593,19 @@
         sheetWarning = e && e.message ? e.message : String(e);
       }
       const unifiedOK = sheets.white || sheets.blue;
+      if (sheets.avisos && sheets.avisos.length && !sheetWarning) {
+        sheetWarning = sheets.avisos.join(" ");
+      }
       if (!unifiedOK && playersAltImg) {
         try {
           const alt = this._makeBodySheetsFromPlayersGoalkeepers(playersAltImg);
-          if (alt.white) sheets = alt;
-        } catch {}
+          if (alt.white) {
+            sheets = alt;
+            sheetWarning = null;
+          }
+        } catch (e) {
+          sheetWarning = sheetWarning || (e && e.message ? e.message : String(e));
+        }
       }
 
       if (playersAltImg) {
@@ -2072,7 +2085,15 @@
     }
 
     _sampleBgColors(img, sampleStep = 6) {
-      // Quantize to 5 bits/channel (32768 buckets) so JPEG/PNG noise averages out.
+      // Se muestrea TODA la imagen, no solo el borde. El fondo de la hoja tiene
+      // un degradado con ruido: mirando solo el borde quedaban tonos sin
+      // cubrir, el relleno por inundación los confundia con el dibujo, los
+      // sprites salian pegados al fondo y el recorte fallaba del todo (en
+      // silencio, asi que el juego pintaba los muñecos de palitos de reserva).
+      //
+      // Ademas el fondo se decide por proximidad y no por coincidencia exacta:
+      // se guardan los doce tonos mas frecuentes y un pixel es de fondo si esta
+      // cerca de alguno de ellos. Con eso el degradado entra entero.
       const q = (v) => v >> 3;
       const key = (r, g, b) => (q(r) << 10) | (q(g) << 5) | q(b);
       const c = document.createElement("canvas");
@@ -2085,20 +2106,43 @@
       const h = c.height;
       const data = ctx.getImageData(0, 0, w, h).data;
       const counts = new Map();
-      const push = (x, y) => {
-        const i = (y * w + x) * 4;
-        if (data[i + 3] < 10) return;
-        const k = key(data[i], data[i + 1], data[i + 2]);
-        counts.set(k, (counts.get(k) ?? 0) + 1);
-      };
-      for (let x = 0; x < w; x += sampleStep) {
-        push(x, 0); push(x, 1); push(x, h - 1); push(x, h - 2);
-      }
       for (let y = 0; y < h; y += sampleStep) {
-        push(0, y); push(1, y); push(w - 1, y); push(w - 2, y);
+        for (let x = 0; x < w; x += sampleStep) {
+          const i = (y * w + x) * 4;
+          if (data[i + 3] < 10) continue;
+          const k = key(data[i], data[i + 1], data[i + 2]);
+          const e = counts.get(k) || { r: 0, g: 0, b: 0, n: 0 };
+          e.r += data[i];
+          e.g += data[i + 1];
+          e.b += data[i + 2];
+          e.n += 1;
+          counts.set(k, e);
+        }
       }
-      const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k]) => k);
-      return { bgSet: new Set(top), key };
+      const refs = [...counts.entries()]
+        .sort((a, b) => b[1].n - a[1].n)
+        .slice(0, 12)
+        .map(([, v]) => [v.r / v.n, v.g / v.n, v.b / v.n]);
+
+      // Una tabla por tonalidad (32 niveles por canal) con lo que es fondo, para
+      // que el recorte no tenga que comparar colores pixel a pixel.
+      const bgLUT = new Uint8Array(32768);
+      for (let br = 0; br < 32; br++) {
+        for (let bg = 0; bg < 32; bg++) {
+          for (let bb = 0; bb < 32; bb++) {
+            const r = br * 8 + 4;
+            const g = bg * 8 + 4;
+            const b = bb * 8 + 4;
+            for (const [pr, pg, pb] of refs) {
+              if (Math.abs(r - pr) + Math.abs(g - pg) + Math.abs(b - pb) <= BG_TOLERANCIA) {
+                bgLUT[(br << 10) | (bg << 5) | bb] = 1;
+                break;
+              }
+            }
+          }
+        }
+      }
+      return { bgLUT, key };
     }
 
     _makeBodySheetsFromUnified(playersImg) {
@@ -2106,8 +2150,8 @@
       if (!playersImg) return out;
 
       const cell = COLLAGE_ATLAS.cell;
-      const { bgSet, key } = this._sampleBgColors(playersImg);
-      const isBgPixel = (r, g, b, a) => a < 8 || bgSet.has(key(r, g, b));
+      const { bgLUT, key } = this._sampleBgColors(playersImg);
+      const isBgPixel = (r, g, b, a) => a < 8 || bgLUT[key(r, g, b)] === 1;
 
       const quadW = Math.floor(playersImg.width / 2);
       const quadH = Math.floor(playersImg.height / 2);
@@ -2220,10 +2264,15 @@
         return comps;
       };
 
+      const avisos = [];
+
       const mkPlayerSheet = (q) => {
         const r = quad(q);
         const comps = extractComponents(r);
-        if (comps.length < 10) return null;
+        if (comps.length < 10) {
+          avisos.push(`El recorte de los jugadores (${q}) solo ha encontrado ${comps.length} figuras de ${10} que busca.`);
+          return null;
+        }
         const sorted = comps
           .slice()
           .sort((a, b) => (b.size - a.size) || (a.y - b.y) || (a.x - b.x))
@@ -2247,7 +2296,10 @@
       const mkKeeperSheet = (q) => {
         const r = quad(q);
         const comps = extractComponents(r);
-        if (comps.length < 6) return null;
+        if (comps.length < 6) {
+          avisos.push(`El recorte de los porteros (${q}) solo ha encontrado ${comps.length} figuras de ${6} que busca.`);
+          return null;
+        }
         const sorted = comps
           .slice()
           .sort((a, b) => (b.size - a.size) || (a.y - b.y) || (a.x - b.x))
@@ -2274,6 +2326,7 @@
       out.blue = mkPlayerSheet("BL") || null;
       out.keeperWhite = mkKeeperSheet("TR") || null;
       out.keeperBlue = mkKeeperSheet("BR") || null;
+      out.avisos = avisos;
       return out;
     }
 
