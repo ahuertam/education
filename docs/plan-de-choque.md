@@ -16,6 +16,21 @@ Los cinco están arreglados. Esto es lo que acabó siendo cada uno:
 | 4 | Typer Dungeon | Monstruos recortados, héroe con manchas blancas | Rectángulos medidos sobre la imagen real + recorte que no se come el blanco del dibujo | `af7fb0b` |
 | 5 | Fuego & Agua | El generador produce niveles imposibles | El generador deja de tirar niveles inválidos y el validador mira lo que no miraba | `b5e8aa2` |
 
+## Segunda ronda: lo que volvio a fallar
+
+El usuario reporto cinco cosas mas: la web iba lenta y el hover con retardo, el
+juego de futbol seguia con huecos y descuadres, los sprites de la mazmorra
+seguian viéndose mal, y el sudoku seguia con operaciones imposibles. Todo
+arreglado:
+
+| Queja | Causa | Arreglo |
+|---|---|---|
+| La web va lenta | Las hojas de sprites eran PNG de casi 2 MB: 10,9 MB para entrar en un juego | Las mismas hojas en WebP: **839 KB** (`6b4a33c`) |
+| El hover va con retardo | Cada tarjeta pintaba dos sombras de 60-80 px de difuminado, y con quince en pantalla eso es repintar una capa enorme en cada paso del raton | Una sombra corta y un `transition` con las propiedades concretas (`8402b77`) |
+| El futbol con huecos y descuadres | El recorte de sprites buscaba las figuras por color: el equipo blanco entraba entre los tonos de fondo y le comian el torso | Frames medidos sobre la imagen y fondo borrado frame a frame; ademas los paneles ya no tapan la cabeza del jugador (`8402b77`) |
+| Los sprites de la mazmorra mal | El heroe arrastraba el separador blanco entre frames y no se recortaba a su figura | Se recorta el separador y la caja del heroe lleva su proporcion real (`f680d62`) |
+| El sudoku con operaciones imposibles | Las tres plantillas fijas se quedaban sin resolver y el error no decia cual | Se generan por construccion y el error dice que operacion falla (`333a8d7`) |
+
 Y el meta: `bb065de` monta **todos** los juegos del catálogo en un test, para
 que esto no vuelva a pasar en verde.
 
