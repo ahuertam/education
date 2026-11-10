@@ -1,5 +1,6 @@
 import { generateLevel } from './levelGenerator';
 import { validateLevel } from './solvability';
+import { traceLaser } from './laser';
 
 describe('FireWater procedural level', () => {
   test('generates deterministically by seed+difficulty', () => {
@@ -83,4 +84,25 @@ describe('FireWater procedural level', () => {
 
     expect(fallos.slice(0, 8)).toEqual([]);
   }, 60000);
+
+  test('el laser llega al sensor y abre su puerta', () => {
+    // El rayo rebotaba en un espejo que lo mandaba hacia arriba y el sensor
+    // estaba mas abajo y en otra x: la puerta del laser no abria nunca.
+    const fallos = [];
+    let conLaser = 0;
+
+    for (let i = 0; i < 200; i++) {
+      const lvl = generateLevel({ seed: `laser-${i}`, difficulty: 'hard' });
+      if (!lvl.laserEmitters?.length) continue;
+      conLaser++;
+      const { sensores } = traceLaser(lvl);
+      if (sensores.length === 0) fallos.push(`laser-${i}: el rayo no activa ningun sensor`);
+      // Y ademas, el sensor debe ser el de la puerta del laser.
+      const sensor = lvl.laserSensors[0];
+      if (!sensores.includes(sensor.id)) fallos.push(`laser-${i}: no activa su sensor`);
+    }
+
+    expect(conLaser).toBeGreaterThan(0);
+    expect(fallos.slice(0, 5)).toEqual([]);
+  });
 });

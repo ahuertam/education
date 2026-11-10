@@ -784,51 +784,63 @@ export function generateLevel({ seed, difficulty }) {
       y: topY - 70,
       direction: 'right'
     };
+    // El rayo sale hacia la derecha y tiene que rebotar hacia abajo para
+    // llegar al sensor, que esta justo debajo del espejo. Con el espejo en
+    // '/' el rayo subia y el sensor no se activaba nunca: la puerta del
+    // laser no abria nunca y el nivel no se podia terminar.
     const mirrorA = {
       id: 'mirror_a',
       x: emitter.x + 260,
       y: topY - 70,
-      orientation: '/'
+      orientation: '\\'
     };
+    // Este segundo espejo es decorativo: esta fuera del recorrido del rayo
+    // para no cortarlo.
     const mirrorB = {
       id: 'mirror_b',
-      x: emitter.x + 260,
+      x: emitter.x + 520,
       y: midY - 110,
       orientation: '\\'
     };
+    // Los estantes van por debajo de las calles: a la misma altura chocaban
+    // con ellas y el laser no se generaba nunca (estaba muerto).
     const mirrorShelf = {
       id: 'mirror_shelf',
-      x: emitter.x + 260,
-      y: topY,
+      x: emitter.x + 200,
+      y: topY - 40,
       w: 220,
       h: 20,
       kind: 'solid',
       material: 'stone'
     };
+    // El sensor va justo debajo del espejo, en la misma x, que es por donde
+    // baja el rayo.
+    // El estante del sensor va a ras de suelo, que siempre esta libre.
     const sensorShelf = {
       id: 'sensor_shelf',
-      x: laserDoor.x - 120,
-      y: midY,
+      x: mirrorA.x - 100,
+      y: groundTop(groundY, groundH) - 30,
       w: 200,
       h: 20,
       kind: 'solid',
       material: 'stone'
     };
+    // El sensor va en la misma x que el espejo, que es por donde baja el
+    // rayo, y encima de su estante.
     const sensor = {
       id: 'laser_sensor_0',
-      x: laserDoor.x - 120,
-      y: midY - 22,
+      x: mirrorA.x,
+      y: groundTop(groundY, groundH) - 52,
       w: 40,
       h: 44,
       doorId: laserDoor.id
     };
-    if (
-      tryPlace(toRect(mirrorShelf), occupancy.platforms, 8) &&
-      tryPlace(toRect(sensorShelf), occupancy.platforms, 8) &&
-      tryPlace({ x: mirrorA.x, y: mirrorA.y, w: 36, h: 36 }, occupancy.buttons, 8) &&
-      tryPlace({ x: mirrorB.x, y: mirrorB.y, w: 36, h: 36 }, occupancy.buttons, 8) &&
-      tryPlace(toRect(sensor), occupancy.buttons, 8)
-    ) {
+    const dMirrorShelf = tryPlace(toRect(mirrorShelf), occupancy.platforms, 8);
+    const dSensorShelf = tryPlace(toRect(sensorShelf), occupancy.platforms, 8);
+    const dMirrorA = tryPlace({ x: mirrorA.x, y: mirrorA.y, w: 36, h: 36 }, occupancy.buttons, 8);
+    const dMirrorB = tryPlace({ x: mirrorB.x, y: mirrorB.y, w: 36, h: 36 }, occupancy.buttons, 8);
+    const dSensor = tryPlace(toRect(sensor), occupancy.buttons, 8);
+    if (dMirrorShelf && dSensorShelf && dMirrorA && dMirrorB && dSensor) {
       doors.push(laserDoor);
       platforms.push(mirrorShelf, sensorShelf);
       laserEmitters.push(emitter);
@@ -862,10 +874,15 @@ export function generateLevel({ seed, difficulty }) {
     // nunca. Las calles (lanes) ya estan colocadas en esas alturas, asi que
     // hay que comprobarlo.
     const overlapsSolid = platforms.some(p => rectsOverlap(toRect(gem), toRect(p), 6));
+    // Ni dentro de una puerta (la del laser, por ejemplo), ni encima de un
+    // boton o una caja.
+    const overlapsDoor = doors.some(d => rectsOverlap(toRect(gem), toRect(d), 6));
+    const overlapsButton = buttons.some(b => rectsOverlap(toRect(gem), toRect(b), 4));
+    const overlapsCrate = crates.some(c => rectsOverlap(toRect(gem), toRect(c), 4));
     // Y una gema encima de la salida estorba: el personaje llega y no la
     // puede coger.
     const overlapsExit = [exits.fire, exits.water].some(ex => rectsOverlap(toRect(gem), toRect(ex), 10));
-    if (overlapsHazard || overlapsSolid || overlapsExit) continue;
+    if (overlapsHazard || overlapsSolid || overlapsDoor || overlapsButton || overlapsCrate || overlapsExit) continue;
     collectibles.push(gem);
   }
 

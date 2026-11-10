@@ -40,6 +40,7 @@ function reflectDirection(dir, orientation) {
   return 'right';
 }
 
+
 export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, onComplete, onGemChange }) {
   const keyIndex = buildKeyIndex(keymap);
   const sceneKey = 'FireWaterPuzzleScene';
@@ -405,81 +406,19 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
       graphics.lineStyle(3, 0xf6e56f, 0.95);
       this.laserSegments = [];
 
+      const { segmentos, sensores } = traceLaser(this.level);
+      this.laserSegments = segmentos;
       for (const sensor of this.laserSensors || []) sensor.setData('active', false);
+      for (const id of sensores) {
+        const sensor = (this.laserSensors || []).find((s) => s.id === id);
+        if (sensor) sensor.setData('active', true);
+      }
 
-      for (const emitter of this.laserEmitters || []) {
-        let dir = emitter.direction || 'right';
-        let x = emitter.x;
-        let y = emitter.y;
-
-        for (let bounce = 0; bounce < 4; bounce += 1) {
-          const vec = directionVector(dir);
-          let endX = x + vec.x * 900;
-          let endY = y + vec.y * 900;
-          let nearestMirror = null;
-          let nearestMirrorDist = Infinity;
-
-          for (const mirror of this.mirrors || []) {
-            const dx = mirror.x - x;
-            const dy = mirror.y - y;
-            const aligned = vec.x !== 0 ? Math.abs(dy) < 16 : Math.abs(dx) < 16;
-            const forward = vec.x !== 0 ? dx * vec.x > 0 : dy * vec.y > 0;
-            if (!aligned || !forward) continue;
-            const dist = vec.x !== 0 ? Math.abs(dx) : Math.abs(dy);
-            if (dist < nearestMirrorDist) {
-              nearestMirror = mirror;
-              nearestMirrorDist = dist;
-            }
-          }
-
-          let nearestSensor = null;
-          let nearestSensorDist = Infinity;
-          for (const sensor of this.laserSensors || []) {
-            const dx = sensor.x - x;
-            const dy = sensor.y - y;
-            const aligned = vec.x !== 0 ? Math.abs(dy) <= sensor.displayHeight / 2 : Math.abs(dx) <= sensor.displayWidth / 2;
-            const forward = vec.x !== 0 ? dx * vec.x > 0 : dy * vec.y > 0;
-            if (!aligned || !forward) continue;
-            const dist = vec.x !== 0 ? Math.abs(dx) : Math.abs(dy);
-            if (dist < nearestSensorDist) {
-              nearestSensor = sensor;
-              nearestSensorDist = dist;
-            }
-          }
-
-          if (nearestSensor && nearestSensorDist < nearestMirrorDist) {
-            endX = vec.x !== 0 ? nearestSensor.x : x;
-            endY = vec.y !== 0 ? nearestSensor.y : y;
-            nearestSensor.setData('active', true);
-            graphics.beginPath();
-            graphics.moveTo(x, y);
-            graphics.lineTo(endX, endY);
-            graphics.strokePath();
-            this.laserSegments.push({ x1: x, y1: y, x2: endX, y2: endY });
-            break;
-          }
-
-          if (nearestMirror) {
-            endX = nearestMirror.x;
-            endY = nearestMirror.y;
-            graphics.beginPath();
-            graphics.moveTo(x, y);
-            graphics.lineTo(endX, endY);
-            graphics.strokePath();
-            this.laserSegments.push({ x1: x, y1: y, x2: endX, y2: endY });
-            dir = reflectDirection(dir, nearestMirror.getData('orientation'));
-            x = nearestMirror.x;
-            y = nearestMirror.y;
-            continue;
-          }
-
-          graphics.beginPath();
-          graphics.moveTo(x, y);
-          graphics.lineTo(endX, endY);
-          graphics.strokePath();
-          this.laserSegments.push({ x1: x, y1: y, x2: endX, y2: endY });
-          break;
-        }
+      for (const seg of segmentos) {
+        graphics.beginPath();
+        graphics.moveTo(seg.x1, seg.y1);
+        graphics.lineTo(seg.x2, seg.y2);
+        graphics.strokePath();
       }
     }
 
