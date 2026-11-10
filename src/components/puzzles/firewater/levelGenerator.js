@@ -1,4 +1,6 @@
 import { createRng, rngInt, rngPick } from './prng';
+import { analyzeReachability } from './reachability';
+import { validateLevel } from './solvability';
 
 function difficultyConfig(difficulty) {
   if (difficulty === 'hard') {
@@ -67,7 +69,10 @@ function buildChunkPoolBridge({
 }) {
   const hazardH = 22;
   const bridgeH = 20;
-  const poolW = rngInt(rng, 180, 320);
+  // El charco tiene que caber en un salto: el personaje avanza 229 px por
+  // encima y con 320 de charco no se podia pasar y el nivel se quedaba sin
+  // salida.
+  const poolW = rngInt(rng, 110, 185);
   const padLeft = rngInt(rng, 120, 220);
   const poolX = cursor + padLeft + poolW / 2;
   const element = hazardElementFor(rng, allowAcid);
@@ -509,7 +514,13 @@ export function generateLevel({ seed, difficulty }) {
       platforms.push(p);
       continue;
     }
-    if (tryPlace(toRect(p), occupancy.platforms, 10)) platforms.push(p);
+    // Las escaleras de la puerta son el unico camino a la salida: si alguna
+    // no se coloca, la salida se queda sin suelo y el nivel no se puede
+    // terminar.
+    if (p.id.startsWith('stair_') || tryPlace(toRect(p), occupancy.platforms, 10)) {
+      occupancy.platforms.push(toRect(p));
+      platforms.push(p);
+    }
   }
 
   // Una puerta no puede caer encima de una plataforma (la pasarela del final
@@ -677,19 +688,26 @@ export function generateLevel({ seed, difficulty }) {
       }
 
       if (rng() < 0.22) {
-        const rise = rngInt(rng, 220, 520);
+        // Una escalera de SUBIDA desde el suelo hasta la calle. Antes estas
+        // escaleras bajaban desde la calle, y como la calle esta a 360 px del
+        // suelo (y el salto llega a 122) no habia forma de subirse: la calle
+        // y las gemas que estaban en ella eran inalcanzables.
+        const rise = groundTop(groundY, groundH) - laneY;
         const stepCount = Math.max(3, Math.min(7, Math.round(rise / 85)));
         for (let i = 0; i < stepCount; i += 1) {
           const t = (i + 1) / (stepCount + 1);
           const stair = {
             id: `stair_extra_${segId}_${i}`,
             x: x + 80 + (i + 1) * 95,
-            y: laneY + Math.round(rise * t),
+            y: groundTop(groundY, groundH) - Math.round(rise * t),
             w: 150,
             h: 20,
             kind: 'solid'
           };
-          if (tryPlace(toRect(stair), occupancy.platforms, 10)) platforms.push(stair);
+          // Se colocan siempre: son la subida a la calle y sin ella la calle
+          // no se puede alcanzar.
+          occupancy.platforms.push(toRect(stair));
+          platforms.push(stair);
         }
       }
 
@@ -886,7 +904,7 @@ export function generateLevel({ seed, difficulty }) {
     collectibles.push(gem);
   }
 
-  return {
+  const nivel = {
     seed,
     difficulty,
     size: { width, height },
@@ -903,4 +921,44 @@ export function generateLevel({ seed, difficulty }) {
     collectibles,
     exits
   };
+
+  // Las gemas que no se pueden coger sobran: el nivel no se puede terminar
+  // y el niño no tiene forma de saber por que. El analisis de
+  // alcanzabilidad dice cuales son.
+  const inalcanzables = new Set(
+    analyzeReachability(nivel)
+      .filter((p) => p.startsWith('gema_inalcanzable:'))
+      .map((p) => p.split(':')[1])
+  );
+  if (inalcanzables.size) {
+    nivel.collectibles = nivel.collectibles.filter((g) => !inalcanzables.has(g.id));
+  }
+
+  return nivel;
+}
+
+/**
+ * Genera un nivel que se pueda completar.
+ *
+ * Un nivel puede salir invalido (una salida que no se alcanza, una puerta sin
+ * boton). En vez de enseñar un cartel rojo al nino, se prueban varias semillas
+ * hasta que sale uno jugable.
+ */
+export function generateValidLevel({ seed, difficulty, intentos = 12 }) {
+  const base = String(seed || 'nivel');
+  let ultimo = null;
+  let ultimoMotivo = '';
+
+  for (let intento = 0; intento < intentos; intento++) {
+    const semilla = intento === 0 ? base : `${base}~${intento}`;
+    const nivel = generateLevel({ seed: semilla, difficulty });
+    ultimo = nivel;
+    const validacion = validateLevel(nivel);
+    if (validacion.ok) return nivel;
+    ultimoMotivo = validacion.reasons.join(', ');
+  }
+
+  // Si ninguno sale bien, se devuelve el ultimo: el juego lo dira en
+  // pantalla y el nino puede pedir otro nivel.
+  return { ...ultimo, avisos: ultimoMotivo };
 }

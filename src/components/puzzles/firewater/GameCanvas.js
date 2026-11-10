@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { generateLevel } from './levelGenerator';
+import { generateValidLevel } from './levelGenerator';
 import { validateLevel } from './solvability';
 import { normalizeSeed } from './seed';
 
@@ -32,14 +32,9 @@ const GameCanvas = ({ seed, difficulty, keymap, paused, onPause, onRestart, onDe
     // otras semillas antes de rendirse: antes el niño se encontraba un
     // cartel rojo en vez del juego.
     const base = normalizeSeed(seed);
-    for (let intento = 0; intento < 12; intento++) {
-      const semilla = intento === 0 ? base : `${base}~${intento}`;
-      const lvl = generateLevel({ seed: semilla, difficulty });
-      const validation = validateLevel(lvl);
-      if (validation.ok) return { lvl, validation: null };
-    }
-    const lvl = generateLevel({ seed: base, difficulty });
-    return { lvl, validation: validateLevel(lvl) };
+    const lvl = generateValidLevel({ seed: base, difficulty });
+    if (lvl.avisos) return { lvl, validation: { ok: false, reasons: [lvl.avisos] } };
+    return { lvl, validation: null };
   }, [seed, difficulty]);
 
   useEffect(() => {

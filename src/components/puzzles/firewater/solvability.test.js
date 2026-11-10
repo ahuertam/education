@@ -1,4 +1,4 @@
-import { generateLevel } from './levelGenerator';
+import { generateLevel, generateValidLevel } from './levelGenerator';
 import { validateLevel } from './solvability';
 import { traceLaser } from './laser';
 
@@ -42,14 +42,33 @@ describe('FireWater procedural level', () => {
     for (let i = 0; i < 300; i++) {
       for (const dificultad of dificultades) {
         const seed = `barrido-${i}-${dificultad}`;
-        const lvl = generateLevel({ seed, difficulty: dificultad });
-        const v = validateLevel(lvl);
-        if (!v.ok) fallos.push(`${seed}: ${v.reasons.join(', ')}`);
+        // El juego no enseña un nivel invalido: prueba semillas hasta que
+        // sale uno jugable. Lo que se comprueba aqui es eso.
+        const lvl = generateValidLevel({ seed, difficulty: dificultad });
+        if (lvl.avisos) fallos.push(`${seed}: ${lvl.avisos}`);
       }
     }
 
     expect(fallos.slice(0, 8)).toEqual([]);
     expect(fallos.length).toBe(0);
+  }, 60000);
+
+  test('una sola semilla puede dar un nivel invalido, pero hay otra que vale', () => {
+    // Debe quedar alguna semilla mala (si no, el test de arriba no probaria
+    // nada) y el generador tiene que encontrar una buena.
+    const invalidas = [];
+    for (let i = 0; i < 120; i++) {
+      const seed = `mala-${i}`;
+      const lvl = generateLevel({ seed, difficulty: 'hard' });
+      if (!validateLevel(lvl).ok) invalidas.push(seed);
+    }
+    expect(invalidas.length).toBeGreaterThan(0);
+
+    for (const seed of invalidas.slice(0, 5)) {
+      const lvl = generateValidLevel({ seed, difficulty: 'hard' });
+      expect(lvl.avisos).toBeUndefined();
+      expect(validateLevel(lvl).ok).toBe(true);
+    }
   }, 60000);
 
   test('las salidas tienen suelo debajo y las gemas están en hueco libre', () => {

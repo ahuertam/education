@@ -1,3 +1,5 @@
+import { analyzeReachability } from './reachability';
+
 function rectsOverlap(a, b) {
   return (
     Math.abs(a.x - b.x) * 2 < (a.w + b.w) &&
@@ -11,6 +13,7 @@ function rectsOverlapWithPadding(a, b, padding) {
     Math.abs(a.y - b.y) * 2 < a.h + b.h + padding * 2
   );
 }
+
 
 export function validateLevel(level) {
   const reasons = [];
@@ -172,6 +175,10 @@ export function validateLevel(level) {
     }
     if (!conSuelo) reasons.push(`exit_unsupported:${ex.id}`);
   }
+
+  // Y que se pueda llegar: una gema encerrada o una salida detras de un
+  // charco imposible hacen el nivel incanterminable sin que nada lo diga.
+  for (const problema of analyzeReachability(level)) reasons.push(problema);
 
   return { ok: reasons.length === 0, reasons };
 }

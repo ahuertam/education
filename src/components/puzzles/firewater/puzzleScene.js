@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { traceLaser } from './laser';
 
 function makeTexture(scene, key, w, h, color) {
   if (scene.textures.exists(key)) return;
