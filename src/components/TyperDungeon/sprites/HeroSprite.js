@@ -79,8 +79,11 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
   // Las tres ultimas columnas del frame son el separador blanco entre
   // frames: se colaba en el dibujo como una linea vertical al lado.
   const srcInsetRight = 4;
-  const croppedH    = Math.round(displayH * 0.85);
-  const clearH      = Math.max(8, Math.round(croppedH * 0.06));
+  // La figura del heroe es alta y estrecha (unos 60x150 en la hoja), asi que
+  // una caja mas ancha que alta la recortaba de lado y salia enano. La caja
+  // lleva su proporcion y asi la figura ocupa el ancho entero.
+  const croppedH    = Math.round(size * 2.5);
+  const clearH      = 0;
 
   return (
     <Wrapper $hurt={hurt}>
