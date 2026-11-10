@@ -76,6 +76,9 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
   // el fondo por el borde y el cuadriculado se queda pegado al dibujo.
   const srcInsetTop = 31;
   const srcInsetBottom = 27;
+  // Las tres ultimas columnas del frame son el separador blanco entre
+  // frames: se colaba en el dibujo como una linea vertical al lado.
+  const srcInsetRight = 4;
   const croppedH    = Math.round(displayH * 0.85);
   const clearH      = Math.max(8, Math.round(croppedH * 0.06));
 
@@ -85,9 +88,12 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
         src={SHEET}
         label="El héroe"
         sx={sx} sy={rowY + srcInsetTop}
-        sw={FRAME_W} sh={FRAME_H - srcInsetTop - srcInsetBottom}
+        sw={FRAME_W - srcInsetRight}
+        sh={FRAME_H - srcInsetTop - srcInsetBottom}
         dw={size} dh={croppedH}
         clearW={size} clearH={clearH}
+        trim={true}
+        trimBgTolerance={35}
         bgTolerance={35}
         cleanupTolerance={35}
       />

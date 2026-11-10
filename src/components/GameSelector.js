@@ -20,7 +20,7 @@ const Header = styled.header`
 `;
 
 const BackButton = styled.button`
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.18);
   border: none;
   color: white;
   padding: 0.8rem 1.5rem;
@@ -30,12 +30,14 @@ const BackButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   font-size: 1.1rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
+  /* Sin backdrop-filter ni "transition: all": con quince tarjetas de fondo,
+     difuminar la capa en cada hover y animar cualquier propiedad ralentiza
+     el raton. */
+  transition: background 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.22);
-    transform: translateX(-5px);
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateX(-4px);
   }
 `;
 

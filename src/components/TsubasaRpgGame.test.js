@@ -56,11 +56,12 @@ describe('los recursos del juego', () => {
     expect(faltan).toEqual([]);
   });
 
-  it('el recorte avisa cuando no encuentra las figuras', () => {
-    // Si el recorte del atlas falla, tiene que dejar constancia: el juego no
-    // puede quedarse en silencio y enseñar los dibujos de reserva.
+  it('el recorte usa frames medidos y borra el fondo frame a frame', () => {
+    // Los frames del cartel estan medidos sobre la imagen (buscarlos a pelo
+    // fallaba: el relleno por color se comia el torso blanco del jugador) y
+    // el fondo de cada frame se borra por separado.
     const js = leer('game.js');
-    expect(js).toContain('avisos');
-    expect(js).toMatch(/avisos\.push/);
+    expect(js).toContain('_atlasFrames');
+    expect(js).toContain('_cutFrameRegion');
   });
 });

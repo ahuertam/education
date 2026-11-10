@@ -1276,8 +1276,11 @@ const COLLAGE_ATLAS = {
 
     _drawUi(ctx) {
       if (this.state === "FIELD") {
-        const animLeft = { x: 8, y: 8, w: 120, h: 88 };
-        const animRight = { x: 132, y: 8, w: 116, h: 88 };
+        // Los paneles no pueden tapar la cabeza de los jugadores: miden 64 de
+        // alto, justo lo que ocupa el sprite, y el jugador esta en la base
+        // del campo (y = 72..136).
+        const animLeft = { x: 8, y: 4, w: 120, h: 64 };
+        const animRight = { x: 132, y: 4, w: 116, h: 64 };
         this._drawBlueFrame(ctx, animLeft.x, animLeft.y, animLeft.w, animLeft.h);
         this._drawBlueFrame(ctx, animRight.x, animRight.y, animRight.w, animRight.h);
         this._drawActionPreview(ctx, animLeft, animRight);
@@ -2084,65 +2087,151 @@ const COLLAGE_ATLAS = {
       return new SpriteSheet(c, 256, 256, { columns: 4 });
     }
 
-    _sampleBgColors(img, sampleStep = 6) {
-      // Se muestrea TODA la imagen, no solo el borde. El fondo de la hoja tiene
-      // un degradado con ruido: mirando solo el borde quedaban tonos sin
-      // cubrir, el relleno por inundación los confundia con el dibujo, los
-      // sprites salian pegados al fondo y el recorte fallaba del todo (en
-      // silencio, asi que el juego pintaba los muñecos de palitos de reserva).
+    /**
+     * Mascara de fondo de la hoja, por continuidad y no por color.
+     *
+     * El fondo de los paneles tiene degradado y ruido, asi que "comparar con
+     * unos cuantos tonos" no sirve: el equipo blanco del jugador entrava
+     * entre esos tonos y le cortaban el torso por la mitad. Lo que si es
+     * continuo es el panel, y la figura esta rodeada por un contorno, asi que
+     * el relleno se para en el borde de la figura.
+     *
+     * Devuelve { mask, w, h } con mask[i] = 1 si el pixel es fondo.
+     */
+    /** Copia de la hoja con el fondo transparente. */
+    /**
+     * Los frames del cartel, medidos sobre la imagen real.
+     *
+     * El cartel (nuevo3.png) es un poster con paneles: cinco frames de
+     * carrera y cinco de disparo en el cuadrante izquierdo, y los porteros a
+     * la derecha. Buscar las figuras a pelo no funciona: cada panel tiene su
+     * tono (unos claros y otros oscuros) y hay hasta casillas de otro gris,
+     * asi que el relleno por color se comia el torso blanco del jugador y el
+     * relleno por continuidad se paraba en el salto de tono y arrastraba el
+     * panel entero. Con los rectangulos medidos y el fondo de cada frame
+     * borrado por separado, cada jugador sale entero y sin panel.
+     */
+    _atlasFrames() {
+      // Los frames del cartel, medidos sobre la imagen real (el contorno de
+      // cada figura). El cartel es un poster con paneles de fondo y con
+      // casillas de otro tono, asi que buscar las figuras a pelo no
+      // funciona: el relleno por color se comia el torso blanco del jugador y
+      // el relleno por continuidad arrastraba el panel entero. Con los
+      // rectangulos medidos y el fondo de cada frame borrado por separado,
+      // cada jugador sale entero y sin panel.
       //
-      // Ademas el fondo se decide por proximidad y no por coincidencia exacta:
-      // se guardan los doce tonos mas frecuentes y un pixel es de fondo si esta
-      // cerca de alguno de ellos. Con eso el degradado entra entero.
-      const q = (v) => v >> 3;
-      const key = (r, g, b) => (q(r) << 10) | (q(g) << 5) | q(b);
+      // De los diez frames del jugador se usan cinco de carrera del
+      // cuadrante de abajo (los que estan sobre panel liso) y cinco de
+      // disparo del cuadrante de arriba (los que no arrastran la pelota).
+      const carrera = [
+        { x: 27, y: 406, w: 128, h: 144 },
+        { x: 159, y: 406, w: 128, h: 144 },
+        { x: 291, y: 406, w: 127, h: 144 },
+        { x: 423, y: 405, w: 127, h: 145 },
+        { x: 554, y: 405, w: 127, h: 145 }
+      ];
+      const disparo = [
+        { x: 39, y: 208, w: 101, h: 148 },
+        { x: 171, y: 211, w: 102, h: 145 },
+        { x: 307, y: 213, w: 113, h: 143 },
+        { x: 453, y: 210, w: 81, h: 146 },
+        { x: 568, y: 210, w: 100, h: 146 }
+      ];
+      // Los porteros: dos parados y dos de diving (ver KEEPER_ANIMATIONS).
+      // El retrato del centro del panel no es un frame.
+      const porteros = [
+        { x: 714, y: 63, w: 176, h: 144 },
+        { x: 1157, y: 63, w: 208, h: 144 },
+        { x: 714, y: 212, w: 176, h: 147 },
+        { x: 968, y: 212, w: 185, h: 147 }
+      ];
+      const jugadores = [...carrera, ...disparo];
+      return {
+        // El equipo azul sale del blanco teñido (asi lo hace el juego), asi
+        // que los frames son los mismos.
+        white: jugadores,
+        blue: jugadores,
+        keeperWhite: porteros,
+        keeperBlue: porteros.map((f) => ({ ...f, y: f.y + 376 }))
+      };
+    }
+
+    /**
+     * Recorta el fondo de un frame concreto. El relleno sale desde el borde
+     * del frame: lo que se alcanza desde ahi es el fondo del panel y lo
+     * demas es dibujo (contornos, pelo, camiseta).
+     */
+    _cutFrameRegion(playersImg, rect) {
+      const { x: rx, y: ry, w: rw, h: rh } = rect;
       const c = document.createElement("canvas");
-      c.width = img.width;
-      c.height = img.height;
+      c.width = Math.max(1, rw);
+      c.height = Math.max(1, rh);
       const ctx = c.getContext("2d", { willReadFrequently: true });
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(playersImg, rx, ry, rw, rh, 0, 0, c.width, c.height);
+      const img = ctx.getImageData(0, 0, c.width, c.height);
+      const d = img.data;
       const w = c.width;
       const h = c.height;
-      const data = ctx.getImageData(0, 0, w, h).data;
-      const counts = new Map();
-      for (let y = 0; y < h; y += sampleStep) {
-        for (let x = 0; x < w; x += sampleStep) {
-          const i = (y * w + x) * 4;
-          if (data[i + 3] < 10) continue;
-          const k = key(data[i], data[i + 1], data[i + 2]);
-          const e = counts.get(k) || { r: 0, g: 0, b: 0, n: 0 };
-          e.r += data[i];
-          e.g += data[i + 1];
-          e.b += data[i + 2];
-          e.n += 1;
-          counts.set(k, e);
-        }
-      }
-      const refs = [...counts.entries()]
-        .sort((a, b) => b[1].n - a[1].n)
-        .slice(0, 12)
-        .map(([, v]) => [v.r / v.n, v.g / v.n, v.b / v.n]);
 
-      // Una tabla por tonalidad (32 niveles por canal) con lo que es fondo, para
-      // que el recorte no tenga que comparar colores pixel a pixel.
-      const bgLUT = new Uint8Array(32768);
-      for (let br = 0; br < 32; br++) {
-        for (let bg = 0; bg < 32; bg++) {
-          for (let bb = 0; bb < 32; bb++) {
-            const r = br * 8 + 4;
-            const g = bg * 8 + 4;
-            const b = bb * 8 + 4;
-            for (const [pr, pg, pb] of refs) {
-              if (Math.abs(r - pr) + Math.abs(g - pg) + Math.abs(b - pb) <= BG_TOLERANCIA) {
-                bgLUT[(br << 10) | (bg << 5) | bb] = 1;
-                break;
-              }
-            }
-          }
+      const TOL = 26;
+      const mask = new Uint8Array(w * h);
+      const vistos = new Uint8Array(w * h);
+      const pila = [];
+      const push = (x, y) => {
+        const i = y * w + x;
+        if (vistos[i]) return;
+        vistos[i] = 1;
+        pila.push(x, y);
+      };
+      for (let x = 0; x < w; x++) { push(x, 0); push(x, h - 1); }
+      for (let y = 0; y < h; y++) { push(0, y); push(w - 1, y); }
+      while (pila.length) {
+        const y = pila.pop();
+        const x = pila.pop();
+        const o = (y * w + x) * 4;
+        const r = d[o], g = d[o + 1], b = d[o + 2];
+        mask[y * w + x] = 1;
+        const vecinos = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]];
+        for (let v = 0; v < 4; v++) {
+          const vx = vecinos[v][0];
+          const vy = vecinos[v][1];
+          if (vx < 0 || vy < 0 || vx >= w || vy >= h) continue;
+          const ni = vy * w + vx;
+          if (vistos[ni]) continue;
+          const no = ni * 4;
+          if (Math.abs(d[no] - r) + Math.abs(d[no + 1] - g) + Math.abs(d[no + 2] - b) > TOL) continue;
+          push(vx, vy);
         }
       }
-      return { bgLUT, key };
+
+      // Ademas del relleno, el fondo se reconoce por su tono: hay frames con
+      // una caja clara rodeada de borde oscuro, y el relleno no puede
+      // cruzarlo. El tono mas frecuente del frame es el del panel (la figura
+      // no llega a la mitad), asi que lo que este cerca de ese tono tambien
+      // es fondo.
+      const cubos = new Map();
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] < 8) continue;
+        const k = `${d[i] >> 3},${d[i + 1] >> 3},${d[i + 2] >> 3}`;
+        const e = cubos.get(k) || { n: 0, r: 0, g: 0, b: 0 };
+        e.n++; e.r += d[i]; e.g += d[i + 1]; e.b += d[i + 2];
+        cubos.set(k, e);
+      }
+      let tono = null;
+      for (const e of cubos.values()) if (!tono || e.n > tono.n) tono = e;
+      const tr = Math.round(tono.r / tono.n);
+      const tg = Math.round(tono.g / tono.n);
+      const tb = Math.round(tono.b / tono.n);
+      const TOL_TONO = 60;
+
+      for (let i = 0; i < d.length; i += 4) {
+        if (mask[i / 4]) { d[i + 3] = 0; continue; }
+        const dist = Math.abs(d[i] - tr) + Math.abs(d[i + 1] - tg) + Math.abs(d[i + 2] - tb);
+        if (dist <= TOL_TONO) d[i + 3] = 0;
+      }
+      ctx.putImageData(img, 0, 0);
+      return c;
     }
 
     _makeBodySheetsFromUnified(playersImg) {
@@ -2150,17 +2239,7 @@ const COLLAGE_ATLAS = {
       if (!playersImg) return out;
 
       const cell = COLLAGE_ATLAS.cell;
-      const { bgLUT, key } = this._sampleBgColors(playersImg);
-      const isBgPixel = (r, g, b, a) => a < 8 || bgLUT[key(r, g, b)] === 1;
-
-      const quadW = Math.floor(playersImg.width / 2);
-      const quadH = Math.floor(playersImg.height / 2);
-      const quad = (q) => {
-        if (q === "TR") return { x: quadW, y: 0, w: playersImg.width - quadW, h: quadH };
-        if (q === "BL") return { x: 0, y: quadH, w: quadW, h: playersImg.height - quadH };
-        if (q === "BR") return { x: quadW, y: quadH, w: playersImg.width - quadW, h: playersImg.height - quadH };
-        return { x: 0, y: 0, w: quadW, h: quadH };
-      };
+      const frames = this._atlasFrames();
 
       const cc = document.createElement("canvas");
       cc.width = cell;
@@ -2168,165 +2247,52 @@ const COLLAGE_ATLAS = {
       const cctx = cc.getContext("2d", { willReadFrequently: true });
       cctx.imageSmoothingEnabled = false;
 
-      const drawSprite = (bbox, dx, dy, outCtx) => {
-        const pad = 2;
-        const sx = Math.max(0, bbox.x - pad);
-        const sy = Math.max(0, bbox.y - pad);
-        const ex = Math.min(playersImg.width, bbox.x + bbox.w + pad);
-        const ey = Math.min(playersImg.height, bbox.y + bbox.h + pad);
-        const sw = Math.max(1, ex - sx);
-        const sh = Math.max(1, ey - sy);
+      const drawFrame = (rect, dx, dy, outCtx) => {
+        const cut = this._cutFrameRegion(playersImg, rect);
         cctx.clearRect(0, 0, cell, cell);
-        const scale = Math.min(cell / sw, cell / sh);
-        const dw = Math.max(1, Math.round(sw * scale));
-        const dh = Math.max(1, Math.round(sh * scale));
+        const scale = Math.min(cell / cut.width, cell / cut.height);
+        const dw = Math.max(1, Math.round(cut.width * scale));
+        const dh = Math.max(1, Math.round(cut.height * scale));
         const ox = Math.floor((cell - dw) / 2);
         const oy = Math.max(0, cell - dh - 1);
-        cctx.drawImage(playersImg, sx, sy, sw, sh, ox, oy, dw, dh);
-        const img = cctx.getImageData(0, 0, cell, cell);
-        const d = img.data;
-        for (let i = 0; i < d.length; i += 4) {
-          if (isBgPixel(d[i], d[i + 1], d[i + 2], d[i + 3])) d[i + 3] = 0;
-        }
-        cctx.putImageData(img, 0, 0);
+        cctx.drawImage(cut, 0, 0, cut.width, cut.height, ox, oy, dw, dh);
         outCtx.drawImage(cc, dx, dy);
       };
 
-      const extractComponents = (r) => {
-        const c = document.createElement("canvas");
-        c.width = Math.max(1, Math.floor(r.w));
-        c.height = Math.max(1, Math.floor(r.h));
-        const ctx = c.getContext("2d", { willReadFrequently: true });
-        ctx.imageSmoothingEnabled = false;
-        ctx.clearRect(0, 0, c.width, c.height);
-        ctx.drawImage(playersImg, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
-        const img = ctx.getImageData(0, 0, c.width, c.height);
-        const d = img.data;
-        const w = c.width;
-        const h = c.height;
-        const vis = new Uint8Array(w * h);
-        const qx = new Int16Array(w * h);
-        const qy = new Int16Array(w * h);
-        const comps = [];
-
-        for (let y0 = 0; y0 < h; y0++) {
-          for (let x0 = 0; x0 < w; x0++) {
-            const idx0 = y0 * w + x0;
-            if (vis[idx0]) continue;
-            const pi = idx0 * 4;
-            if (isBgPixel(d[pi], d[pi + 1], d[pi + 2], d[pi + 3])) continue;
-            let qh = 0;
-            let qt = 0;
-            qx[qt] = x0;
-            qy[qt] = y0;
-            qt++;
-            vis[idx0] = 1;
-            let size = 0;
-            let minX = x0;
-            let maxX = x0;
-            let minY = y0;
-            let maxY = y0;
-
-            while (qh < qt) {
-              const x = qx[qh];
-              const y = qy[qh];
-              qh++;
-              size++;
-              if (x < minX) minX = x;
-              if (x > maxX) maxX = x;
-              if (y < minY) minY = y;
-              if (y > maxY) maxY = y;
-              const push = (nx, ny) => {
-                const nidx = ny * w + nx;
-                if (vis[nidx]) return;
-                const npi = nidx * 4;
-                if (isBgPixel(d[npi], d[npi + 1], d[npi + 2], d[npi + 3])) return;
-                vis[nidx] = 1;
-                qx[qt] = nx;
-                qy[qt] = ny;
-                qt++;
-              };
-              if (x > 0) push(x - 1, y);
-              if (x < w - 1) push(x + 1, y);
-              if (y > 0) push(x, y - 1);
-              if (y < h - 1) push(x, y + 1);
-            }
-
-            if (size < 80) continue;
-            const bw = maxX - minX + 1;
-            const bh = maxY - minY + 1;
-            if (bw < 12 || bh < 12) continue;
-            comps.push({ x: r.x + minX, y: r.y + minY, w: bw, h: bh, size });
-          }
-        }
-
-        comps.sort((a, b) => (a.y - b.y) || (a.x - b.x));
-        return comps;
-      };
-
-      const avisos = [];
-
-      const mkPlayerSheet = (q) => {
-        const r = quad(q);
-        const comps = extractComponents(r);
-        if (comps.length < 10) {
-          avisos.push(`El recorte de los jugadores (${q}) solo ha encontrado ${comps.length} figuras de ${10} que busca.`);
-          return null;
-        }
-        const sorted = comps
-          .slice()
-          .sort((a, b) => (b.size - a.size) || (a.y - b.y) || (a.x - b.x))
-          .slice(0, 10)
-          .sort((a, b) => (a.y - b.y) || (a.x - b.x));
-        const run = sorted.slice(0, 5).sort((a, b) => a.x - b.x);
-        const kick = sorted.slice(5, 10).sort((a, b) => a.x - b.x);
-
+      // 5 frames de carrera y 5 de disparo.
+      const mkPlayerSheet = (lista) => {
         const c = document.createElement("canvas");
         c.width = cell * 5;
         c.height = cell * 3;
         const ctx = c.getContext("2d");
         ctx.imageSmoothingEnabled = false;
         ctx.clearRect(0, 0, c.width, c.height);
-        for (let i = 0; i < 5; i++) drawSprite(run[i], i * cell, 0, ctx);
-        for (let i = 0; i < 5; i++) drawSprite(kick[i], i * cell, cell, ctx);
+        for (let i = 0; i < 5; i++) drawFrame(lista[i], i * cell, 0, ctx);
+        for (let i = 0; i < 5; i++) drawFrame(lista[5 + i], i * cell, cell, ctx);
         ctx.drawImage(c, 0, 0, cell, cell, 0, cell * 2, cell, cell);
         return new SpriteSheet(c, cell, cell);
       };
 
-      const mkKeeperSheet = (q) => {
-        const r = quad(q);
-        const comps = extractComponents(r);
-        if (comps.length < 6) {
-          avisos.push(`El recorte de los porteros (${q}) solo ha encontrado ${comps.length} figuras de ${6} que busca.`);
-          return null;
-        }
-        const sorted = comps
-          .slice()
-          .sort((a, b) => (b.size - a.size) || (a.y - b.y) || (a.x - b.x))
-          .slice(0, 6)
-          .sort((a, b) => a.x - b.x);
-        const stand = sorted.slice(0, 2).sort((a, b) => a.y - b.y);
-        const rest = sorted.slice(2).sort((a, b) => (a.y - b.y) || (a.x - b.x));
-        const row1 = rest.slice(0, 2).sort((a, b) => a.x - b.x);
-        const row2 = rest.slice(2, 4).sort((a, b) => a.x - b.x);
-
+      // 2 frames parados y 2 de diving (ver KEEPER_ANIMATIONS).
+      const mkKeeperSheet = (lista) => {
         const c = document.createElement("canvas");
         c.width = cell * 2;
         c.height = cell * 3;
         const ctx = c.getContext("2d");
         ctx.imageSmoothingEnabled = false;
         ctx.clearRect(0, 0, c.width, c.height);
-        for (let i = 0; i < 2; i++) drawSprite(stand[i], i * cell, 0, ctx);
-        for (let i = 0; i < 2; i++) drawSprite(row1[i], i * cell, cell, ctx);
-        for (let i = 0; i < 2; i++) drawSprite(row2[i], i * cell, cell * 2, ctx);
+        drawFrame(lista[0], 0, 0, ctx);
+        drawFrame(lista[1], cell, 0, ctx);
+        drawFrame(lista[2], 0, cell, ctx);
+        drawFrame(lista[3], cell, cell, ctx);
+        ctx.drawImage(c, 0, 0, cell, cell, 0, cell * 2, cell, cell);
         return new SpriteSheet(c, cell, cell);
       };
 
-      out.white = mkPlayerSheet("TL") || null;
-      out.blue = mkPlayerSheet("BL") || null;
-      out.keeperWhite = mkKeeperSheet("TR") || null;
-      out.keeperBlue = mkKeeperSheet("BR") || null;
-      out.avisos = avisos;
+      out.white = mkPlayerSheet(frames.white);
+      out.blue = mkPlayerSheet(frames.blue);
+      out.keeperWhite = mkKeeperSheet(frames.keeperWhite);
+      out.keeperBlue = mkKeeperSheet(frames.keeperBlue);
       return out;
     }
 
