@@ -569,9 +569,9 @@ const COLLAGE_ATLAS = {
       this.state = "LOADING";
 
       const v = Date.now();
-      const playersSrc = `./assets/nuevo3.png?v=${v}`;
-      const playersAltSrc = `./assets/players_goalkeepers_spritesheet.png?v=${v}`;
-      const uiSrc = `./assets/ui_elements.png?v=${v}`;
+      const playersSrc = `./assets/nuevo3.webp?v=${v}`;
+      const playersAltSrc = `./assets/players_goalkeepers_spritesheet.webp?v=${v}`;
+      const uiSrc = `./assets/ui_elements.webp?v=${v}`;
 
       await Promise.all([
         this.assets.loadImage("players", playersSrc).catch(() => null),

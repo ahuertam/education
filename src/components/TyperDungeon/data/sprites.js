@@ -5,7 +5,7 @@
 const PUBLIC_URL = process.env.PUBLIC_URL;
 
 export const HERO_SPRITE = {
-  src: `${PUBLIC_URL}/games/mazmorra/uiElements.png`,
+  src: `${PUBLIC_URL}/games/mazmorra/uiElements.webp`,
   sheetW: 1268,
   sheetH: 832,
   frameW: 158,
@@ -17,13 +17,13 @@ export const HERO_SPRITE = {
 };
 
 export const MONSTERS_SPRITE = {
-  src: `${PUBLIC_URL}/games/mazmorra/monsters.png`,
+  src: `${PUBLIC_URL}/games/mazmorra/monsters.webp`,
   sheetW: 1268,
   sheetH: 832,
 };
 
 export const DUNGEON_SPRITE = {
-  src: `${PUBLIC_URL}/games/mazmorra/mazmorra1.png`,
+  src: `${PUBLIC_URL}/games/mazmorra/mazmorra1.webp`,
   sheetW: 1268,
   sheetH: 832,
   cellW: 422,
