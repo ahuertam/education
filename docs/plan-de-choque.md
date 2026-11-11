@@ -383,6 +383,11 @@ leer píxeles de un canvas que en jsdom no existe.
 - ~~**El láser** de Fuego & Agua~~ → **hecho** (`940dcfb`): no solo era
   sospechoso, estaba muerto (no se generaba ni un nivel con láser) y el rayo no
   llegaba a su sensor.
+- **Los MP3 viejos de la música** (`animo1`, `animo2`, `lab1`, `lab2`,
+  `presion1`, `presion2`, `stars`): 34 MB que ya no descarga nadie, porque el
+  código apunta a los `.m4a` (AAC mono a 80 kbps, la mitad de peso y suena
+  igual). **Queda por decidir** si se borran del repo (el despliegue pasa de
+  75 MB a 41 MB) o se dejan como respaldo. Se han dejado como están.
 - **Regenerar los sprites con alfa real** (la opción de fondo del Typer
   Dungeon), si algún día se rehace el arte.
 - ~~**Unificar los cuatro juegos de fracciones y números** con
