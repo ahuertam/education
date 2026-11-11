@@ -591,12 +591,15 @@ export function generateLevel({ seed, difficulty }) {
 
         // Ni el shelf ni sus escaleras pueden pisar la zona de aparicion.
         const pisaSpawn = [shelf, ...steps].some((p) => rectsOverlap(toRect(p), zonaSpawn, 8));
-        let okPlatforms = !pisaSpawn && tryPlace(toRect(shelf), occupancy.platforms, 10);
-        for (const st of steps) okPlatforms = okPlatforms && tryPlace(toRect(st), occupancy.platforms, 10);
-        if (!okPlatforms) {
+        // Las escaleras del estante se colocan siempre: son la unica forma de
+        // subir al boton elevated. Si se perdian, ese boton era
+        // inalcanzable y la puerta no se abria nunca.
+        if (pisaSpawn) {
           occupancy.platforms.length = prevOccPlatforms;
           continue;
         }
+        for (const st of steps) occupancy.platforms.push(toRect(st));
+        occupancy.platforms.push(toRect(shelf));
 
         extraPlatforms.push(...steps, shelf);
         buttonY = shelf.y - shelf.h / 2 + btnH / 2 - 2;
