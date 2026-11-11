@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import styled from 'styled-components';
 import {
   BackButton,
   Button,
@@ -24,6 +25,29 @@ import {
 } from './styles';
 import { formatKeyLabel } from './keymap';
 import { normalizeSeed } from './seed';
+import { NIVELES } from './niveles';
+
+const GridNiveles = styled.div`
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px;
+  flex: 1;
+`;
+
+const BotonNivel = styled.button`
+  background: ${(p) => (p.$activo ? 'rgba(255, 176, 32, 0.28)' : 'rgba(255, 255, 255, 0.08)')};
+  border: 1px solid ${(p) => (p.$activo ? 'rgba(255, 176, 32, 0.7)' : 'rgba(255, 255, 255, 0.18)')};
+  color: #fff;
+  border-radius: 10px;
+  height: 34px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+
+  &:active {
+    transform: scale(0.94);
+  }
+`;
 
 const StartScreen = ({
   onBack,
@@ -99,15 +123,34 @@ const StartScreen = ({
             </Segmented>
           </Row>
           <Row>
+            <Label>Nivel</Label>
+            <GridNiveles>
+              {NIVELES.map((n, i) => (
+                <BotonNivel
+                  key={n.id}
+                  $activo={seed === n.id}
+                  onClick={() => setSeed(n.id)}
+                  title={n.titulo}
+                >
+                  {i + 1}
+                </BotonNivel>
+              ))}
+            </GridNiveles>
+          </Row>
+          <Muted>
+            Elige uno de los {NIVELES.length} niveles del cole (pasa el raton para
+            ver el nombre) o deja la seed vacía para un nivel generado al azar.
+          </Muted>
+          <Row>
             <Label>Seed</Label>
             <Input
               value={seed}
-              placeholder="ej: aula-7"
+              placeholder="ej: aula-7 (o vacío, para uno al azar)"
               onChange={(e) => setSeed(normalizeSeed(e.target.value))}
             />
           </Row>
           <Muted>
-            Si dejas la seed vacía se generará una aleatoria. La misma seed + dificultad crea el mismo nivel.
+            La misma seed + dificultad crea el mismo nivel.
           </Muted>
           <ButtonRow>
             <Button $variant="primary" onClick={onStart} disabled={!canStart}>

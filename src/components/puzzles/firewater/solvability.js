@@ -53,7 +53,9 @@ export function validateLevel(level) {
       const overlapX = Math.abs(p.x - hz.x) * 2 < p.w + hz.w;
       return overlapX && p.y < hz.y;
     });
-    if (!bridge) reasons.push(`hazard_without_bridge:${hz.id}`);
+    // Un puente solo hace falta si el charco es mas ancho que un salto
+    // (229 px). Los charcos estrechos se saltan y no necesitan puente.
+    if (!bridge && hz.w > 229) reasons.push(`hazard_without_bridge:${hz.id}`);
   }
 
   const spawnRects = [

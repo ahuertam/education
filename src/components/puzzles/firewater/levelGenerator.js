@@ -1,6 +1,7 @@
 import { createRng, rngInt, rngPick } from './prng';
 import { analyzeReachability } from './reachability';
 import { validateLevel } from './solvability';
+import { NIVELES_POR_ID, crearNivel } from './niveles';
 
 function difficultyConfig(difficulty) {
   if (difficulty === 'hard') {
@@ -949,6 +950,15 @@ export function generateLevel({ seed, difficulty }) {
  */
 export function generateValidLevel({ seed, difficulty, intentos = 12 }) {
   const base = String(seed || 'nivel');
+
+  // Si la seed es el nombre de un nivel propio, ese es el nivel.
+  const propio = NIVELES_POR_ID[base];
+  if (propio) {
+    const nivel = crearNivel(propio);
+    const validacion = validateLevel(nivel);
+    if (validacion.ok) return nivel;
+  }
+
   let ultimo = null;
   let ultimoMotivo = '';
 
