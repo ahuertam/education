@@ -18,6 +18,8 @@ Todo lo que no sea el `README.md` de la raíz vive aquí.
 Documentos de trabajo que recogieron el diseño de cada juego. Describen el porqué;
 el código es la foto del qué.
 
+- [`typerdungeon-arte.md`](typerdungeon-arte.md) — como rehacer el arte de la
+  mazmorra hoja por hoja, con el matte y la comprobacion de cada paso.
 - [`plan-de-choque.md`](plan-de-choque.md) — el diagnóstico y el arreglo de los
   cinco juegos que estaban rotos (sprices, recortes y niveles imposibles), con
   lo que queda pendiente.
