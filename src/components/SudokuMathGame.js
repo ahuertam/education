@@ -407,7 +407,7 @@ const SudokuMathGame = ({ onBack }) => {
   const correctSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const wrongSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const placeSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
-  const bgmRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab1.mp3`));
+  const bgmRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab1.m4a`));
   const audioRef = useRef({ unlocked: false });
 
   const poolAvailable = useMemo(() => {

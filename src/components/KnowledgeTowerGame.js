@@ -48,7 +48,7 @@ const KnowledgeTowerGame = ({ onBack }) => {
 
   const nextBlockY = useRef(500);
   
-  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.m4a`));
   const successSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const errorSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const crashSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/explosion.mp3`));

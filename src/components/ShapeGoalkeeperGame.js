@@ -242,7 +242,7 @@ const ShapeGoalkeeperGame = ({ onBack }) => {
   const nextObjectId = useRef(0);
   const spawnIntervalRef = useRef(null);
   const animationFrameRef = useRef(null);
-  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.m4a`));
   
   // Refs for game loop access to avoid stale closures
   const goalkeeperYRef = useRef(300);

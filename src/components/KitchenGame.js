@@ -398,7 +398,7 @@ const KitchenGame = ({ onBack }) => {
   const [statusMessage, setStatusMessage] = useState('');
   const [gameMode, setGameMode] = useState('easy');
   
-  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab1.mp3`));
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab1.m4a`));
   const timeoutsRef = useRef([]);
   const hookBusyRef = useRef(false);
   const currentMixRef = useRef(currentMix);

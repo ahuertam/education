@@ -129,7 +129,7 @@ const MathsteroidsGame = ({ onBack, operation = 'multiplication', multiplication
   const [isMobile] = useState(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0);
   
   const explosionSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/explosion.mp3`));
-  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/stars.mp3`));
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/stars.m4a`));
   
   // Game physics state
   const stateRef = useRef({

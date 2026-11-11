@@ -302,7 +302,7 @@ const AccentHunterGame = ({ onBack }) => {
   const [selectedBalloon, setSelectedBalloon] = useState(null);
   const [feedback, setFeedback] = useState({ show: false, isCorrect: false, message: '' });
   
-  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
+  const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.m4a`));
 
   // Background Music
   useEffect(() => {

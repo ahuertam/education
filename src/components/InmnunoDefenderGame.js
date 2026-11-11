@@ -205,7 +205,7 @@ const InmnunoDefenderGame = ({ onBack }) => {
   const updateRef = useRef(null);
   const keysRef = useRef(new Set());
   const touchRef = useRef({ up: false, down: false, left: false, right: false, shoot: false });
-  const bgmRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.mp3`));
+  const bgmRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab2.m4a`));
   const shootSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const hitSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const correctSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));

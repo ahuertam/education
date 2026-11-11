@@ -229,7 +229,7 @@ const SpaceDefenderGame = ({ onBack, operation = 'multiplication', multiplicatio
   const shootSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const errorSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/beep.mp3`));
   const explosionSoundRef = useRef(new Audio(`${process.env.PUBLIC_URL}/explosion.mp3`));
-  const bgmRef = useRef(new Audio(`${process.env.PUBLIC_URL}/stars.mp3`));
+  const bgmRef = useRef(new Audio(`${process.env.PUBLIC_URL}/stars.m4a`));
 
   useEffect(() => {
     // Pre-configure error sound
