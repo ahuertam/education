@@ -380,13 +380,14 @@ leer píxeles de un canvas que en jsdom no existe.
   que sea ganable.
 - **Fuego & Agua, fase F4**: decidir el futuro del generador procedural (828
   líneas con cinco subsistemas) o pasarse a un nivel fijo curado.
-- **El láser** de Fuego & Agua: el agente lo señalo como sospechoso, pero no
-  se ha podido reproducir, así que no se ha tocado.
+- ~~**El láser** de Fuego & Agua~~ → **hecho** (`940dcfb`): no solo era
+  sospechoso, estaba muerto (no se generaba ni un nivel con láser) y el rayo no
+  llegaba a su sensor.
 - **Regenerar los sprites con alfa real** (la opción de fondo del Typer
   Dungeon), si algún día se rehace el arte.
-- **Unificar los cuatro juegos de fracciones y números** con
-  `src/components/ui/JuegoBase.js`: ahora mismo cada uno tiene sus propios
-  estilos.
+- ~~**Unificar los cuatro juegos de fracciones y números** con
+  `src/components/ui/JuegoBase.js`~~ → **hecho** (`a8ce7a0`): −1009 líneas
+  duplicadas. Los cuatro importan ahora el marco común.
 
 ---
 
