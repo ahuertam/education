@@ -11,7 +11,7 @@ import { leerPNG } from '../../../test-utils/leerPNG';
 import { MONSTERS } from '../data/monsters';
 import { HERO_SPRITE } from '../data/sprites';
 
-const MAZMORRA = path.join(__dirname, '../../../../public/games/mazmorra');
+const MAZMORRA = path.join(__dirname, '../../../../assets-originales/mazmorra');
 const FONDO_MONSTRUOS = leerPNG(path.join(MAZMORRA, 'monsters.png'));
 const FONDO_HEROE = leerPNG(path.join(MAZMORRA, 'uiElements.png'));
 

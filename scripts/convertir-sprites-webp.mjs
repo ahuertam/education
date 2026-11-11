@@ -9,8 +9,9 @@
 //
 //   node scripts/convertir-sprites-webp.mjs
 //
-// Los PNG de origen se quedan en public/ como material de trabajo; si algún dia
-// se regenera una hoja hay que volver a pasar este script.
+// Los PNG de origen se quedan en assets-originales/ (fuera de lo que se
+// despliega); si algún dia se regenera una hoja hay que volver a pasar este
+// script.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,15 +19,18 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PUBLICO = path.join(RAIZ, 'public');
+const FUENTES = path.join(RAIZ, 'assets-originales');
+const DESTINO = path.join(RAIZ, 'public');
 
+// Las hojas originales viven en assets-originales/ (fuera de public/, que es lo
+// que se despliega) y su version WebP, en public/.
 const FICHEROS = [
-  'games/mazmorra/monsters.png',
-  'games/mazmorra/uiElements.png',
-  'games/mazmorra/mazmorra1.png',
-  'games/tsubasa/assets/nuevo3.png',
-  'games/tsubasa/assets/ui_elements.png',
-  'games/tsubasa/assets/players_goalkeepers_spritesheet.png',
+  ['mazmorra/monsters.png', 'games/mazmorra/monsters.webp'],
+  ['mazmorra/uiElements.png', 'games/mazmorra/uiElements.webp'],
+  ['mazmorra/mazmorra1.png', 'games/mazmorra/mazmorra1.webp'],
+  ['tsubasa/nuevo3.png', 'games/tsubasa/assets/nuevo3.webp'],
+  ['tsubasa/ui_elements.png', 'games/tsubasa/assets/ui_elements.webp'],
+  ['tsubasa/players_goalkeepers_spritesheet.png', 'games/tsubasa/assets/players_goalkeepers_spritesheet.webp'],
 ];
 
 const CHROME = process.env.CHROME_PATH
@@ -80,12 +84,12 @@ const evaluar = async (expr) => (await send('Runtime.evaluate', {
 
 await send('Runtime.enable');
 await send('Page.enable');
-await send('Page.navigate', { url: `file://${PUBLICO}/games/mazmorra/` });
+await send('Page.navigate', { url: `file://${FUENTES}/` });
 await sleep(1500);
 
-for (const rel of FICHEROS) {
-  const origen = path.join(PUBLICO, rel);
-  const destino = origen.replace(/\.png$/, '.webp');
+for (const [relFuente, relDestino] of FICHEROS) {
+  const origen = path.join(FUENTES, relFuente);
+  const destino = path.join(DESTINO, relDestino);
   const base64 = await evaluar(`(async () => {
     const img = new Image();
     img.src = 'file://${origen}';
