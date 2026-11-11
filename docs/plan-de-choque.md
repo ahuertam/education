@@ -31,6 +31,27 @@ arreglado:
 | Los sprites de la mazmorra mal | El heroe arrastraba el separador blanco entre frames y no se recortaba a su figura | Se recorta el separador y la caja del heroe lleva su proporcion real (`f680d62`) |
 | El sudoku con operaciones imposibles | Las tres plantillas fijas se quedaban sin resolver y el error no decia cual | Se generan por construccion y el error dice que operacion falla (`333a8d7`) |
 
+## Tercera ronda: Fuego y Agua, que seguia roto
+
+El juego arrancaba, pero no se podia terminar. Tres cosas distintas, todas
+en el generador de niveles:
+
+| Queja | Causa | Arreglo |
+|---|---|---|
+| El laser no existia | Los dos estantes del laser chocaban con las calles, asi que la colocacion fallaba siempre y no se generaba ni un nivel con laser | Los estantes van a ras de suelo y el rayo ya llega a su sensor (`940dcfb`) |
+| La puerta del laser no abria nunca | El rayo rebotaba en un espejo en `/` (que lo manda hacia arriba) con el sensor mas abajo y en otra x | El sensor va en la misma x que el espejo y el espejo gira el rayo hacia abajo (`940dcfb`) |
+| Los niveles no se podian terminar | Las calles estaban a 360 y 620 px del suelo (el salto llega a 122) y los charcos median hasta 320 px (el salto avanza 229) | Las escaleras suben desde el suelo en vez de bajar, y los charcos miden 110-185 (`7f50e70`) |
+
+Se anade `reachability.js`: un analisis que comprueba que se puede llegar a
+las gemas, a las salidas y a los botones (caminando, saltando un charco y
+subiendo a una plataforma). El generador quita las gemas inalcanzables y el
+juego busca semilla hasta que sale un nivel jugable.
+
+**Lo que sigue pendiente**: las cajas que hay que empujar hasta el boton son
+un Sokoban y el analizador no las tiene en cuenta (se asumen abiertas), asi
+que un nivel puede tener una puerta que solo se abre empujando una caja a un
+sitio imposible. Es el ultimo hueco de verdad.
+
 Y el meta: `bb065de` monta **todos** los juegos del catálogo en un test, para
 que esto no vuelva a pasar en verde.
 
