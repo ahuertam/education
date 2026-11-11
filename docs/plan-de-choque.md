@@ -402,3 +402,10 @@ leer píxeles de un canvas que en jsdom no existe.
 
 Cada paso es un commit, con su test, y se despliega al final. Los pasos 1 y 2
 caben en una tarde.
+
+## Unified
+
+Los cuatro juegos de fracciones y numeros ya usan el marco comun
+(`src/components/ui/JuegoBase.js`): cada uno tenia su copia de los estilos del
+marco, unas 200 lineas duplicadas por juego. Ahora importan el marco comun y
+comparten tambien la barra y la pantalla final. `-1009 lineas, +149`.
