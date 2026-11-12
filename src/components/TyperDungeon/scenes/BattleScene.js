@@ -340,8 +340,8 @@ export default function BattleScene({ state, dispatch }) {
         <FloorLine />
 
         <HeroEnSala $attacking={heroAnim === 'attack'}>
-          <HeroSprite state={heroAnim} size={86} />
-          <Sombra $w={92} $h={13} />
+          <HeroSprite state={heroAnim} size={112} />
+          <Sombra $w={118} $h={13} />
         </HeroEnSala>
 
         <MonsterArea>

@@ -1,19 +1,26 @@
-// Sprite-sheet coordinates for uiElements.png (1268×832).
-// Adjust the values below using the browser DevTools / an image editor.
-// Hero idle/walk row and attack row are sized in pixels per frame.
+// Hojas de sprites de la mazmorra.
+//
+// El heroe y los monstruos ya vienen recortados con alfa real (scripts/
+// recortar-sprites.mjs): antes el runtime los recortaba por color y el panel
+// gris de los carteles se colaba en los sprites (manchas dentro de las
+// figuras y una linea blanca vertical en el heroe). Ahora el recorte solo
+// se aplica a las imagenes que todavia no traen alfa.
 
 const PUBLIC_URL = process.env.PUBLIC_URL;
 
 export const HERO_SPRITE = {
-  src: `${PUBLIC_URL}/games/mazmorra/uiElements.webp`,
-  sheetW: 1268,
-  sheetH: 832,
-  frameW: 158,
-  frameH: 270,
+  src: `${PUBLIC_URL}/games/mazmorra/heroe.webp`,
+  sheetW: 1192,
+  sheetH: 478,
+  frameW: 149,
+  frameH: 239,
+  // La figura del heroe mide 120x186 dentro de la celda (el resto es el
+  // margen y el hueco que dejan las espadas de los frames de ataque).
+  figureW: 120,
   idleFrames: 8,
   attackFrames: 8,
   idleRowY: 0,
-  attackRowY: 278,
+  attackRowY: 239,
 };
 
 export const MONSTERS_SPRITE = {

@@ -79,10 +79,6 @@ function removeBackground(ctx, w, h, tolerance = 50, cleanupTolerance = 20) {
   const [br, bg, bb] = bgColor;
   const maxDist = tolerance * 3;
 
-  function isArtifactColor(r, g, b) {
-    return r > 220 && g > 220 && b > 220 && Math.abs(r - g) < 30 && Math.abs(g - b) < 30 && Math.abs(r - b) < 30;
-  }
-
   // Un pixel es de fondo si esta cerca del color del panel. Los blancos y los
   // grises claros **no** se cuentan: el blanco de verdad es parte del dibujo
   // (la armadura del heroe, el hueso de un esqueleto) y borrarlo dejaba
@@ -174,6 +170,20 @@ function removeBackground(ctx, w, h, tolerance = 50, cleanupTolerance = 20) {
 
   ctx.putImageData(imageData, 0, 0);
   return bgColor;
+}
+
+// Las hojas de la mazmorra ya vienen recortadas con alfa (scripts/
+// recortar-sprites.mjs). Si el frame ya tiene fondo transparente, quitar el
+// fondo por color es contraproducente: se comeria el blanco de verdad (la
+// armadura del heroe, el hueso de los esqueletos). Con alfa, el recorte se
+// limita a la silueta.
+function tieneAlfa(ctx, w, h) {
+  const d = ctx.getImageData(0, 0, w, h).data;
+  let transparentes = 0;
+  for (let i = 3; i < d.length; i += 4) {
+    if (d[i] < 250) transparentes++;
+  }
+  return transparentes / (w * h) > 0.05;
 }
 
 // Compute the opaque bounding box of a sprite whose background has been
@@ -296,7 +306,9 @@ function processExpensiveFrame(img, opts) {
   if (clearW > 0 && clearH > 0) {
     tctx.clearRect(0, 0, clearW, clearH);
   }
-  const bgColor = removeBackground(tctx, dw, dh, bgTolerance, cleanupTolerance);
+  const bgColor = tieneAlfa(tctx, dw, dh)
+    ? null
+    : removeBackground(tctx, dw, dh, bgTolerance, cleanupTolerance);
   const bbox = trim ? computeTrimBbox(tmp, bgColor, trimBgTolerance, trimEdgeThreshold) : null;
   return { tmp, bgColor, bbox };
 }

@@ -7,6 +7,7 @@ const {
   src: SHEET,
   frameW: FRAME_W,
   frameH: FRAME_H,
+  figureW: FIGURE_W,
   idleFrames: IDLE_FRAMES,
   attackFrames: ATTACK_FRAMES,
   idleRowY: IDLE_ROW_Y,
@@ -67,38 +68,24 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
     }
   }, [state]);
 
-  const scale    = size / FRAME_W;
-  const displayH = Math.round(FRAME_H * scale);
-  const sx       = frame * FRAME_W;
-  // Cada frame del heroe lleva una banda de cuadriculado arriba (el titulo
-  // "HERO", hasta la fila 30) y otra abajo (el nombre del frame, desde la
-  // 243). Hay que quitar las dos: si queda un resto, el recorte no encuentra
-  // el fondo por el borde y el cuadriculado se queda pegado al dibujo.
-  const srcInsetTop = 31;
-  const srcInsetBottom = 27;
-  // Las tres ultimas columnas del frame son el separador blanco entre
-  // frames: se colaba en el dibujo como una linea vertical al lado.
-  const srcInsetRight = 4;
-  // La figura del heroe es alta y estrecha (unos 60x150 en la hoja), asi que
-  // una caja mas ancha que alta la recortaba de lado y salia enano. La caja
-  // lleva su proporcion y asi la figura ocupa el ancho entero.
-  const croppedH    = Math.round(size * 2.5);
-  const clearH      = 0;
+  // La hoja viene recortada con alfa: la celda ya esta limpia y todos los
+  // frames ocupan el mismo sitio, asi que no hay que recortar ni trimar nada
+  // (si se trimara, cada frame escalaria por separado y la animacion
+  // bailaria). Se escala la celda para que la figura del heroe mida `size`.
+  const escala    = size / FIGURE_W;
+  const displayW  = Math.round(FRAME_W * escala);
+  const displayH  = Math.round(FRAME_H * escala);
+  const sx        = frame * FRAME_W;
 
   return (
     <Wrapper $hurt={hurt}>
       <SpriteCanvas
         src={SHEET}
         label="El héroe"
-        sx={sx} sy={rowY + srcInsetTop}
-        sw={FRAME_W - srcInsetRight}
-        sh={FRAME_H - srcInsetTop - srcInsetBottom}
-        dw={size} dh={croppedH}
-        clearW={size} clearH={clearH}
-        trim={true}
-        trimBgTolerance={35}
-        bgTolerance={35}
-        cleanupTolerance={35}
+        sx={sx} sy={rowY}
+        sw={FRAME_W} sh={FRAME_H}
+        dw={displayW} dh={displayH}
+        trim={false}
       />
     </Wrapper>
   );

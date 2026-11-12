@@ -24,9 +24,13 @@ const DESTINO = path.join(RAIZ, 'public');
 
 // Las hojas originales viven en assets-originales/ (fuera de public/, que es lo
 // que se despliega) y su version WebP, en public/.
+//
+// Las dos primeras son las hojas de la mazmorra ya recortadas con alfa real
+// (scripts/recortar-sprites.mjs): sin el recorte, el panel gris de los
+// carteles se colaba en los sprites.
 const FICHEROS = [
-  ['mazmorra/monsters.png', 'games/mazmorra/monsters.webp'],
-  ['mazmorra/uiElements.png', 'games/mazmorra/uiElements.webp'],
+  ['mazmorra/monsters-recortado.png', 'games/mazmorra/monsters.webp'],
+  ['mazmorra/uiElements-recortado.png', 'games/mazmorra/heroe.webp'],
   ['mazmorra/mazmorra1.png', 'games/mazmorra/mazmorra1.webp'],
   ['tsubasa/nuevo3.png', 'games/tsubasa/assets/nuevo3.webp'],
   ['tsubasa/ui_elements.png', 'games/tsubasa/assets/ui_elements.webp'],
@@ -107,7 +111,7 @@ for (const [relFuente, relDestino] of FICHEROS) {
   const buf = Buffer.from(base64, 'base64');
   fs.writeFileSync(destino, buf);
   const antes = fs.statSync(origen).size;
-  console.log(`${rel}: ${(antes / 1024).toFixed(0)} KB -> ${(buf.length / 1024).toFixed(0)} KB`);
+  console.log(`${relFuente}: ${(antes / 1024).toFixed(0)} KB -> ${(buf.length / 1024).toFixed(0)} KB`);
 }
 
 ws.close();

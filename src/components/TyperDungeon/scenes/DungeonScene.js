@@ -62,7 +62,7 @@ const ControlPanel = styled.div`
 `;
 
 const HeroPanel = styled.div`
-  width: 110px;
+  width: 140px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -133,7 +133,7 @@ export default function DungeonScene({ state, dispatch }) {
 
       <ControlPanel>
         <HeroPanel $walking={isWalking}>
-          <HeroSprite state="idle" size={90} />
+          <HeroSprite state="idle" size={100} />
         </HeroPanel>
         <StatsPanel>
           <HeroHUD

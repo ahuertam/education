@@ -53,35 +53,33 @@ geometría**, que ya está medida:
 
 ## Herramientas que hay
 
-- `src/test-utils/leerPNG.js`: lee PNG en Node puro (sin dependencias; `zlib`
-  viene de serie).
+- `scripts/png.mjs`: **lee y escribe** PNG en Node puro (sin dependencias;
+  `zlib` viene de serie). El escritor arma IHDR, IDAT con `zlib.deflateSync` y
+  el CRC32 de cada trozo.
+- `src/test-utils/leerPNG.js`: reexporta el lector para los tests.
+- `scripts/recortar-sprites.mjs`: el recorte con matte (el héroe y los
+  monstruos).
 - `scripts/convertir-sprites-webp.mjs`: convierte las hojas a WebP con el
-  propio Chrome. Sirve de ejemplo de cómo escribir PNG sin dependencias: para
-  escribir hace falta lo mismo en sentido inverso (inflar con `zlib.deflateSync`
-  y calcular el CRC32).
-
-Falta un **escritor de PNG** (el que hay es lector). Son unas 40 líneas: IHDR,
-IDAT con `zlib.deflateSync` y el CRC32 de cada trozo.
+  propio Chrome.
 
 ---
 
 ## El orden
 
-### Paso 1 — El héroe (16 frames)
+### Paso 1 — El héroe (16 frames) — HECHO
 
 Es lo que más se ve (está en cada pantalla de combate) y es el que tiene la
 línea blanca.
 
-1. Escribir el escritor de PNG.
+1. Escribir el escritor de PNG. → `scripts/png.mjs` (lee y escribe).
 2. Script `scripts/recortar-sprites.mjs` que:
    - lee `assets-originales/mazmorra/uiElements.png`;
-   - para cada uno de los 16 frames (8 de idle en la fila 0, 8 de attack en la
-     278), recorta con el matte y lo guarda en una hoja nueva
-     `public/games/mazmorra/heroe.webp`;
+   - para cada uno de los 16 frames (8 de idle y 8 de ataque), recorta con el
+     matte y lo guarda en una hoja nueva `public/games/mazmorra/heroe.webp`;
    - mide el marco de cada figura (no el del frame) para que todos los frames
      ocupen el mismo sitio y la animación no baile.
 3. Cambiar `data/sprites.js` para que apunte a la hoja nueva y usar los
-   rectángulos ya medidos.
+   rectángulos ya medidos. → celda de 149×239 (la figura, 120 de ancho).
 4. En `SpriteCanvas`, si la imagen **ya tiene alfa**, no hacer el recorte por
    color (es decir: si el frame tiene más de un 5 % de píxeles transparentes,
    se usa tal cual). Así el runtime no toca lo que ya viene limpio.
@@ -90,14 +88,27 @@ línea blanca.
      armadura, y no queda ni un píxel del color del panel;
    - captura: entrar en combate y mirar al héroe y al esqueleto.
 
-### Paso 2 — Los 12 monstruos
+Lo que salió del camino al hacerlo:
+
+- las bandas de rótulo **no están donde se suponía**: la fila de idle va de
+  la 31 a la 242 y la de ataque de la 279 a la 513 (la de ataque tiene el
+  rótulo 7 filas más arriba, y por eso la espada salía cortada). Ahora se
+  detectan solas: una fila es banda si es casi blanca.
+- el color del panel hay que tomarlo **por fila** (el degradado es vertical) y
+  de las **columnas de al lado** de la figura: si se toma de toda la fila, la
+  mediana la contaminan los píxeles de la propia figura (la medusa, que es
+  verde, se colaba y dejaba bandas grises detrás).
+- la primera y la última fila del panel son el borde del frame (una línea
+  clara) y se quedan como una raya: se quitan.
+
+### Paso 2 — Los 12 monstruos — HECHO
 
 1. El mismo script, con los rectángulos que ya están medidos en
    `data/monsters.js` (son el contorno real de cada figura).
-2. Una hoja `public/games/mazmorra/monstruos.webp` con los 12, en rejilla, cada
-   uno en su celda y con el alfa ya resuelto.
-3. `data/monsters.js` pasa a guardar el índice de celda en vez del rectángulo.
-4. **Comprobar:** el test de `sprites.test.js` se adapta para leer la hoja
+2. Una hoja `public/games/mazmorra/monsters.webp` con los 12, cada uno en su
+   sitio y con el alfa ya resuelto. La hoja conserva el tamaño y las
+   posiciones de la original, así que `data/monsters.js` no cambia.
+3. **Comprobar:** el test de `sprites.test.js` se adapta para leer la hoja
    nueva y exigir que no quede fondo dentro de la silueta; y una captura con
    los doce monstruos en fila.
 
@@ -108,16 +119,14 @@ corta). Aquí el recorte no hace falta: son fondos, se quedan opacos. Solo
 conviene pasarlos a WebP (2,3 MB → 210 KB, ya está hecho) y quitar el rótulo
 con un recorte de 52 px en el generador, que ya lo hace.
 
-### Paso 4 — Limpieza
+### Paso 4 — Limpieza — PENDIENTE
 
-Con las tres hojas ya limpias:
-
-- borrar el recorte por color del runtime (`removeBackground`,
-  `sampleBackground`, `computeTrimBbox`) o dejar solo el camino para imagenes
-  con fondo;
+- borrar `public/games/mazmorra/uiElements.webp` (la hoja vieja del heroe, ya
+  sin usar);
 - borrar `assets-originales/mazmorra/` (5,8 MB) cuando los nuevos artefacts
   estén en su sitio;
-- el test de sprites pasa a comprobar la hoja final, no la original.
+- el recorte por color del runtime (`removeBackground`, `sampleBackground`)
+  se queda solo para las imágenes que no traigan alfa.
 
 ---
 
