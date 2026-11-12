@@ -10,17 +10,17 @@ const PUBLIC_URL = process.env.PUBLIC_URL;
 
 export const HERO_SPRITE = {
   src: `${PUBLIC_URL}/games/mazmorra/heroe.webp`,
-  sheetW: 1192,
-  sheetH: 478,
-  frameW: 149,
-  frameH: 239,
-  // La figura del heroe mide 120x186 dentro de la celda (el resto es el
+  sheetW: 1064,
+  sheetH: 402,
+  frameW: 133,
+  frameH: 201,
+  // La figura del heroe mide 88 de ancho dentro de la celda (el resto es el
   // margen y el hueco que dejan las espadas de los frames de ataque).
-  figureW: 120,
+  figureW: 88,
   idleFrames: 8,
   attackFrames: 8,
   idleRowY: 0,
-  attackRowY: 239,
+  attackRowY: 201,
 };
 
 export const MONSTERS_SPRITE = {

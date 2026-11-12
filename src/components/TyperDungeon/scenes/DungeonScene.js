@@ -54,7 +54,7 @@ const TreasureGlow = styled.div`
 `;
 
 const ControlPanel = styled.div`
-  height: 150px;
+  height: 190px;
   background: #0f0a04;
   border-top: 3px solid #5a4020;
   display: flex;
@@ -62,7 +62,7 @@ const ControlPanel = styled.div`
 `;
 
 const HeroPanel = styled.div`
-  width: 140px;
+  width: 130px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -133,7 +133,7 @@ export default function DungeonScene({ state, dispatch }) {
 
       <ControlPanel>
         <HeroPanel $walking={isWalking}>
-          <HeroSprite state="idle" size={100} />
+          <HeroSprite state="idle" size={75} />
         </HeroPanel>
         <StatsPanel>
           <HeroHUD

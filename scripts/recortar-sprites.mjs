@@ -24,10 +24,19 @@ import { leerPNG, escribirPNG } from './png.mjs';
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FUENTES = path.join(RAIZ, 'assets-originales', 'mazmorra');
 
-// El ruido del PNG (el degradado del panel tiembla unos pixeles) y el punto en
-// el que un pixel ya es claramente dibujo.
-const RUIDO = 26;
-const NETO = 90;
+// El corte: un pixel es fondo si esta a menos de UMBRAL del color del panel,
+// y dibujo si esta mas lejos.
+//
+// El corte es duro (alfa 0 o 255, nunca un valor intermedio) porque el arte
+// es pixel art: con un alfa gradual los pixeles del borde se quedan a medio
+// camino entre el gris del panel y el dibujo, y al pintar el sprite sobre el
+// suelo de la mazmorra se ve un halo translucido alrededor de la figura.
+const UMBRAL = 45;
+
+// El numero del frame (el rotulo "1", "2"...) esta dibujado en blanco en la
+// esquina superior izquierda del panel, no en la banda blanca. Se busca en
+// esa esquina y se borra: si no, sale un numero en cada sprite.
+const ROTULO = { w: 16, h: 30 };
 
 // Cuanto puede desviarse el color del panel de una fila a la siguiente antes
 // de pensar que la muestra esta contaminada (el degradado es continuo).
@@ -116,8 +125,8 @@ function referenciasFila(img, y0, h, muestras) {
 }
 
 /**
- * Calcula el alfa de una region: cuan lejos queda cada pixel del color del
- * panel de esa fila.
+ * Calcula el alfa de una region: un pixel es dibujo si queda lejos del
+ * color del panel de esa fila, y fondo si no (corte duro, ver UMBRAL).
  */
 function matteRegion(img, rect, refs) {
   const [x0, y0, w, h] = rect;
@@ -127,13 +136,35 @@ function matteRegion(img, rect, refs) {
     for (let i = 0; i < w; i++) {
       const p = pixel(img, x0 + i, y0 + j);
       const dist = Math.abs(p[0] - br) + Math.abs(p[1] - bg) + Math.abs(p[2] - bb);
-      const t = Math.max(0, Math.min(1, (dist - RUIDO) / (NETO - RUIDO)));
       const d = (j * w + i) * 4;
       salida[d] = p[0]; salida[d + 1] = p[1]; salida[d + 2] = p[2];
-      salida[d + 3] = Math.round(t * 255);
+      salida[d + 3] = dist > UMBRAL ? 255 : 0;
     }
   }
   return salida;
+}
+
+/**
+ * Borra el rotulo del frame: los pixeles con dibujo en la esquina superior
+ * izquierda del recorte (el numero del frame, en blanco).
+ */
+function borrarRotulo(alfa, w, h) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (let j = 0; j < Math.min(ROTULO.h, h); j++) {
+    for (let i = 0; i < Math.min(ROTULO.w, w); i++) {
+      if (alfa[(j * w + i) * 4 + 3] === 0) continue;
+      if (i < minX) minX = i;
+      if (i > maxX) maxX = i;
+      if (j < minY) minY = j;
+      if (j > maxY) maxY = j;
+    }
+  }
+  if (maxX < 0) return;
+  for (let j = Math.max(0, minY - 1); j <= Math.min(h - 1, maxY + 1); j++) {
+    for (let i = Math.max(0, minX - 1); i <= Math.min(w - 1, maxX + 1); i++) {
+      alfa[(j * w + i) * 4 + 3] = 0;
+    }
+  }
 }
 
 // --- El heroe -------------------------------------------------------------
@@ -165,6 +196,37 @@ function filasDelPanel(img, y0, y1) {
   return [inicio + 1, y - 1];
 }
 
+/**
+ * La fila de pie del cuerpo (los pies) de un frame: el punto mas bajo con
+ * dibujo en las columnas centrales, donde no llega la espada.
+ */
+function pieDelCuerpo(alfa, w, h) {
+  let maxY = -1;
+  const izq = Math.floor(w * 0.3);
+  const der = Math.floor(w * 0.75);
+  for (let j = 0; j < h; j++) {
+    for (let i = izq; i < der; i++) {
+      if (alfa[(j * w + i) * 4 + 3] < 24) continue;
+      if (j > maxY) maxY = j;
+    }
+  }
+  return maxY;
+}
+
+/**
+ * Mueve el contenido de un frame las filas indicadas: un numero positivo
+ * lo sube (las filas de abajo se pierden).
+ */
+function desplazar(alfa, w, h, filas) {
+  const nueva = Buffer.alloc(w * h * 4);
+  for (let j = 0; j < h; j++) {
+    const origen = j - filas;
+    if (origen < 0 || origen >= h) continue;
+    alfa.copy(nueva, j * w * 4, origen * w * 4, (origen + 1) * w * 4);
+  }
+  return nueva;
+}
+
 function recortarHeroe(img) {
   const figuras = [];
 
@@ -178,18 +240,39 @@ function recortarHeroe(img) {
       const der = [region[0] + region[2] - 8, region[0] + region[2] - 1];
       const refs = referenciasFila(img, region[1], region[3], [izq, der]);
       const alfa = matteRegion(img, region, refs);
-      // La silueta de la figura, en coordenadas propias del frame.
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      for (let j = 0; j < region[3]; j++) {
-        for (let i = 0; i < region[2]; i++) {
-          if (alfa[(j * region[2] + i) * 4 + 3] < 24) continue;
-          if (i < minX) minX = i;
-          if (i > maxX) maxX = i;
-          if (j < minY) minY = j;
-          if (j > maxY) maxY = j;
-        }
+      // El numero del frame va dibujado en la esquina del panel: se borra.
+      borrarRotulo(alfa, region[2], region[3]);
+      figuras.push({ region, alfa, bloque: bloque.nombre });
+    }
+  }
+
+  // Las dos filas de frames no tienen al heroe a la misma altura: en la hoja
+  // original el de ataque esta mas abajo. Sin corregirlo, el heroe da un
+  // salto de 30 pixeles al atacar. Se miden los pies del primer frame de
+  // cada fila (el de ataque es el frame sin espada) y se sube la fila que
+  // sobra.
+  const pieIdle = pieDelCuerpo(figuras[0].alfa, figuras[0].region[2], figuras[0].region[3]);
+  const pieAtaque = pieDelCuerpo(figuras[8].alfa, figuras[8].region[2], figuras[8].region[3]);
+  const desvio = pieIdle - pieAtaque;
+  if (desvio !== 0) {
+    console.log(`  el heroe de ataque estaba ${-desvio} px mas abajo: se sube`);
+    for (const f of figuras) {
+      if (f.bloque !== 'ataque') continue;
+      f.alfa = desplazar(f.alfa, f.region[2], f.region[3], desvio);
+    }
+  }
+
+  // La silueta de cada figura, en coordenadas propias del frame.
+  for (const f of figuras) {
+    f.minX = Infinity; f.minY = Infinity; f.maxX = -Infinity; f.maxY = -Infinity;
+    for (let j = 0; j < f.region[3]; j++) {
+      for (let i = 0; i < f.region[2]; i++) {
+        if (f.alfa[(j * f.region[2] + i) * 4 + 3] < 24) continue;
+        if (i < f.minX) f.minX = i;
+        if (i > f.maxX) f.maxX = i;
+        if (j < f.minY) f.minY = j;
+        if (j > f.maxY) f.maxY = j;
       }
-      figuras.push({ region, alfa, minX, minY, maxX, maxY });
     }
   }
 

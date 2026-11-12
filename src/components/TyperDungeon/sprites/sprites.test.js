@@ -23,17 +23,33 @@ const esPanel = (r, g, b) =>
  * Cuenta lo que queda dentro de un rectangulo: los pixeles opacos que son
  * del color del panel (restos de fondo) y la silueta (caja de los pixeles
  * con dibujo), para ver que no es un bloque.
+ *
+ * Un resto de panel es un manchon: un pixel del color del panel con mas
+ * vecinos tambien del panel. Los bordes del dibujo, suavizados, tambien son
+ * del color del panel, pero van sueltos y no cuentan.
  */
 function analizar(img, x0, y0, w, h) {
   let opacos = 0, panel = 0, blancos = 0;
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  const esPanelEn = (i, j) => {
+    if (i < 0 || j < 0 || i >= w || j >= h) return false;
+    const s = ((y0 + j) * img.ancho + (x0 + i)) * 4;
+    if (img.rgba[s + 3] < 250) return false;
+    return esPanel(img.rgba[s], img.rgba[s + 1], img.rgba[s + 2]);
+  };
   for (let j = 0; j < h; j++) {
     for (let i = 0; i < w; i++) {
       const s = ((y0 + j) * img.ancho + (x0 + i)) * 4;
       const a = img.rgba[s + 3];
       if (a < 250) continue;
       opacos++;
-      if (esPanel(img.rgba[s], img.rgba[s + 1], img.rgba[s + 2])) panel++;
+      if (esPanel(img.rgba[s], img.rgba[s + 1], img.rgba[s + 2])) {
+        let vecinos = 0;
+        for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          if (esPanelEn(i + di, j + dj)) vecinos++;
+        }
+        if (vecinos >= 3) panel++;
+      }
       if (img.rgba[s] > 200 && img.rgba[s + 1] > 200 && img.rgba[s + 2] > 200) blancos++;
       if (i < minX) minX = i;
       if (i > maxX) maxX = i;
