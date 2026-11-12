@@ -330,6 +330,24 @@ dificultades) con el generador real:
   de mantener. La alternativa es **un nivel fijo curado** (que se puede diseñar a
   mano y garantizar jugable) y quedarse con el procedural como "nivel aleatorio"
   opcional. Eso reduce el arreglo de F1+F2 a una tarde.
+  → **Hecho a medias** (2026-11-12): los veinte niveles propios existen y son
+  los que se guarantee, pero **no se podían completar**. Ahora sí (commit
+  `e97a50c`):
+  - Los duenios de las gemas y las activaciones de las puertas estaban en
+    castellano (`'fuego'`, `'agua'`, `'boton'`, `'palanca'`) y el juego solo
+    entiende `'fire'`, `'water'`, `'button'`, `'lever'`, `'laser'`: la gema
+    del agua no la podía recoger nadie y **ninguna puerta se abría**.
+    El validador (`solvability.js`) ahora rechaza esas dos cosas.
+  - La caja que hay que empujar al botón caía encima de una plataforma y no
+    se podía empujar al botón: ahora la caja y el botón se colocan juntos,
+    en el suelo y antes de la puerta.
+  - La caja tenía una fricción de 650 px/s²: no se movía. Ahora 40.
+  - Las puertas de botón se quedan abiertas (antes se cerraban en cuanto
+    soltabas el botón, y con la caja era imposible pasar).
+  - El fuego y el agua chocaban entre sí: el fuego salía detrás del agua y
+    la empujaba al charco de lava (muerte sin haber hecho nada mal).
+  - Queda pendiente decidir qué pasa con el generador procedural: se queda
+    como "nivel aleatorio" opcional o se retira.
 
 ---
 
