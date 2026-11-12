@@ -93,6 +93,23 @@ describe('los niveles propios', () => {
     }
   });
 
+  it('los charcos se pueden saltar (o tienen puente encima)', () => {
+    // Un salto cubre unos 215 px, pero el personaje tiene que aterrizar
+    // limpio: el charco no puede pasar de 90 px o hay que saltarlo con una
+    // precision de 0,3 segundos (imposible para un niño).
+    for (const definicion of NIVELES) {
+      const nivel = crearNivel(definicion);
+      for (const hz of nivel.hazards) {
+        const puente = nivel.platforms.some((p) =>
+          p.id !== 'ground'
+          && Math.abs(p.x - hz.x) * 2 < p.w + hz.w
+          && p.y < hz.y);
+        if (puente) continue;
+        expect(hz.w).toBeLessThanOrEqual(90);
+      }
+    }
+  });
+
   it('el laser de los niveles que lo tienen llega a su sensor', () => {
     const conLaser = NIVELES.filter((n) => n.laser);
     expect(conLaser.length).toBeGreaterThan(0);
