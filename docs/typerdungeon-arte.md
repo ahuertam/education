@@ -100,6 +100,14 @@ Lo que salió del camino al hacerlo:
   verde, se colaba y dejaba bandas grises detrás).
 - la primera y la última fila del panel son el borde del frame (una línea
   clara) y se quedan como una raya: se quitan.
+- **el casco y las hombreras del héroe están pintados con el mismo gris que
+  el panel** (121,127,133), así que ningún recorte por color puede
+  salvarlos: se los come y el héroe sale con agujeros (parece translúcido).
+  Lo que los separa del fondo es el **contorno negro**, así que el recorte
+  final es **por inundación**: el panel se quita desde fuera y el casco se
+  queda porque no hay manera de llegar a él.
+- la fila de ataque está dibujada 34 px más abajo que la de idle: si no se
+  corrige, el héroe da un salto al atacar. Se alinean por los pies.
 
 ### Paso 2 — Los 12 monstruos — HECHO
 

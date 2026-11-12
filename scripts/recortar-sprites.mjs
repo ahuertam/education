@@ -125,20 +125,50 @@ function referenciasFila(img, y0, h, muestras) {
 }
 
 /**
- * Calcula el alfa de una region: un pixel es dibujo si queda lejos del
- * color del panel de esa fila, y fondo si no (corte duro, ver UMBRAL).
+ * Calcula el alfa de una region por inundacion: el fondo es lo que se
+ * puede alcanzar desde el borde de la region sin pasar por el dibujo.
+ *
+ * Por que no basta con mirar el color: el casco del heroe y sus hombreras
+ * estan pintados con el MISMO gris que el panel (121,127,133), asi que un
+ * recorte por color se los come y el heroe sale con agujeros. Lo que los
+ * separa es el contorno negro: el panel se llega desde fuera y el casco no.
  */
 function matteRegion(img, rect, refs) {
   const [x0, y0, w, h] = rect;
   const salida = Buffer.alloc(w * h * 4);
-  for (let j = 0; j < h; j++) {
+  const fondo = new Uint8Array(w * h);
+  const pila = [];
+
+  const distancia = (i, j) => {
     const [br, bg, bb] = refs[j];
+    const p = pixel(img, x0 + i, y0 + j);
+    return Math.abs(p[0] - br) + Math.abs(p[1] - bg) + Math.abs(p[2] - bb);
+  };
+
+  const visita = (i, j) => {
+    if (i < 0 || j < 0 || i >= w || j >= h) return;
+    const k = j * w + i;
+    if (fondo[k]) return;
+    if (distancia(i, j) > UMBRAL) return;
+    fondo[k] = 1;
+    pila.push(k);
+  };
+
+  for (let i = 0; i < w; i++) { visita(i, 0); visita(i, h - 1); }
+  for (let j = 0; j < h; j++) { visita(0, j); visita(w - 1, j); }
+  while (pila.length) {
+    const k = pila.pop();
+    const i = k % w;
+    const j = (k / w) | 0;
+    visita(i - 1, j); visita(i + 1, j); visita(i, j - 1); visita(i, j + 1);
+  }
+
+  for (let j = 0; j < h; j++) {
     for (let i = 0; i < w; i++) {
       const p = pixel(img, x0 + i, y0 + j);
-      const dist = Math.abs(p[0] - br) + Math.abs(p[1] - bg) + Math.abs(p[2] - bb);
       const d = (j * w + i) * 4;
       salida[d] = p[0]; salida[d + 1] = p[1]; salida[d + 2] = p[2];
-      salida[d + 3] = dist > UMBRAL ? 255 : 0;
+      salida[d + 3] = fondo[j * w + i] ? 0 : 255;
     }
   }
   return salida;

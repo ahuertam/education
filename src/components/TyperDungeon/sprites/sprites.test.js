@@ -71,14 +71,17 @@ describe('los monstruos', () => {
     }
   });
 
-  it('el recorte deja el sprite limpio: sin restos de panel', () => {
-    const fallos = [];
+  it('el panel desaparece: las esquinas del recorte quedan transparentes', () => {
+    // El recorte es por inundacion (el panel se quita desde fuera): si
+    // queda panel alrededor de la figura, las esquinas siguen pintadas.
     for (const m of Object.values(MONSTERS)) {
-      const r = analizar(MONSTRUOS, m.x, m.y, m.w, m.h);
-      const pct = (r.panel / r.opacos) * 100;
-      if (pct > 2) fallos.push(`${m.key}: queda ${pct.toFixed(1)}% de panel`);
+      for (const [cx, cy] of [
+        [m.x, m.y], [m.x + m.w - 1, m.y], [m.x, m.y + m.h - 1], [m.x + m.w - 1, m.y + m.h - 1],
+      ]) {
+        const s = (cy * MONSTRUOS.ancho + cx) * 4;
+        expect(MONSTRUOS.rgba[s + 3]).toBe(0);
+      }
     }
-    expect(fallos).toEqual([]);
   });
 
   it('el recorte deja una silueta con forma (no un bloque)', () => {
@@ -120,29 +123,32 @@ describe('el héroe', () => {
     expect(HEROE.alto).toBe(CELDA_H * 2);
   });
 
-  it('cada frame sale limpio: sin restos de panel', () => {
-    const fallos = [];
+  it('el panel desaparece: el fondo de cada frame queda transparente', () => {
     for (let f = 0; f < 16; f++) {
-      const r = analizar(HEROE, (f % 8) * CELDA_W, (f < 8 ? 0 : CELDA_H), CELDA_W, CELDA_H);
-      const pct = (r.panel / r.opacos) * 100;
-      if (pct > 2) fallos.push(`frame ${f}: queda ${pct.toFixed(1)}% de panel`);
+      const x0 = (f % 8) * CELDA_W;
+      const y0 = f < 8 ? 0 : CELDA_H;
+      for (const [cx, cy] of [[x0, y0], [x0 + CELDA_W - 1, y0], [x0, y0 + CELDA_H - 1], [x0 + CELDA_W - 1, y0 + CELDA_H - 1]]) {
+        const s = (cy * HEROE.ancho + cx) * 4;
+        expect(HEROE.rgba[s + 3]).toBe(0);
+      }
     }
-    expect(fallos).toEqual([]);
   });
 
   it('no queda la línea blanca del separador entre frames', () => {
     // El separador era una columna blanca de arriba abajo al lado de la
-    // figura. Ninguna columna de la celda puede estar llena de dibujo.
+    // figura. Ninguna columna de la celda puede estar llena de blanco.
     for (let f = 0; f < 16; f++) {
       const x0 = (f % 8) * CELDA_W;
       const y0 = f < 8 ? 0 : CELDA_H;
       for (let i = 0; i < CELDA_W; i++) {
-        let opacos = 0;
+        let blancos = 0, opacos = 0;
         for (let j = 0; j < CELDA_H; j++) {
           const s = ((y0 + j) * HEROE.ancho + x0 + i) * 4;
-          if (HEROE.rgba[s + 3] > 250) opacos++;
+          if (HEROE.rgba[s + 3] < 250) continue;
+          opacos++;
+          if (HEROE.rgba[s] > 200 && HEROE.rgba[s + 1] > 200 && HEROE.rgba[s + 2] > 200) blancos++;
         }
-        expect(opacos / CELDA_H).toBeLessThan(0.9);
+        if (opacos / CELDA_H > 0.9) expect(blancos / opacos).toBeLessThan(0.9);
       }
     }
   });
@@ -170,10 +176,12 @@ describe('el héroe', () => {
     expect(Math.abs(anchos[0] - HERO_SPRITE.figureW)).toBeLessThanOrEqual(6);
   });
 
-  it('la armadura blanca del heroe no se come', () => {
-    // Si el recorte tratara el blanco como si fuera fondo, el heroe salia
-    // con agujeros: la armadura (clara) tiene que seguir ahi.
+  it('la armadura y el casco del heroe no se come', () => {
+    // Si el recorte tratara el blanco (o el gris del casco, que es el mismo
+    // que el del panel) como si fuera fondo, el heroe salia con agujeros.
     const r = analizar(HEROE, 0, 0, CELDA_W, CELDA_H);
     expect(r.blancos).toBeGreaterThan(50);
+    // Y el casco (gris del panel, dentro de la silueta) se queda opaco.
+    expect(r.panel).toBeGreaterThan(50);
   });
 });
