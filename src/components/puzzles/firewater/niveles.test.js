@@ -45,9 +45,51 @@ describe('los niveles propios', () => {
       const nivel = crearNivel(definicion);
       expect(nivel.exits.fire).toBeTruthy();
       expect(nivel.exits.water).toBeTruthy();
+      // Los duenios son los que entiende el juego ('fire' y 'water'): con
+      // otros nombres la gema del agua no la puede recoger nadie y el nivel
+      // no se puede terminar.
       const duenios = new Set(nivel.collectibles.map((g) => g.owner));
-      expect(duenios.has('fuego')).toBe(true);
-      expect(duenios.has('agua')).toBe(true);
+      expect(duenios.has('fire')).toBe(true);
+      expect(duenios.has('water')).toBe(true);
+    }
+  });
+
+  it('cada puerta se puede abrir: su activador existe y es del tipo correcto', () => {
+    // El juego abre una puerta segun su 'activation' ('button', 'lever' o
+    // 'laser'). Si el nombre no es exactamente ese, la puerta se queda
+    // cerrada para siempre.
+    for (const definicion of NIVELES) {
+      const nivel = crearNivel(definicion);
+      for (const puerta of nivel.doors) {
+        expect(['button', 'lever', 'laser']).toContain(puerta.activation);
+        const tieneActivador =
+          (puerta.activation === 'button' && nivel.buttons.some((b) => b.doorId === puerta.id)) ||
+          (puerta.activation === 'lever' && nivel.levers.some((l) => l.doorId === puerta.id)) ||
+          (puerta.activation === 'laser' && nivel.laserSensors.some((s) => s.doorId === puerta.id));
+        expect(tieneActivador).toBe(true);
+      }
+    }
+  });
+
+  it('la caja de cada puerta se puede empujar hasta el boton', () => {
+    // La caja tiene que estar en el suelo, al lado del boton y sin pisarlo:
+    // si cae encima de una plataforma no se puede empujar hasta el boton y
+    // la puerta no se abre nunca; si esta encima del boton, la puerta se
+    // abre sola y el nivel no tiene misterio.
+    for (const definicion of NIVELES) {
+      const nivel = crearNivel(definicion);
+      for (const puerta of nivel.doors.filter((d) => d.activation === 'button')) {
+        const boton = nivel.buttons.find((b) => b.doorId === puerta.id);
+        const caja = nivel.crates.find((c) => c.id === `caja_${puerta.id.split('_')[1]}`);
+        expect(boton).toBeTruthy();
+        expect(caja).toBeTruthy();
+        expect(Math.abs(caja.x - boton.x)).toBeGreaterThan((boton.w + caja.w) / 2);
+        // Y la caja no puede estar sobre el suelo de un charco.
+        for (const hz of nivel.hazards) {
+          const dentro = Math.abs(caja.x - hz.x) * 2 < hz.w + caja.w;
+          expect(dentro).toBe(false);
+        }
+      }
     }
   });
 

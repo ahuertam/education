@@ -56,6 +56,11 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
         water: { left: false, right: false, jump: false }
       };
       this.exitState = { fire: false, water: false, done: false };
+      // Las puertas que ya se han abierto: se quedan abiertas. En el juego
+      // original hay que mantener el boton pulsado, pero aqui el boton y la
+      // caja hay que colocarlos con mucho cuidado y el niño se frustraba
+      // (-> la puerta se cerraba justo cuando iba a pasar).
+      this.puertasAbiertas = new Set();
       this.onPause = onPause;
       this.onDeath = onDeath;
       this.onRestart = onRestart;
@@ -197,7 +202,10 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
         crate.setDisplaySize(c.w, c.h);
         crate.setCollideWorldBounds(true);
         crate.setBounce(0.05);
-        crate.setDrag(650, 0);
+        // La friccion tiene que ser floja: con 650 la caja se quedaba
+        // pegada al sitio y no se podia empujar ni al boton, asi que las
+        // puertas de boton no se abrian nunca.
+        crate.setDrag(40, 0);
         crates.push(crate);
       }
 
@@ -238,7 +246,9 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
         for (const crate of crates) this.physics.add.collider(crate, door);
       }
 
-      this.physics.add.collider(fire, water);
+      // El fuego y el agua NO chocan entre si: el fuego va detras del agua
+      // al salir, asi que si chocaran, el que va delante acababa empujado
+      // al charco y se mataba solo (sin haberlo hecho mal).
       for (const crate of crates) {
         this.physics.add.collider(fire, crate);
         this.physics.add.collider(water, crate);
@@ -520,7 +530,15 @@ export function createPuzzleScene({ level, keymap, onPause, onDeath, onRestart, 
           (activation === 'lever' && activeLeverDoors.has(door.getData('id'))) ||
           (activation === 'laser' && activeLaserDoors.has(door.getData('id')));
 
-        if (shouldOpen) {
+        // Las puertas de boton se quedan abiertas para siempre; la palanca y
+        // el laser siguen siendo momentaneos (la palanca se puede volver a
+        // cerrar).
+        if (shouldOpen && activation === 'button') this.puertasAbiertas.add(door.getData('id'));
+        const abierta = activation === 'button'
+          ? this.puertasAbiertas.has(door.getData('id'))
+          : shouldOpen;
+
+        if (abierta) {
           if (door.body.enable) {
             door.body.enable = false;
             door.setVisible(false);

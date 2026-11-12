@@ -8,8 +8,8 @@
 // Formato de cada nivel:
 //   charcos:     [[x, ancho], ...]              charcos de lava o de agua
 //   plataformas: [[x, alto, ancho], ...]        alto = altura sobre el suelo
-//   puertas:     [[x, 'boton'|'palanca'|'laser'], ...]
-//   gemas:       [[x, 'fuego'|'agua'], ...]
+//   puertas:     [[x, 'button'|'lever'|'laser'], ...]
+//   gemas:       [[x, 'fire'|'water'], ...]
 //   laser:       true                            el nivel trae emisor y sensor
 //   ancho:       pixeles                         ancho del campo
 
@@ -25,7 +25,7 @@ export const NIVELES = [
     titulo: 'El primer charco',
     ancho: 2200,
     charcos: [[700, 130]],
-    gemas: [[420, 'fuego'], [1200, 'agua']],
+    gemas: [[420, 'fire'], [1200, 'water']],
   },
   {
     id: 'n2-plataforma',
@@ -33,22 +33,22 @@ export const NIVELES = [
     ancho: 2300,
     charcos: [[760, 140]],
     plataformas: [[1150, 110, 220]],
-    gemas: [[420, 'fuego'], [1260, 'agua']],
+    gemas: [[420, 'fire'], [1260, 'water']],
   },
   {
     id: 'n3-dos-charcos',
     titulo: 'Dos charcos',
     ancho: 2500,
     charcos: [[600, 120], [1300, 120]],
-    gemas: [[380, 'fuego'], [950, 'agua'], [1700, 'fuego']],
+    gemas: [[380, 'fire'], [950, 'water'], [1700, 'fire']],
   },
   {
     id: 'n4-puerta',
     titulo: 'La primera puerta',
     ancho: 2500,
     charcos: [[700, 130]],
-    puertas: [[1300, 'boton']],
-    gemas: [[420, 'fuego'], [900, 'agua'], [1700, 'fuego']],
+    puertas: [[1300, 'button']],
+    gemas: [[420, 'fire'], [900, 'water'], [1700, 'fire']],
   },
   {
     id: 'n5-gema-alta',
@@ -56,38 +56,38 @@ export const NIVELES = [
     ancho: 2500,
     charcos: [[650, 130]],
     plataformas: [[1000, 100, 200]],
-    gemas: [[400, 'fuego'], [1100, 'agua'], [1600, 'fuego']],
+    gemas: [[400, 'fire'], [1100, 'water'], [1600, 'fire']],
   },
   {
     id: 'n6-puerta-y-charco',
     titulo: 'Puerta despues del charco',
     ancho: 2700,
     charcos: [[600, 130], [1500, 130]],
-    puertas: [[1150, 'boton']],
-    gemas: [[380, 'fuego'], [900, 'agua'], [1900, 'fuego']],
+    puertas: [[1150, 'button']],
+    gemas: [[380, 'fire'], [900, 'water'], [1900, 'fire']],
   },
   {
     id: 'n7-escalera',
     titulo: 'La escalera',
     ancho: 2700,
     plataformas: [[900, 95, 180], [1120, 190, 180], [1340, 285, 180]],
-    gemas: [[500, 'fuego'], [1430, 'agua'], [1900, 'fuego']],
+    gemas: [[500, 'fire'], [1430, 'water'], [1900, 'fire']],
   },
   {
     id: 'n8-dos-puertas',
     titulo: 'Dos puertas',
     ancho: 2800,
     charcos: [[750, 120]],
-    puertas: [[1100, 'boton'], [1700, 'boton']],
-    gemas: [[420, 'fuego'], [1350, 'agua'], [2100, 'fuego']],
+    puertas: [[1100, 'button'], [1700, 'button']],
+    gemas: [[420, 'fire'], [1350, 'water'], [2100, 'fire']],
   },
   {
     id: 'n9-palanca',
     titulo: 'La palanca',
     ancho: 2700,
     charcos: [[900, 130]],
-    puertas: [[1500, 'palanca']],
-    gemas: [[450, 'fuego'], [1100, 'agua'], [2000, 'fuego']],
+    puertas: [[1500, 'lever']],
+    gemas: [[450, 'fire'], [1100, 'water'], [2000, 'fire']],
   },
   {
     id: 'n10-laser',
@@ -96,7 +96,7 @@ export const NIVELES = [
     charcos: [[800, 130]],
     puertas: [[1900, 'laser']],
     laser: true,
-    gemas: [[450, 'fuego'], [1200, 'agua'], [2200, 'fuego']],
+    gemas: [[450, 'fire'], [1200, 'water'], [2200, 'fire']],
   },
   {
     id: 'n11-dos-calles',
@@ -104,7 +104,7 @@ export const NIVELES = [
     ancho: 2800,
     plataformas: [[850, 100, 260], [1400, 200, 260]],
     charcos: [[600, 120]],
-    gemas: [[400, 'fuego'], [980, 'agua'], [1520, 'fuego'], [2100, 'agua']],
+    gemas: [[400, 'fire'], [980, 'water'], [1520, 'fire'], [2100, 'water']],
   },
   {
     id: 'n12-puerta-alta',
@@ -112,15 +112,15 @@ export const NIVELES = [
     ancho: 2900,
     charcos: [[700, 120]],
     plataformas: [[1300, 100, 220]],
-    puertas: [[1800, 'boton']],
-    gemas: [[450, 'fuego'], [1400, 'agua'], [2200, 'fuego']],
+    puertas: [[1800, 'button']],
+    gemas: [[450, 'fire'], [1400, 'water'], [2200, 'fire']],
   },
   {
     id: 'n13-tres-charcos',
     titulo: 'Tres charcos',
     ancho: 3000,
     charcos: [[500, 110], [1100, 110], [1700, 110]],
-    gemas: [[350, 'fuego'], [900, 'agua'], [1450, 'fuego'], [2100, 'agua']],
+    gemas: [[350, 'fire'], [900, 'water'], [1450, 'fire'], [2100, 'water']],
   },
   {
     id: 'n14-puente',
@@ -128,16 +128,16 @@ export const NIVELES = [
     ancho: 2900,
     charcos: [[900, 220]],
     plataformas: [[890, 80, 260]],
-    gemas: [[450, 'fuego'], [1350, 'agua'], [2000, 'fuego']],
+    gemas: [[450, 'fire'], [1350, 'water'], [2000, 'fire']],
   },
   {
     id: 'n15-dos-puertas-laser',
     titulo: 'Puertas y laser',
     ancho: 3000,
     charcos: [[750, 120]],
-    puertas: [[1200, 'boton'], [2100, 'laser']],
+    puertas: [[1300, 'button'], [2100, 'laser']],
     laser: true,
-    gemas: [[420, 'fuego'], [1500, 'agua'], [2400, 'fuego']],
+    gemas: [[420, 'fire'], [1500, 'water'], [2400, 'fire']],
   },
   {
     id: 'n16-torre',
@@ -145,15 +145,15 @@ export const NIVELES = [
     ancho: 3000,
     plataformas: [[800, 95, 180], [1020, 190, 180], [1240, 285, 180], [1460, 380, 180]],
     charcos: [[550, 110]],
-    gemas: [[380, 'fuego'], [1540, 'agua'], [2100, 'fuego']],
+    gemas: [[380, 'fire'], [1540, 'water'], [2100, 'fire']],
   },
   {
     id: 'n17-palancas',
     titulo: 'Dos palancas',
     ancho: 3100,
     charcos: [[700, 120], [1500, 120]],
-    puertas: [[1100, 'palanca'], [1900, 'palanca']],
-    gemas: [[400, 'fuego'], [1300, 'agua'], [2200, 'fuego'], [2600, 'agua']],
+    puertas: [[1100, 'lever'], [1900, 'lever']],
+    gemas: [[400, 'fire'], [1300, 'water'], [2200, 'fire'], [2600, 'water']],
   },
   {
     id: 'n18-calles-y-puertas',
@@ -161,8 +161,8 @@ export const NIVELES = [
     ancho: 3200,
     plataformas: [[900, 100, 240], [1600, 200, 240]],
     charcos: [[650, 120]],
-    puertas: [[1350, 'boton']],
-    gemas: [[400, 'fuego'], [1020, 'agua'], [1720, 'fuego'], [2300, 'agua']],
+    puertas: [[1350, 'button']],
+    gemas: [[400, 'fire'], [1020, 'water'], [1720, 'fire'], [2300, 'water']],
   },
   {
     id: 'n19-laser-y-escalera',
@@ -172,7 +172,7 @@ export const NIVELES = [
     charcos: [[650, 120]],
     puertas: [[2100, 'laser']],
     laser: true,
-    gemas: [[400, 'fuego'], [1320, 'agua'], [2500, 'fuego']],
+    gemas: [[400, 'fire'], [1320, 'water'], [2500, 'fire']],
   },
   {
     id: 'n20-final',
@@ -180,9 +180,9 @@ export const NIVELES = [
     ancho: 3400,
     plataformas: [[800, 95, 180], [1020, 190, 180], [1240, 285, 180], [1800, 100, 200]],
     charcos: [[600, 120], [1500, 120], [2400, 120]],
-    puertas: [[1600, 'boton'], [2600, 'laser']],
+    puertas: [[1600, 'button'], [2600, 'laser']],
     laser: true,
-    gemas: [[400, 'fuego'], [1340, 'agua'], [1900, 'fuego'], [2800, 'agua']],
+    gemas: [[400, 'fire'], [1340, 'water'], [1900, 'fire'], [2800, 'water']],
   },
 ];
 
@@ -235,6 +235,59 @@ export function crearNivel(definicion) {
     return wanted;
   };
 
+  // Una plataforma encima de este sitio: la caja que cae ahi se queda
+  // arriba y no se puede empujar hasta el boton.
+  const hayPlataformaEncima = (x) => nivel.platforms.some((p) =>
+    p.id !== 'ground'
+    && Math.abs(p.y - p.h / 2 - SUELO_TOP) < 260
+    && x >= p.x - p.w / 2 - 50 && x <= p.x + p.w / 2 + 50);
+
+  // Un sitio en el suelo: sin charco y sin plataforma encima.
+  const sitioEnSuelo = (wanted) => {
+    const vale = (x) => !enCharco(x) && !hayPlataformaEncima(x);
+    if (vale(wanted)) return wanted;
+    for (let x = wanted + 40; x < wanted + 320; x += 40) if (vale(x)) return x;
+    for (let x = wanted - 40; x > wanted - 320; x -= 40) if (vale(x)) return x;
+    return wanted;
+  };
+
+  // Un sitio antes de la puerta (para el boton o la palanca): en el suelo,
+  // sin charco y sin plataforma encima, y nunca encima de la puerta.
+  const sitioAntesDeLaPuerta = (puertaX) => {
+    for (let x = puertaX - 500; x <= puertaX - 120; x += 40) {
+      if (!enCharco(x) && !hayPlataformaEncima(x)) return x;
+    }
+    return puertaX - 200;
+  };
+
+  // Un sitio al lado del boton para la caja: en el suelo, sin charco, sin
+  // plataforma encima y sin pisar el boton (si lo pisara, la puerta se
+  // abriria sola y el nivel no tendria misterio).
+  const sitioAlLadoDelBoton = (xBoton) => {
+    const vale = (x) => !enCharco(x) && !hayPlataformaEncima(x) && Math.abs(x - xBoton) > 90;
+    for (const d of [-130, 130, -200, 200, -280, 280, -350, 350]) {
+      const x = xBoton + d;
+      if (x > 120 && x < ancho - 320 && vale(x)) return x;
+    }
+    return xBoton + 130;
+  };
+
+  // La caja y el boton, juntos, antes de la puerta y en el suelo: el jugador
+  // empuja la caja encima del boton y la puerta se queda abierta mientras
+  // pasa. La caja va a la izquierda del boton para poder empujarla a la
+  // derecha.
+  const sitioCajaYBoton = (puertaX) => {
+    for (let x = puertaX - 640; x <= puertaX - 200; x += 40) {
+      const boton = x + 120;
+      if (boton > puertaX - 120) continue;
+      if (x < 200 || boton > ancho - 320) continue;
+      if (enCharco(x) || enCharco(boton)) continue;
+      if (hayPlataformaEncima(x) || hayPlataformaEncima(boton)) continue;
+      return { caja: x, boton };
+    }
+    return null;
+  };
+
   plataformas.forEach(([x, alto, w], i) => {
     nivel.platforms.push({
       id: `plat_${i}`, x, y: SUELO_TOP - alto, w, h: 20, kind: 'solid',
@@ -266,11 +319,15 @@ export function crearNivel(definicion) {
       activation: tipo,
     };
     nivel.doors.push(puerta);
-    if (tipo === 'boton') {
-      // El boton se pone antes de la puerta, en el suelo: se llega andando.
+    if (tipo === 'button') {
+      // El boton y la caja, antes de la puerta y en el suelo. La caja a la
+      // izquierda del boton: se empuja a la derecha hasta encima.
+      const sitio = sitioCajaYBoton(x);
+      const xBoton = sitio ? sitio.boton : x - 200;
+      const xCaja = sitio ? sitio.caja : sitioAlLadoDelBoton(xBoton);
       nivel.buttons.push({
         id: `boton_${i}`,
-        x: sitioLibre(x - 280),
+        x: xBoton,
         y: SUELO_TOP + 5,
         w: 70,
         h: 14,
@@ -278,16 +335,19 @@ export function crearNivel(definicion) {
       });
       nivel.crates.push({
         id: `caja_${i}`,
-        x: sitioLibre(x - 470),
+        // La caja tiene que estar en el suelo: si cae encima de una
+        // plataforma no se puede empujar hasta el boton y la puerta no se
+        // abre nunca.
+        x: xCaja,
         y: SUELO_TOP - 140,
         w: 46,
         h: 46,
       });
     }
-    if (tipo === 'palanca') {
+    if (tipo === 'lever') {
       nivel.levers.push({
         id: `palanca_${i}`,
-        x: sitioLibre(x - 280),
+        x: sitioAntesDeLaPuerta(x),
         y: SUELO_TOP - 60,
         w: 40,
         h: 28,

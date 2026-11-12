@@ -39,9 +39,23 @@ export function validateLevel(level) {
 
   for (const door of level.doors) {
     const activation = door.activation || 'button';
+    // El juego solo abre las puertas con estos tres nombres. Con otro (por
+    // ejemplo 'boton') la puerta se queda cerrada para siempre y el nivel no
+    // se puede terminar.
+    if (!['button', 'lever', 'laser'].includes(activation)) {
+      reasons.push(`door_bad_activation:${door.id}:${activation}`);
+    }
     if (activation === 'button' && !buttonDoorIds.has(door.id)) reasons.push(`door_without_button:${door.id}`);
     if (activation === 'lever' && !leverDoorIds.has(door.id)) reasons.push(`door_without_lever:${door.id}`);
     if (activation === 'laser' && !laserDoorIds.has(door.id)) reasons.push(`door_without_sensor:${door.id}`);
+  }
+
+  // Las gemas: el duenio tiene que ser 'fire' o 'water'. Con otro nombre
+  // (por ejemplo 'fuego') la gema la puede recoger el personaje equivocado y
+  // el otro no llega nunca, asi que el nivel no se puede terminar.
+  for (const g of level.collectibles || []) {
+    if (g.kind && g.kind !== 'gem') continue;
+    if (!['fire', 'water'].includes(g.owner)) reasons.push(`gem_bad_owner:${g.id}:${g.owner}`);
   }
 
   for (const hz of level.hazards) {
