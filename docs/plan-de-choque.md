@@ -231,27 +231,35 @@ nuevo** (monstruos distintos, un héroe rediseñado), eso sí necesita un
 generador de imágenes, y con eso hace falta una clave de API o una cuenta: dímelo
 y lo planteo con el servicio que prefieras.
 
-**Lo que se hizo al final (y fue distinto de lo previsto).** No hizo falta
-regenerar ninguna hoja: el problema eran dos cosas del recorte, no el arte.
+**Lo que se hizo al final.** La opción A (regenerar las hojas con alfa real) es
+la que se ha hecho, sin ningún servicio externo: `scripts/recortar-sprites.mjs`
+hace un *matte* por distancia al color del panel (alfa proporcional, no 0/255)
+y recorta las bandas de rótulo por geometría.
 
-- Los rectángulos de cada monstruo estaban estimados a ojo y cogían mucho panel
-  de más. Se han **medido sobre la imagen real** (el contorno de cada figura),
-  así que el recorte encuentra el fondo por el borde.
-- El recorte borraba como si fueran fondo los píxeles blancos y grises claros.
-  Ese blanco es el de verdad de la armadura del héroe y del hueso de los
-  esqueletos, y al borrarlo dejaba agujeros y manchas. Ahora el recorte solo
-  quita lo que está cerca del color del panel.
-- El héroe lleva una banda de cuadriculado arriba (el rótulo) y otra abajo (el
-  nombre del frame) que no se quitaban: al recortar 22 píxeles de arriba se
-  quedaban 10 de cuadriculado, el fondo no se encontraba por el borde y la
-  banda se pegaba al dibujo. Ahora se cortan las dos bandas enteras.
+- `scripts/png.mjs` lee y escribe PNG en Node puro (sin dependencias).
+- El color del panel se toma **por fila** (el degradado es vertical) y de las
+  **columnas de al lado** de la figura: si se toma de toda la fila, la mediana
+  la contaminan los píxeles de la propia figura.
+- Las bandas de rótulo **no están donde se suponía** (la fila de ataque tiene
+  el rótulo 7 filas más arriba, y por eso la espada salía cortada): ahora se
+  detectan solas, y también se quitan la primera y la última fila del panel,
+  que son el borde del frame.
+- El héroe sale en una hoja nueva (`heroe.webp`, celda de 149×239) con los 16
+  frames en su sitio y la caja de la figura común, para que la animación no
+  baile. Los doce monstruos conservan su sitio en la hoja, así que sus
+  rectángulos no cambian.
+- En `SpriteCanvas`, si el frame **ya trae alfa** (más de un 5 % de píxeles
+  transparentes) no se toca nada: el recorte por color se comería el blanco
+  de verdad (la armadura, el hueso).
 
-La regenerarte con alfa real sigue siendo la opción de fondo si el arte se
-quiere rehacer, pero con estas tres cosas los sprites salen limpios.
+Lo que queda en pie del arte viejo: rehacerlo de verdad (monstruos distintos,
+un héroe rediseñado) sigue necesitando un generador de imágenes, pero ya no
+hace falta para que los sprites salgan limpios.
 
 **Se acepta cuando:** ningún monstruo tiene manchas grises dentro, el héroe no
-tiene parches blancos, y el test de frames está en verde. → **Hecho**
-(`src/components/TyperDungeon/sprites/sprites.test.js`).
+tiene parches blancos ni la línea del separador, y el test de frames está en
+verde. → **Hecho** (`src/components/TyperDungeon/sprites/sprites.test.js`,
+commit `4196d14`).
 
 ---
 

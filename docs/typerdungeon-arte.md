@@ -119,14 +119,15 @@ corta). Aquí el recorte no hace falta: son fondos, se quedan opacos. Solo
 conviene pasarlos a WebP (2,3 MB → 210 KB, ya está hecho) y quitar el rótulo
 con un recorte de 52 px en el generador, que ya lo hace.
 
-### Paso 4 — Limpieza — PENDIENTE
+### Paso 4 — Limpieza
 
 - borrar `public/games/mazmorra/uiElements.webp` (la hoja vieja del heroe, ya
-  sin usar);
+  sin usar) → **hecho** (`258d08b`);
 - borrar `assets-originales/mazmorra/` (5,8 MB) cuando los nuevos artefacts
-  estén en su sitio;
+  estén en su sitio → **pendiente**: los recortes se quedan porque el test los
+  lee;
 - el recorte por color del runtime (`removeBackground`, `sampleBackground`)
-  se queda solo para las imágenes que no traigan alfa.
+  se queda solo para las imágenes que no traigan alfa → **hecho**.
 
 ---
 
