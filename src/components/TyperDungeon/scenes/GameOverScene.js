@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { tocar } from '../audio';
 
 const fadeDown = keyframes`
   from { opacity:0; transform: translateY(-20px); }
@@ -56,7 +57,20 @@ const Button = styled.button`
   &:hover { background: #3a2010; }
 `;
 
-export default function GameOverScene({ dispatch }) {
+// Lo que se ha conseguido en la partida: aunque se pierda, esto dice que no
+// fue en balde.
+const Resumen = styled.div`
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  color: #f0d080;
+  line-height: 1.9;
+  letter-spacing: 1px;
+`;
+
+export default function GameOverScene({ state, dispatch }) {
+  const { score = 0, bestStreak = 0 } = state ?? {};
+  // El lamento al caer.
+  useEffect(() => { tocar('derrota'); }, []);
   return (
     <Wrapper>
       <Skull>💀</Skull>
@@ -65,6 +79,9 @@ export default function GameOverScene({ dispatch }) {
         La oscuridad de la mazmorra se cierra sobre el valiente aventurero.
         Debes practicar más para vencer a los monstruos.
       </Sub>
+      <Resumen>
+        Puntos: {score} · Mejor racha: {bestStreak}
+      </Resumen>
       <Button onClick={() => dispatch({ type: 'RESTART' })}>
         ↩ Volver al menú
       </Button>

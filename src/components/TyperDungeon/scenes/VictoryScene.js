@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { tocar } from '../audio';
 
 const burst = keyframes`
   0%   { transform: scale(0.5); opacity:0; }
@@ -65,7 +66,19 @@ const Button = styled.button`
   &:hover { background: #4a3000; }
 `;
 
-export default function VictoryScene({ dispatch }) {
+// Los numeros de la partida: puntos y la mejor racha de palabras seguidas.
+const Resumen = styled.div`
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  color: #ffd700;
+  line-height: 1.9;
+  letter-spacing: 1px;
+`;
+
+export default function VictoryScene({ state, dispatch }) {
+  const { score = 0, bestStreak = 0 } = state ?? {};
+  // La fanfarria al conquistar la mazmorra.
+  useEffect(() => { tocar('victoria'); }, []);
   return (
     <Wrapper>
       <Trophy>🏆</Trophy>
@@ -74,6 +87,9 @@ export default function VictoryScene({ dispatch }) {
         ¡Increíble! Has derrotado al Dragón Rojo y liberado la mazmorra.
         Tu habilidad mecanográfica ha salvado el reino.
       </Sub>
+      <Resumen>
+        Puntos: {score} · Mejor racha: {bestStreak}
+      </Resumen>
       <Button onClick={() => dispatch({ type: 'RESTART' })}>
         ↩ Jugar de nuevo
       </Button>

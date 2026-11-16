@@ -16,7 +16,7 @@ const estado = (extra = {}) => ({
   currentWord: 'casa',
   config: { language: 'es', difficulty: 'normal', totalFloors: 5, timeLimit: 12, heroes: 1 },
   floor: 2,
-  map: [{ type: 'monster', bg: 'battle', monster: goblin }],
+  map: [{ type: 'monster', bg: 'battle', monster: goblin, id: '2-0' }],
   roomIndex: 0,
   phase: 'battle',
   ...extra,

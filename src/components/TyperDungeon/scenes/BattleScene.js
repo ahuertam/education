@@ -6,9 +6,11 @@ import WordBubble from '../ui/WordBubble';
 import TypingInput from '../ui/TypingInput';
 import HeroHUD from '../ui/HeroHUD';
 import DungeonBackground from '../ui/DungeonBackground';
+import MapaPiso from '../ui/MapaPiso';
 import { monsterName } from '../data/monsters';
 import { dungeonName } from '../data/dungeons';
 import { getWordDifficultyLevel, timeLimitForLevel } from '../data/words';
+import { tocar } from '../audio';
 
 const heroAttack = keyframes`
   0%   { transform: translateX(0); }
@@ -26,6 +28,27 @@ const victoryBurst = keyframes`
   0%   { transform: scale(0.6); opacity: 0; }
   60%  { transform: scale(1.05); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
+`;
+
+const tauntAppear = keyframes`
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+`;
+
+// Lo que dice el monstruo al aparecer. Va aparte de la palabra (que es lo
+// que hay que escribir) para que no se mezclen.
+const TauntBubble = styled.div`
+  background: rgba(24, 12, 4, 0.92);
+  border: 2px solid #8a5a20;
+  border-radius: 10px;
+  padding: 6px 12px;
+  color: #ffc857;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-style: italic;
+  text-align: center;
+  animation: ${tauntAppear} 0.3s ease-out;
+  max-width: 320px;
 `;
 
 const BattleWrapper = styled.div`
@@ -199,7 +222,10 @@ const HERO_HURT_MS    = 600;
 const TIMER_TICK_MS   = 100;
 
 export default function BattleScene({ state, dispatch }) {
-  const { hero, monster, monsterHp, monsterMaxHp, currentWord, config, floor, map, roomIndex, phase } = state;
+  const {
+    hero, monster, monsterHp, monsterMaxHp, currentWord, config, floor, map, roomIndex, phase,
+    score, streak, shield,
+  } = state;
   const room = map[roomIndex];
   const bgKey = room?.bg ?? 'battle';
   const monstPct = monsterMaxHp > 0 ? Math.max(0, Math.round((monsterHp / monsterMaxHp) * 100)) : 0;
@@ -222,6 +248,15 @@ export default function BattleScene({ state, dispatch }) {
   const [flash, setFlash] = useState(null); // { key, color }
   const [typed, setTyped] = useState('');
   const [timeLeft, setTimeLeft] = useState(relojTotal);
+  // La frase del monstruo al aparecer (unos segundos, para que no estorbe).
+  const [taunt, setTaunt] = useState('');
+
+  useEffect(() => {
+    if (!monster) { setTaunt(''); return undefined; }
+    setTaunt(monster.taunt?.[config.language] ?? monster.taunt?.es ?? '');
+    const t = setTimeout(() => setTaunt(''), 3800);
+    return () => clearTimeout(t);
+  }, [monster, config.language]);
 
   // Track animation timers in refs so a fast follow-up action can cancel them
   // before the old one fires and snaps the hero/monster back to idle.
@@ -264,6 +299,8 @@ export default function BattleScene({ state, dispatch }) {
     clearAnimTimers();
     setHeroAnim('attack');
     triggerFlash(willKill ? 'rgba(255,180,40,0.7)' : 'rgba(255,220,50,0.6)');
+    tocar('espada');
+    setTimeout(() => tocar(willKill ? 'muerte' : 'impacto'), 120);
 
     if (willKill) {
       // Monster death animation is 800ms and runs forwards; do not reset it
@@ -285,6 +322,7 @@ export default function BattleScene({ state, dispatch }) {
     setMonsterAnim('idle');
     setHeroAnim('hurt');
     triggerFlash('rgba(200,30,20,0.5)');
+    tocar('dano');
     heroTimerRef.current = setTimeout(() => setHeroAnim('idle'), HERO_HURT_MS);
   }, [dispatch]);
 
@@ -345,6 +383,9 @@ export default function BattleScene({ state, dispatch }) {
         </HeroEnSala>
 
         <MonsterArea>
+          {!isDying && taunt && (
+            <TauntBubble key={taunt}>{taunt}</TauntBubble>
+          )}
           {!isDying && (
             <WordBubble
               word={currentWord}
@@ -358,6 +399,7 @@ export default function BattleScene({ state, dispatch }) {
             <MonsterHPFill $pct={monstPct} />
           </MonsterHPBar>
         </MonsterArea>
+        <MapaPiso map={map} roomIndex={roomIndex} floor={floor} />
       </DungeonView>
 
       <ControlPanel>
@@ -369,6 +411,9 @@ export default function BattleScene({ state, dispatch }) {
             totalFloors={config.totalFloors}
             dungeon={dungeonName(floor, config.totalFloors)}
             team={heroes}
+            score={score}
+            streak={streak}
+            shield={shield}
           />
           {relojTotal > 0 && !isDying && (
             <>

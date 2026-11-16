@@ -75,7 +75,32 @@ const TeamBadge = styled.div`
   letter-spacing: 1px;
 `;
 
-export default function HeroHUD({ hp, maxHp, floor, totalFloors, dungeon, team }) {
+const Points = styled.span`
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #f0d080;
+  font-weight: bold;
+`;
+
+// La racha: las palabras seguidas. Se ilumina cuando llega a tres, que es
+// cuando el niño empieza a escribir en ritmo.
+const Streak = styled.span`
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: ${props => (props.$caliente ? '#ffd257' : '#a08040')};
+  text-shadow: ${props => (props.$caliente ? '0 0 8px rgba(255,210,87,0.7)' : 'none')};
+`;
+
+const ShieldBadge = styled.span`
+  font-size: 0.7rem;
+  color: #7ad3ff;
+  letter-spacing: 1px;
+`;
+
+export default function HeroHUD({
+  hp, maxHp, floor, totalFloors, dungeon, team, score = 0, streak = 0, shield = false,
+}) {
   const pct = maxHp > 0 ? Math.max(0, Math.round((hp / maxHp) * 100)) : 0;
   return (
     <HUD>
@@ -85,6 +110,12 @@ export default function HeroHUD({ hp, maxHp, floor, totalFloors, dungeon, team }
           <BarFill $pct={pct} />
         </BarTrack>
         <HpText>{hp}/{maxHp}</HpText>
+      </Row>
+      <Row>
+        <Label>PT</Label>
+        <Points>{score}</Points>
+        {streak > 1 && <Streak $caliente={streak >= 3}>racha ×{streak}</Streak>}
+        {shield && <ShieldBadge>escudo</ShieldBadge>}
       </Row>
       <FloorBadge>
         Mazmorra {floor} / {totalFloors}

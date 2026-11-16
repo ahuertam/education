@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import HeroSprite from '../sprites/HeroSprite';
 import HeroHUD from '../ui/HeroHUD';
 import DungeonBackground from '../ui/DungeonBackground';
+import MapaPiso from '../ui/MapaPiso';
 import { dungeonName } from '../data/dungeons';
+import { tocar } from '../audio';
 
 const fadeIn = keyframes`
   from { opacity:0; } to { opacity:1; }
@@ -103,15 +105,27 @@ const StairsButton = styled.button`
 const PHASE_MESSAGES = {
   exploring: '…el héroe avanza por la oscuridad…',
   pre_battle: '¡Un enemigo aparece!',
-  treasure: '¡Has encontrado un tesoro! +2 PV',
+  treasure: '¡Has encontrado un tesoro!',
   stairs_found: '¡Unas escaleras descienden a las profundidades!',
 };
 
 export default function DungeonScene({ state, dispatch }) {
-  const { hero, phase, config, floor, map, roomIndex } = state;
+  const { hero, phase, config, floor, map, roomIndex, shield } = state;
   const room = map[roomIndex] ?? {};
   const msg = PHASE_MESSAGES[phase] ?? '';
   const isWalking = phase === 'exploring';
+  // El mensaje del tesoro depende de lo que te ha dado.
+  const mensajeTesoro = shield ? '¡Te llevas un escudo: aguanta un golpe!' : '¡El cofre te da 3 puntos de vida!';
+
+  // Un sonido por sala nueva (no en cada render).
+  const salaRef = useRef(room.id);
+  useEffect(() => {
+    if (salaRef.current === room.id) return;
+    salaRef.current = room.id;
+    if (phase === 'treasure') tocar('tesoro');
+    else if (phase === 'stairs_found') tocar('puerta');
+    else if (phase === 'pre_battle') tocar('monstruo');
+  }, [room.id, phase]);
 
   return (
     <Wrapper>
@@ -119,7 +133,7 @@ export default function DungeonScene({ state, dispatch }) {
         <DungeonBackground bgKey={room.bg} style={{ position: 'absolute', inset: 0 }}>
           <MessageBox>
             {phase === 'treasure' && <TreasureGlow>★</TreasureGlow>}
-            {msg}
+            {phase === 'treasure' ? mensajeTesoro : msg}
             {phase === 'stairs_found' && (
               <div style={{ marginTop: 12 }}>
                 <StairsButton onClick={() => dispatch({ type: 'DESCEND_STAIRS' })}>
@@ -129,6 +143,7 @@ export default function DungeonScene({ state, dispatch }) {
             )}
           </MessageBox>
         </DungeonBackground>
+        <MapaPiso map={map} roomIndex={roomIndex} floor={floor} />
       </DungeonView>
 
       <ControlPanel>
@@ -143,6 +158,9 @@ export default function DungeonScene({ state, dispatch }) {
             totalFloors={config.totalFloors}
             dungeon={dungeonName(floor, config.totalFloors)}
             team={config.heroes ?? 1}
+            score={state.score}
+            streak={state.streak}
+            shield={shield}
           />
         </StatsPanel>
       </ControlPanel>

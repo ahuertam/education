@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import DungeonBackground from '../ui/DungeonBackground';
+import { iniciarAmbiente } from '../audio';
 
 const flicker = keyframes`
   0%,100%,92% { opacity:1; }
@@ -119,6 +120,9 @@ export default function MenuScene({ dispatch }) {
   const [heroes, setHeroes]         = useState(1);
 
   const handleStart = () => {
+    // El navegador no deja sonar nada hasta que el niño ha pulsado algo:
+    // este es el momento de arrancar el rumor de la mazmorra.
+    iniciarAmbiente();
     dispatch({ type: 'START_GAME', config: { language, difficulty, totalFloors, timeLimit, heroes } });
   };
 

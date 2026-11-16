@@ -12,6 +12,7 @@ export const MONSTERS = {
   goblin: {
     key: 'goblin',
     name: { es: 'Goblin', en: 'Goblin' },
+    taunt: { es: '¡A que no me des las palabras!', en: 'Bet you can’t knock these out!' },
     // Lesser — top-left of monsters.png
     x: 11, y: 88, w: 128, h: 137,
     displayW: 160, tier: 1, hp: 3, damage: 1,
@@ -19,18 +20,21 @@ export const MONSTERS = {
   slime: {
     key: 'slime',
     name: { es: 'Moho gelatinoso', en: 'Slime Mold' },
+    taunt: { es: 'Soy blandito, pero muerdo.', en: 'I’m soft, but I bite.' },
     x: 184, y: 131, w: 162, h: 99,
     displayW: 160, tier: 1, hp: 2, damage: 1,
   },
   skeleton: {
     key: 'skeleton',
     name: { es: 'Esqueleto', en: 'Skeleton' },
+    taunt: { es: '¡Huesos a la obra!', en: 'Bones at work!' },
     x: 370, y: 52, w: 165, h: 175,
     displayW: 170, tier: 1, hp: 4, damage: 1,
   },
   gnoll: {
     key: 'gnoll',
     name: { es: 'Gnoll', en: 'Gnoll' },
+    taunt: { es: '¡A zarpazos con tus palabras!', en: 'Claw your way through!' },
     // Intermediate — top-right of monsters.png
     x: 674, y: 46, w: 167, h: 191,
     displayW: 180, tier: 2, hp: 5, damage: 1,
@@ -38,18 +42,21 @@ export const MONSTERS = {
   gazer: {
     key: 'gazer',
     name: { es: 'Gazer', en: 'Gazer' },
+    taunt: { es: 'Te estoy mirando escribir.', en: 'I’m watching you type.' },
     x: 883, y: 54, w: 165, h: 153,
     displayW: 180, tier: 2, hp: 5, damage: 2,
   },
   ogre: {
     key: 'ogre',
     name: { es: 'Ogro', en: 'Ogre' },
+    taunt: { es: '¡Mis palabras pesan más que tú!', en: 'My words hit harder than you!' },
     x: 1098, y: 44, w: 159, h: 194,
     displayW: 185, tier: 2, hp: 6, damage: 2,
   },
   minotaur: {
     key: 'minotaur',
     name: { es: 'Minotauro', en: 'Minotaur' },
+    taunt: { es: '¡Vaya maza de palabras!', en: 'Bring on your words!' },
     // Greater — middle section
     x: 12, y: 321, w: 227, h: 226,
     displayW: 210, tier: 3, hp: 8, damage: 2,
@@ -57,18 +64,21 @@ export const MONSTERS = {
   medusa: {
     key: 'medusa',
     name: { es: 'Medusa', en: 'Medusa' },
+    taunt: { es: 'Un error y te convierto en piedra.', en: 'One mistake and I petrify you.' },
     x: 282, y: 330, w: 112, h: 217,
     displayW: 200, tier: 3, hp: 7, damage: 2,
   },
   beholder: {
     key: 'beholder',
     name: { es: 'Contemplador', en: 'Beholder' },
+    taunt: { es: 'Te tengo el ojo.', en: 'I’ve got my eye on you.' },
     x: 430, y: 331, w: 201, h: 177,
     displayW: 200, tier: 3, hp: 9, damage: 3,
   },
   lich: {
     key: 'lich',
     name: { es: 'Lich', en: 'Lich' },
+    taunt: { es: '¡Palabras necrománticas!', en: 'Necromantic words!' },
     // Elite — bottom section
     x: 56, y: 604, w: 164, h: 222,
     displayW: 180, tier: 4, hp: 12, damage: 3,
@@ -76,12 +86,14 @@ export const MONSTERS = {
   ettin: {
     key: 'ettin',
     name: { es: 'Ettin', en: 'Ettin' },
+    taunt: { es: 'Dos cabezas, un teclado.', en: 'Two heads, one keyboard.' },
     x: 457, y: 594, w: 345, h: 234,
     displayW: 240, tier: 4, hp: 14, damage: 3,
   },
   dragon: {
     key: 'dragon',
     name: { es: 'Dragón Rojo', en: 'Red Dragon' },
+    taunt: { es: '¡El último de la mazmorra!', en: 'The last of the dungeon!' },
     // Elite boss — right side of the sheet (large)
     x: 837, y: 351, w: 431, h: 479,
     displayW: 380, tier: 5, hp: 20, damage: 4,

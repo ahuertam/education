@@ -17,6 +17,11 @@ function buildInitialState() {
     monsterMaxHp: 0,
     currentWord: '',
     usedWords: [],
+    // Racha de palabras seguidas, puntos, y el escudo del tesoro.
+    streak: 0,
+    bestStreak: 0,
+    score: 0,
+    shield: false,
   };
 }
 
@@ -28,7 +33,7 @@ function phaseForRoom(room) {
   return 'exploring';
 }
 
-function reducer(state, action) {
+export function reducer(state, action) {
   switch (action.type) {
     case 'START_GAME': {
       const { language, difficulty, totalFloors, timeLimit = 0, heroes = 1 } = action.config;
@@ -70,12 +75,24 @@ function reducer(state, action) {
       const newMonsterHp = state.monsterHp - 1;
       // Only mark the just-completed word as used; never pre-populate with nextWord.
       let usedWords = [...state.usedWords, state.currentWord];
+      // La racha: cada palabra followed suma mas, y cada cinco seguidas el
+      // heroe recupera un punto de vida (la "vida extra").
+      const streak = state.streak + 1;
+      const score = state.score + 10 + streak * 2;
+      const bestStreak = Math.max(state.bestStreak, streak);
+      const hero = streak % 5 === 0
+        ? { ...state.hero, hp: Math.min(state.hero.maxHp, state.hero.hp + 1) }
+        : state.hero;
       if (newMonsterHp <= 0) {
         const isFinalBoss = state.monster?.key === 'dragon';
         return {
           ...state,
           monsterHp: 0,
           usedWords,
+          hero,
+          streak,
+          score,
+          bestStreak,
           phase: isFinalBoss ? 'victory' : 'monster_dying',
         };
       }
@@ -84,23 +101,32 @@ function reducer(state, action) {
         usedWords = [];
         nextWord = getWord(state.config.difficulty, state.config.language, state.floor, new Set());
       }
-      return { ...state, monsterHp: newMonsterHp, currentWord: nextWord, usedWords };
+      return { ...state, monsterHp: newMonsterHp, currentWord: nextWord, usedWords, hero, streak, score, bestStreak };
     }
 
     case 'WORD_ERROR': {
       const dmg = state.monster?.damage ?? 1;
-      const newHp = state.hero.hp - dmg;
       // Only mark the just-failed word as used; never pre-populate with nextWord.
       let usedWords = [...state.usedWords, state.currentWord];
+      // El escudo del tesoro se come el golpe: por eso el cofre es util.
+      if (state.shield) {
+        let nextWord = getWord(state.config.difficulty, state.config.language, state.floor, new Set(usedWords));
+        if (nextWord === null) {
+          usedWords = [];
+          nextWord = getWord(state.config.difficulty, state.config.language, state.floor, new Set());
+        }
+        return { ...state, shield: false, streak: 0, usedWords, currentWord: nextWord };
+      }
+      const newHp = state.hero.hp - dmg;
       if (newHp <= 0) {
-        return { ...state, hero: { ...state.hero, hp: 0 }, usedWords, phase: 'game_over' };
+        return { ...state, hero: { ...state.hero, hp: 0 }, usedWords, streak: 0, phase: 'game_over' };
       }
       let nextWord = getWord(state.config.difficulty, state.config.language, state.floor, new Set(usedWords));
       if (nextWord === null) {
         usedWords = [];
         nextWord = getWord(state.config.difficulty, state.config.language, state.floor, new Set());
       }
-      return { ...state, hero: { ...state.hero, hp: newHp }, currentWord: nextWord, usedWords };
+      return { ...state, hero: { ...state.hero, hp: newHp }, currentWord: nextWord, usedWords, streak: 0 };
     }
 
     case 'ADVANCE_ROOM': {
@@ -110,11 +136,19 @@ function reducer(state, action) {
     }
 
     case 'COLLECT_TREASURE': {
-      const heal = 2;
-      const newHp = Math.min(state.hero.hp + heal, state.hero.maxHp);
+      // El cofre da algo util: un escudo que se come el siguiente golpe, o
+      // vida si ya llevaba uno.
+      const shield = !state.shield;
+      const newHp = shield ? state.hero.hp : Math.min(state.hero.hp + 3, state.hero.maxHp);
       const nextIndex = state.roomIndex + 1;
       const nextRoom = state.map[nextIndex];
-      return { ...state, hero: { ...state.hero, hp: newHp }, roomIndex: nextIndex, phase: phaseForRoom(nextRoom) };
+      return {
+        ...state,
+        hero: { ...state.hero, hp: newHp },
+        shield,
+        roomIndex: nextIndex,
+        phase: phaseForRoom(nextRoom),
+      };
     }
 
     case 'DESCEND_STAIRS': {

@@ -31,7 +31,7 @@ const Wrapper = styled.div`
 // Hero sprite. Idle breathes through all 8 frames; attack cycles 8 frames
 // at 70ms/frame. The flood-fill cost is paid once per frame and then cached,
 // so the loop is a single drawImage per tick.
-export default function HeroSprite({ state = 'idle', size = 100 }) {
+export default function HeroSprite({ state = 'idle', size = 100, label = 'El héroe' }) {
   const [frame, setFrame] = useState(0);
   const [hurt,  setHurt]  = useState(false);
 
@@ -81,7 +81,7 @@ export default function HeroSprite({ state = 'idle', size = 100 }) {
     <Wrapper $hurt={hurt}>
       <SpriteCanvas
         src={SHEET}
-        label="El héroe"
+        label={label}
         sx={sx} sy={rowY}
         sw={FRAME_W} sh={FRAME_H}
         dw={displayW} dh={displayH}

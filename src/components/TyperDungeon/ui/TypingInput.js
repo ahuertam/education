@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
+import { tocarTecla } from '../audio';
 
 const shake = keyframes`
   0%,100% { transform: translateX(0); }
@@ -64,6 +65,10 @@ export default function TypingInput({ targetWord, onCorrect, onError, onTypedCha
     if (!active) return;
     // Ignore the intermediate values an IME/accent sequence produces mid-composition.
     if (e.nativeEvent?.isComposing) return;
+    // El clic de teclear: es lo que hace que escribir se sienta como
+    // machacar al monstruo y no como rellenar un formulario. Suena con
+    // cualquier tecla, tambien con las equivocadas.
+    tocarTecla();
     const value = e.target.value.normalize('NFC').toLowerCase();
 
     // Longer than the target can only come from a paste — onPaste blocks that,

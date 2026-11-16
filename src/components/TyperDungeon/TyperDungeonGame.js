@@ -7,6 +7,7 @@ import DungeonScene from './scenes/DungeonScene';
 import BattleScene from './scenes/BattleScene';
 import GameOverScene from './scenes/GameOverScene';
 import VictoryScene from './scenes/VictoryScene';
+import { pararAmbiente } from './audio';
 
 const Container = styled.div`
   min-height: 100vh;
@@ -90,13 +91,21 @@ export default function TyperDungeonGame({ onBack }) {
     return () => clearTimeout(t);
   }, [phase, roomIndex, dispatch]);
 
+  // El rumor de la mazmorra suena solo mientras se juega: al volver al menu,
+  // al perder o al ganar se para. Y al salir del juego, tambien.
+  useEffect(() => {
+    if (phase === 'menu' || phase === 'game_over' || phase === 'victory') pararAmbiente();
+  }, [phase]);
+
+  useEffect(() => () => pararAmbiente(), []);
+
   const renderScene = () => {
     if (phase === 'menu')        return <MenuScene dispatch={dispatch} />;
     if (phase === 'battle' || phase === 'monster_dying') {
       return <BattleScene state={state} dispatch={dispatch} />;
     }
-    if (phase === 'game_over')   return <GameOverScene dispatch={dispatch} />;
-    if (phase === 'victory')     return <VictoryScene dispatch={dispatch} />;
+    if (phase === 'game_over')   return <GameOverScene state={state} dispatch={dispatch} />;
+    if (phase === 'victory')     return <VictoryScene state={state} dispatch={dispatch} />;
     // exploring | pre_battle | treasure | stairs_found
     return <DungeonScene state={state} dispatch={dispatch} />;
   };
