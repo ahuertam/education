@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercadillo Navideño - CEIP José Iturzaeta</title>
+    <meta name="description" content="Puestos, actividades y descarga de tu pasaporte navideño del CEIP José Iturzaeta.">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f6f1e4;
+            color: #2b2118;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            padding: 16px;
+        }
+        .envoltorio {
+            max-width: 760px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* CABECERA */
+        .cabecera {
+            background: linear-gradient(160deg, #14532d, #0b3b20);
+            color: #fff;
+            border: 3px solid #b45309;
+            border-radius: 14px;
+            padding: 20px 18px;
+            text-align: center;
+            box-shadow: 0 4px 14px #0002;
+        }
+        .antetitulo {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: .9;
+        }
+        .cabecera h1 {
+            font-size: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 6px 0;
+            text-shadow: 0 2px 0 #0004;
+        }
+        .colegio {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fde68a;
+        }
+        .franja {
+            display: inline-block;
+            margin-top: 12px;
+            background: #fff;
+            color: #14532d;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        /* PANELES */
+        .panel {
+            background: #fff;
+            border: 2px solid #e7d9bd;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 2px 8px #0000000d;
+        }
+        .panel h2 {
+            font-size: 18px;
+            color: #14532d;
+            margin-bottom: 12px;
+        }
+        .nota {
+            font-size: 12px;
+            color: #6b5b4b;
+            margin-top: 10px;
+        }
+
+        /* PUESTOS */
+        .puestos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .puesto {
+            border: 1px solid #e7d9bd;
+            border-left: 5px solid #14532d;
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: #fffdf7;
+        }
+        .puesto .nombre {
+            font-weight: 800;
+            font-size: 13px;
+            color: #b91c1c;
+            text-transform: uppercase;
+        }
+        .puesto ul {
+            list-style: none;
+            margin-top: 4px;
+            font-size: 13px;
+            color: #4b3f33;
+        }
+        .puesto ul li::before {
+            content: '• ';
+            color: #b45309;
+        }
+        .aviso {
+            margin-top: 14px;
+            background: #fff7ed;
+            border: 2px dashed #b45309;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+        }
+
+        /* FORMULARIO */
+        .campo {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #14532d;
+            margin-bottom: 6px;
+        }
+        input {
+            width: 100%;
+            max-width: 320px;
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 2px solid #14532d;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            color: #2b2118;
+            background: #fffdf7;
+        }
+        button {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 12px;
+            padding: 12px;
+            background: #b91c1c;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 800;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #991b1b;
+        }
+
+        /* VISTA PREVIA DEL PASAPORTE */
+        .vista-titulo {
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #6b5b4b;
+            margin-bottom: 8px;
+        }
+        .pasaporte {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 4px 16px #0002;
+            margin: 0 auto;
+            max-width: 1060px;
+        }
+        .pasaporte-datos {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .pasaporte-datos .linea {
+            border-bottom: 1px solid #333;
+            display: inline-block;
+            min-width: 220px;
+            padding: 0 6px 2px;
+        }
+        .pasaporte img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* IMPRESIÓN: sólo sale el pasaporte */
+        @page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .envoltorio,
+            .vista-titulo {
+                display: none !important;
+            }
+            .pasaporte {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 0;
+                max-width: none;
+            }
+            .pasaporte-datos {
+                font-size: 13pt;
+                margin-bottom: 4mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="envoltorio">
+
+        <!-- CARTEL -->
+        <header class="cabecera">
+            <p class="antetitulo">Recaudación para el viaje de fin de curso · 6º de primaria</p>
+            <h1>¡Mercadillo Navideño!</h1>
+            <p class="colegio">CEIP José Iturzaeta</p>
+            <!-- FECHA: pon aquí la fecha y la hora del mercadillo cuando las tengas -->
+            <span class="franja">¡Ven y colabora con nuestra ilusión! ¡Os esperamos!</span>
+        </header>
+
+        <!-- PUESTOS Y ACTIVIDADES -->
+        <section class="panel">
+            <h2>🎪 Puestos y actividades</h2>
+            <div class="puestos">
+                <div class="puesto">
+                    <span class="nombre">🌰 Castañas</span>
+                    <ul><li>Asar</li><li>Venta</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">🎡 Ruleta</span>
+                    <ul><li>Tirada 1</li><li>Tirada 2</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">🎲 Bingo</span>
+                    <ul><li>Juego general</li><li>Cartones extra</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">🎨 Tatuos</span>
+                    <ul><li>Diseños navideños</li><li>Diseños fantasía</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">🎯 Juegos</span>
+                    <ul><li>Minigolf navideño</li><li>Lanza el aro</li><li>Alimenta al muñeco</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">✂️ Talleres</span>
+                    <ul><li>Adornos con rollos</li><li>Pintar adornos de madera</li><li>Taller sorpresa</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">🧸 Adopción peluches</span>
+                    <ul><li>Elige tu peluche</li><li>Venta</li><li>Certificado de adopción</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">🎁 Venta de productos y adornos</span>
+                    <ul><li>Adornos hechos a mano</li><li>Regalos originales</li></ul>
+                </div>
+                <div class="puesto">
+                    <span class="nombre">🍪 Venta de comida</span>
+                    <ul><li>Venta de comida</li></ul>
+                </div>
+            </div>
+            <p class="aviso">🎡 <strong>¡Ojo!</strong> Por cada <strong>3 sellos</strong> del pasaporte te toca una <strong>tirada extra</strong> en la ruleta de premios. Apunta las tiradas al final del pasaporte.</p>
+        </section>
+
+        <!-- PASAPORTE -->
+        <section class="panel">
+            <h2>🛂 Tu pasaporte navideño</h2>
+            <label class="campo" for="nombre">Escribe tu nombre para el pasaporte</label>
+            <input id="nombre" type="text" maxlength="40" placeholder="Tu nombre..." autocomplete="off">
+            <button id="descargar" type="button">🖨️ Imprimir / Guardar como PDF</button>
+            <p class="nota">Imprime en <strong>A4 apaisado</strong> (horizontal). Lleva el pasaporte a los puestos para que te lo sellen. Si te abre dentro de WhatsApp y no te deja imprimir, haz una captura de pantalla.</p>
+        </section>
+
+    </div>
+
+    <p class="vista-titulo">Vista previa del pasaporte</p>
+    <div class="pasaporte">
+        <div class="pasaporte-datos">
+            <span>Nombre: <span class="linea" id="nombre-impreso">_______________________</span></span>
+            <span>Curso: <span class="linea">________________</span></span>
+        </div>
+        <img src="pasaporte.png" alt="Pasaporte navideño del CEIP José Iturzaeta con los huecos para los sellos, las tiradas de la ruleta y el aviso de tirada extra por cada tres sellos">
+    </div>
+
+    <script>
+        var nombre = document.getElementById('nombre');
+        var impreso = document.getElementById('nombre-impreso');
+
+        function pintarNombre() {
+            impreso.textContent = nombre.value.trim() || '_______________________';
+        }
+
+        nombre.addEventListener('input', pintarNombre);
+        nombre.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') window.print();
+        });
+        document.getElementById('descargar').addEventListener('click', function() {
+            window.print();
+        });
+    </script>
+</body>
+</html>
