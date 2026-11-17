@@ -3,177 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercadillo Navideño - CEIP José Iturzaeta</title>
-    <meta name="description" content="Puestos, actividades y descarga de tu pasaporte navideño del CEIP José Iturzaeta.">
+    <title>II Mercadillo Iturnavideño - Colegio J. Iturzaeta</title>
+    <meta name="description" content="Viernes 11 de diciembre, de 16:00 a 20:00 h, en el pabellón deportivo del Colegio J. Iturzaeta. Puestos, ruleta de premios y tu pasaporte navideño.">
+    <meta property="og:title" content="II Mercadillo Iturnavideño">
+    <meta property="og:description" content="Viernes 11 de diciembre · 16:00-20:00 h · Pabellón Deportivo del Colegio J. Iturzaeta">
+    <meta property="og:image" content="cartel.jpg">
     <style>
+        :root {
+            --verde: #0c3b2a;
+            --verde-2: #14563c;
+            --rojo: #c1121f;
+            --rojo-2: #e63946;
+            --oro: #ffd166;
+            --oro-2: #f4a261;
+            --crema: #fdf6e8;
+            --tinta: #2b2118;
+            --gris: #6b5b4b;
+        }
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        body {
-            background: #f6f1e4;
-            color: #2b2118;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.5;
-            padding: 16px;
+        html {
+            scroll-behavior: smooth;
         }
+        body {
+            background: var(--crema);
+            color: var(--tinta);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.55;
+            -webkit-text-size-adjust: 100%;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        a {
+            color: inherit;
+        }
+
+        /* ---------- HERO ---------- */
+        .hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            overflow: hidden;
+            background:
+                radial-gradient(120% 80% at 50% 0%, #1a6b48 0%, var(--verde) 55%, #082a1e 100%);
+            color: #fff;
+            padding: 28px 18px 34px;
+            text-align: center;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: -60% 0 auto 0;
+            height: 220%;
+            pointer-events: none;
+            opacity: .55;
+            background-image:
+                radial-gradient(2px 2px at 12% 10%, #fff 50%, transparent),
+                radial-gradient(2px 2px at 32% 28%, #fff 50%, transparent),
+                radial-gradient(1.5px 1.5px at 58% 16%, #fff 50%, transparent),
+                radial-gradient(2px 2px at 78% 34%, #fff 50%, transparent),
+                radial-gradient(1.5px 1.5px at 92% 12%, #fff 50%, transparent),
+                radial-gradient(2px 2px at 45% 46%, #fff 50%, transparent),
+                radial-gradient(1.5px 1.5px at 8% 42%, #fff 50%, transparent),
+                radial-gradient(2px 2px at 66% 58%, #fff 50%, transparent);
+            animation: nieve 18s linear infinite;
+        }
+        @keyframes nieve {
+            from { transform: translateY(-12%); }
+            to { transform: translateY(12%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .hero::before { animation: none; }
+        }
+        .hero > * {
+            position: relative;
+        }
+        .hero-texto {
+            position: relative;
+        }
+        .kicker {
+            display: inline-block;
+            background: var(--oro);
+            color: #5a3200;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 14px;
+        }
+        .titulo {
+            font-size: 34px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 3px 0 #0003;
+        }
+        .titulo span {
+            display: block;
+            color: var(--oro);
+            font-size: 40px;
+            text-shadow: 0 3px 0 #7a1a10, 0 6px 18px #0004;
+        }
+        .lema {
+            max-width: 34ch;
+            margin: 12px auto 0;
+            font-size: 15px;
+            color: #e8f5ee;
+        }
+        .datos {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 20px 0 0;
+        }
+        .datos li {
+            background: #ffffff1f;
+            border: 1px solid #ffffff33;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .botones {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 13px 20px;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .btn-oro {
+            background: var(--oro);
+            color: #5a3200;
+            box-shadow: 0 4px 0 #c98f1e;
+        }
+        .btn-oro:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #c98f1e;
+        }
+        .btn-linea {
+            background: transparent;
+            border-color: #ffffff66;
+            color: #fff;
+        }
+        .cartel {
+            max-width: 340px;
+            margin: 26px auto 0;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 14px 34px #0006;
+            transform: rotate(-1.2deg);
+        }
+        @media (min-width: 900px) {
+            .hero {
+                grid-template-columns: 1.05fr .95fr;
+                align-items: center;
+                gap: 34px;
+                text-align: left;
+                padding: 44px 32px 40px;
+            }
+            .hero-texto {
+                max-width: 520px;
+                margin: 0 auto;
+            }
+            .titulo {
+                font-size: 38px;
+            }
+            .titulo span {
+                font-size: 48px;
+            }
+            .lema {
+                margin-left: 0;
+            }
+            .datos,
+            .botones {
+                justify-content: flex-start;
+            }
+            .cartel {
+                margin: 0;
+                max-width: 420px;
+                justify-self: center;
+            }
+        }
+
+        /* ---------- SECCIONES ---------- */
         .envoltorio {
-            max-width: 760px;
+            max-width: 940px;
             margin: 0 auto;
+            padding: 0 16px 40px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 18px;
         }
-
-        /* CABECERA */
-        .cabecera {
-            background: linear-gradient(160deg, #14532d, #0b3b20);
-            color: #fff;
-            border: 3px solid #b45309;
-            border-radius: 14px;
-            padding: 20px 18px;
-            text-align: center;
-            box-shadow: 0 4px 14px #0002;
-        }
-        .antetitulo {
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            opacity: .9;
-        }
-        .cabecera h1 {
-            font-size: 30px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 6px 0;
-            text-shadow: 0 2px 0 #0004;
-        }
-        .colegio {
-            font-size: 15px;
-            font-weight: 700;
-            color: #fde68a;
-        }
-        .franja {
-            display: inline-block;
-            margin-top: 12px;
-            background: #fff;
-            color: #14532d;
-            font-weight: 700;
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 4px;
-        }
-
-        /* PANELES */
         .panel {
             background: #fff;
-            border: 2px solid #e7d9bd;
-            border-radius: 14px;
-            padding: 16px;
-            box-shadow: 0 2px 8px #0000000d;
+            border: 2px solid #f0e2c4;
+            border-radius: 16px;
+            padding: 18px 16px;
+            box-shadow: 0 3px 12px #0000000a;
         }
         .panel h2 {
-            font-size: 18px;
-            color: #14532d;
-            margin-bottom: 12px;
+            font-size: 21px;
+            color: var(--verde);
+            margin-bottom: 4px;
         }
-        .nota {
-            font-size: 12px;
-            color: #6b5b4b;
-            margin-top: 10px;
+        .sub {
+            font-size: 14px;
+            color: var(--gris);
+            margin-bottom: 14px;
         }
-
-        /* PUESTOS */
         .puestos {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr;
             gap: 10px;
         }
+        @media (min-width: 620px) {
+            .puestos {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 900px) {
+            .puestos {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
         .puesto {
-            border: 1px solid #e7d9bd;
-            border-left: 5px solid #14532d;
-            border-radius: 8px;
-            padding: 8px 10px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            border: 1px solid #f0e2c4;
+            border-left: 5px solid var(--verde-2);
+            border-radius: 12px;
+            padding: 12px;
             background: #fffdf7;
         }
-        .puesto .nombre {
-            font-weight: 800;
-            font-size: 13px;
-            color: #b91c1c;
+        .puesto .ico {
+            font-size: 26px;
+            line-height: 1.1;
+        }
+        .puesto h3 {
+            font-size: 15px;
             text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--rojo);
         }
-        .puesto ul {
-            list-style: none;
-            margin-top: 4px;
-            font-size: 13px;
+        .puesto p {
+            font-size: 14px;
             color: #4b3f33;
-        }
-        .puesto ul li::before {
-            content: '• ';
-            color: #b45309;
         }
         .aviso {
             margin-top: 14px;
-            background: #fff7ed;
-            border: 2px dashed #b45309;
-            border-radius: 10px;
-            padding: 10px 12px;
-            font-size: 13px;
+            background: #fff7e6;
+            border: 2px dashed var(--oro-2);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 14px;
         }
-
-        /* FORMULARIO */
+        .pasos {
+            list-style: none;
+            counter-reset: paso;
+            display: grid;
+            gap: 10px;
+        }
+        .pasos li {
+            counter-increment: paso;
+            position: relative;
+            padding-left: 40px;
+            font-size: 14px;
+        }
+        .pasos li::before {
+            content: counter(paso);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--verde-2);
+            color: #fff;
+            font-weight: 800;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .campo {
             display: block;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
-            color: #14532d;
+            color: var(--verde);
             margin-bottom: 6px;
         }
         input {
             width: 100%;
-            max-width: 320px;
-            padding: 10px 12px;
+            padding: 13px 14px;
             font-size: 16px;
-            border: 2px solid #14532d;
-            border-radius: 8px;
+            border: 2px solid var(--verde-2);
+            border-radius: 12px;
             text-align: center;
             font-weight: 700;
-            color: #2b2118;
+            color: var(--tinta);
             background: #fffdf7;
         }
-        button {
+        input:focus {
+            outline: 3px solid #ffd16666;
+            border-color: var(--oro-2);
+        }
+        .descargar {
             display: block;
             width: 100%;
-            max-width: 320px;
             margin-top: 12px;
-            padding: 12px;
-            background: #b91c1c;
+            padding: 14px;
+            background: var(--rojo);
             color: #fff;
             font-size: 16px;
             font-weight: 800;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
+            box-shadow: 0 4px 0 #8d0d16;
         }
-        button:hover {
-            background: #991b1b;
+        .descargar:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #8d0d16;
+        }
+        .nota {
+            font-size: 13px;
+            color: var(--gris);
+            margin-top: 12px;
         }
 
-        /* VISTA PREVIA DEL PASAPORTE */
+        /* ---------- VISTA PREVIA DEL PASAPORTE ---------- */
         .vista-titulo {
             text-align: center;
             font-size: 12px;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: #6b5b4b;
-            margin-bottom: 8px;
+            color: var(--gris);
+            margin: 26px auto 10px;
         }
         .pasaporte {
             background: #fff;
-            border-radius: 14px;
-            padding: 16px;
-            box-shadow: 0 4px 16px #0002;
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 6px 20px #0002;
             margin: 0 auto;
             max-width: 1060px;
         }
@@ -190,16 +382,37 @@
         .pasaporte-datos .linea {
             border-bottom: 1px solid #333;
             display: inline-block;
-            min-width: 220px;
+            min-width: 200px;
             padding: 0 6px 2px;
         }
-        .pasaporte img {
+
+        /* ---------- PIE ---------- */
+        .pie {
+            background: var(--verde);
+            color: #dcefe5;
+            text-align: center;
+            padding: 26px 18px 30px;
+            font-size: 14px;
+        }
+        .pie strong {
+            color: var(--oro);
             display: block;
-            width: 100%;
-            height: auto;
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+        .pie .compartir {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 11px 18px;
+            border-radius: 999px;
+            background: #25d366;
+            color: #06340f;
+            font-weight: 800;
+            font-size: 15px;
+            text-decoration: none;
         }
 
-        /* IMPRESIÓN: sólo sale el pasaporte */
+        /* ---------- IMPRESIÓN: sólo sale el pasaporte ---------- */
         @page {
             size: A4 landscape;
             margin: 8mm;
@@ -207,10 +420,11 @@
         @media print {
             body {
                 background: #fff;
-                padding: 0;
             }
+            .hero,
             .envoltorio,
-            .vista-titulo {
+            .vista-titulo,
+            .pie {
                 display: none !important;
             }
             .pasaporte {
@@ -228,68 +442,130 @@
 </head>
 <body>
 
+    <!-- CABECERA -->
+    <header class="hero">
+        <div class="hero-texto">
+            <span class="kicker">II edición</span>
+            <h1 class="titulo">¡Llega el <span>Mercadillo<br>Iturnavideño!</span></h1>
+            <p class="lema">Te invitamos a vivir una tarde llena de magia y diversión en el Colegio J. Iturzaeta. Ven a pasar un rato inolvidable con familia y amigos.</p>
+
+            <ul class="datos">
+                <li>📅 Viernes 11 de diciembre</li>
+                <li>🕒 De 16:00 a 20:00 h</li>
+                <li>📍 Pabellón Deportivo</li>
+            </ul>
+
+            <div class="botones">
+                <a class="btn btn-oro" href="#pasaporte">🛂 Descargar mi pasaporte</a>
+                <a class="btn btn-linea" href="cartel.jpg" download>⬇️ Cartel oficial</a>
+            </div>
+        </div>
+
+        <figure class="cartel">
+            <img src="cartel.jpg" alt="Cartel oficial del II Mercadillo Iturnavideño del Colegio J. Iturzaeta: viernes 11 de diciembre, de 16:00 a 20:00 h, en el pabellón deportivo" width="1024" height="1536">
+        </figure>
+    </header>
+
     <div class="envoltorio">
 
-        <!-- CARTEL -->
-        <header class="cabecera">
-            <p class="antetitulo">Recaudación para el viaje de fin de curso · 6º de primaria</p>
-            <h1>¡Mercadillo Navideño!</h1>
-            <p class="colegio">CEIP José Iturzaeta</p>
-            <!-- FECHA: pon aquí la fecha y la hora del mercadillo cuando las tengas -->
-            <span class="franja">¡Ven y colabora con nuestra ilusión! ¡Os esperamos!</span>
-        </header>
-
-        <!-- PUESTOS Y ACTIVIDADES -->
+        <!-- PUESTOS -->
         <section class="panel">
             <h2>🎪 Puestos y actividades</h2>
+            <p class="sub">Un mercadillo lleno de planes para toda la familia.</p>
             <div class="puestos">
                 <div class="puesto">
-                    <span class="nombre">🌰 Castañas</span>
-                    <ul><li>Asar</li><li>Venta</li></ul>
+                    <span class="ico">🎡</span>
+                    <div>
+                        <h3>Gran ruleta</h3>
+                        <p>Un montón de premios increíbles. Tirada 1 y tirada 2… ¡y otra por cada 3 sellos del pasaporte!</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">🎡 Ruleta</span>
-                    <ul><li>Tirada 1</li><li>Tirada 2</li></ul>
+                    <span class="ico">🎲</span>
+                    <div>
+                        <h3>Bingo y sorteos</h3>
+                        <p>Juego general y cartones extra. ¡Cesta de Navidad para el ganador!</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">🎲 Bingo</span>
-                    <ul><li>Juego general</li><li>Cartones extra</li></ul>
+                    <span class="ico">✂️</span>
+                    <div>
+                        <h3>Talleres</h3>
+                        <p>Adornos con rollos, pintar adornos de madera y taller sorpresa.</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">🎨 Tatuos</span>
-                    <ul><li>Diseños navideños</li><li>Diseños fantasía</li></ul>
+                    <span class="ico">🎄</span>
+                    <div>
+                        <h3>Adornos navideños</h3>
+                        <p>Adornos hechos a mano y regalos originales.</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">🎯 Juegos</span>
-                    <ul><li>Minigolf navideño</li><li>Lanza el aro</li><li>Alimenta al muñeco</li></ul>
+                    <span class="ico">🧸</span>
+                    <div>
+                        <h3>Adopción de peluches</h3>
+                        <p>Elige tu peluche, llévatelo a casa y recibe su certificado de adopción.</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">✂️ Talleres</span>
-                    <ul><li>Adornos con rollos</li><li>Pintar adornos de madera</li><li>Taller sorpresa</li></ul>
+                    <span class="ico">🎯</span>
+                    <div>
+                        <h3>Juegos</h3>
+                        <p>Minigolf navideño, lanza el aro y alimenta al muñeco.</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">🧸 Adopción peluches</span>
-                    <ul><li>Elige tu peluche</li><li>Venta</li><li>Certificado de adopción</li></ul>
+                    <span class="ico">🌰</span>
+                    <div>
+                        <h3>Castañas</h3>
+                        <p>Asadas al fuego y a la venta.</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">🎁 Venta de productos y adornos</span>
-                    <ul><li>Adornos hechos a mano</li><li>Regalos originales</li></ul>
+                    <span class="ico">☕</span>
+                    <div>
+                        <h3>Aperitivos</h3>
+                        <p>Venta de comida para picar y tomar algo caliente.</p>
+                    </div>
                 </div>
                 <div class="puesto">
-                    <span class="nombre">🍪 Venta de comida</span>
-                    <ul><li>Venta de comida</li></ul>
+                    <span class="ico">🎨</span>
+                    <div>
+                        <h3>Tatuos</h3>
+                        <p>Diseños navideños y diseños fantasía.</p>
+                    </div>
+                </div>
+                <div class="puesto">
+                    <span class="ico">✨</span>
+                    <div>
+                        <h3>¡Y mucho más!</h3>
+                        <p>Unas sorpresas más te esperan en el propio mercadillo.</p>
+                    </div>
                 </div>
             </div>
-            <p class="aviso">🎡 <strong>¡Ojo!</strong> Por cada <strong>3 sellos</strong> del pasaporte te toca una <strong>tirada extra</strong> en la ruleta de premios. Apunta las tiradas al final del pasaporte.</p>
+            <p class="aviso">🎡 <strong>¡Ojo!</strong> Por cada <strong>3 sellos</strong> de tu pasaporte te toca una <strong>tirada extra</strong> en la ruleta de premios. Anota las tiradas al final del pasaporte.</p>
         </section>
 
-        <!-- PASAPORTE -->
+        <!-- CÓMO FUNCIONA -->
         <section class="panel">
             <h2>🛂 Tu pasaporte navideño</h2>
-            <label class="campo" for="nombre">Escribe tu nombre para el pasaporte</label>
-            <input id="nombre" type="text" maxlength="40" placeholder="Tu nombre..." autocomplete="off">
-            <button id="descargar" type="button">🖨️ Imprimir / Guardar como PDF</button>
-            <p class="nota">Imprime en <strong>A4 apaisado</strong> (horizontal). Lleva el pasaporte a los puestos para que te lo sellen. Si te abre dentro de WhatsApp y no te deja imprimir, haz una captura de pantalla.</p>
+            <p class="sub">Descárgalo, imprímelo y llévalo contigo: te lo sellan en cada puesto.</p>
+            <ol class="pasos">
+                <li>Escribe tu nombre y descarga el pasaporte (sale en PDF, en A4 apaisado).</li>
+                <li>Imprímelo y llévalo al pabellón: en cada puesto te ponen un sello, la actividad y la fecha.</li>
+                <li>Por cada 3 sellos te toca una tirada extra en la ruleta. Marca las tiradas en la parte de abajo del pasaporte.</li>
+            </ol>
+        </section>
+
+        <!-- DESCARGA -->
+        <section class="panel" id="pasaporte">
+            <h2>⬇️ Descarga tu pasaporte</h2>
+            <p class="sub">Un pasaporte para cada niño y niña. Escribe el nombre tal y como quieres que aparezca.</p>
+            <label class="campo" for="nombre">Tu nombre</label>
+            <input id="nombre" type="text" maxlength="40" placeholder="Escribe tu nombre..." autocomplete="off">
+            <button class="descargar" id="descargar" type="button">🖨️ Imprimir / Guardar como PDF</button>
+            <p class="nota">Imprime en <strong>A4 apaisado</strong> (horizontal). Si te abre dentro de WhatsApp y no te deja imprimir, haz una captura de pantalla.</p>
         </section>
 
     </div>
@@ -302,6 +578,14 @@
         </div>
         <img src="pasaporte.png" alt="Pasaporte navideño del CEIP José Iturzaeta con los huecos para los sellos, las tiradas de la ruleta y el aviso de tirada extra por cada tres sellos">
     </div>
+
+    <!-- PIE -->
+    <footer class="pie">
+        <strong>¡La Navidad empieza en el Iturzaeta!</strong>
+        Organizado por las familias de 6.º curso. Toda la recaudación va destinada al viaje de fin de curso de los niños y niñas participantes en esta actividad.
+        <br>
+        <a class="compartir" href="https://api.whatsapp.com/send?text=%F0%9F%8E%84%20%C2%A1Llega%20el%20II%20Mercadillo%20Iturnavide%C3%B1o%21%20%F0%9F%8E%84%0A%F0%9F%93%85%20Viernes%2011%20de%20diciembre%0A%F0%9F%95%92%20De%2016%3A00%20a%2020%3A00%20h%0A%F0%9F%93%8D%20Pabell%C3%B3n%20Deportivo%20del%20Colegio%20J.%20Iturzaeta%0A%0A%C2%A1Ven%20a%20vivir%20una%20tarde%20llena%20de%20magia%20con%20familia%20y%20amigos%21%20Ruleta%20con%20premios%2C%20bingo%2C%20talleres%2C%20casta%C3%B1as%20y%20tu%20pasaporte%20navide%C3%B1o.%0A%F0%9F%91%89%20edutika.es/navidad" target="_blank" rel="noopener">💬 Compartir con la familia</a>
+    </footer>
 
     <script>
         var nombre = document.getElementById('nombre');
