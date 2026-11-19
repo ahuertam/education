@@ -14,7 +14,7 @@ import {
   Accion, Pastilla, TEAL, NARANJA, NAVY, VERDE, ROJO, GRIS,
 } from '../../ui/JuegoBase';
 import {
-  COLUMNAS, FILAS, TECLAS, TIPOS,
+  COLUMNAS, TECLAS, TIPOS,
   abrirPuerta, cajasPendientes, generarNivel, mover,
 } from './logic';
 
