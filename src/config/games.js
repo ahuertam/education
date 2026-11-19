@@ -17,6 +17,7 @@
 //   title       → el nombre que ve el niño
 //   color       → el color de la tarjeta
 //   categories  → en qué categorías de la landing aparece
+//   nivel       → banda de Primaria en la que se introduce (inicial/medio/alto)
 //   description → texto fijo, o una función si depende de la categoría activa
 
 import {
@@ -125,6 +126,19 @@ export const CATEGORIES = [
 // La multiplicación pasa antes por la pantalla de configuración de tablas.
 export const CATEGORY_NEEDS_CONFIG = 'multiplication';
 
+// --- Niveles ---------------------------------------------------------------
+//
+// ADI (la serie de Adibou/Adi de Coktel Vision) partía el material por edad
+// y por habilidad: la misma actividad venía en varias versiones, una por
+// curso. Aquí cada juego declara en qué banda de Primaria se introduce su
+// contenido, y el selector deja ver "hasta" la banda elegida: un niño de 1º
+// no ve Álgebra y uno de 6º lo ve todo.
+export const NIVELES = [
+  { id: 'inicial', label: '1º-2º', hasta: 2 },
+  { id: 'medio', label: '3º-4º', hasta: 4 },
+  { id: 'alto', label: '5º-6º', hasta: 6 },
+];
+
 // --- Juegos ---------------------------------------------------------------
 
 const MATH_CATEGORIES = ['addition', 'subtraction', 'multiplication', 'division'];
@@ -133,42 +147,52 @@ export const GAMES = [
   // Matemáticas
   {
     id: 'memory', icon: FaGamepad, title: 'Memorama Matemático', color: '#4CAF50',
-    categories: MATH_CATEGORIES,
+    // También en 'mixed_math': es el único juego de matemáticas mixtas que
+    // sirve desde 1º, y así la categoría no se queda vacía en el nivel bajo.
+    categories: [...MATH_CATEGORIES, 'mixed_math'],
+    nivel: 'inicial',
     description: (a) => `Encuentra las parejas de operaciones y resultados ${a}.`,
   },
   {
     id: 'space', icon: FaRocket, title: 'Defensor Espacial', color: '#FF5722',
     categories: MATH_CATEGORIES,
+    nivel: 'inicial',
     description: (a) => `Destruye asteroides resolviendo operaciones ${a}.`,
   },
   {
     id: 'frog', icon: FaFrog, title: 'El Salto de la Rana', color: '#8BC34A',
     categories: MATH_CATEGORIES,
+    nivel: 'inicial',
     description: (a) => `Ayuda a la rana a cruzar el estanque ${a}.`,
   },
   {
     id: 'bubbles', icon: FaRegCircle, title: 'Pop de Burbujas', color: '#00BCD4',
     categories: MATH_CATEGORIES,
+    nivel: 'inicial',
     description: (a) => `Explota las burbujas correctas mientras estás ${a}.`,
   },
   {
     id: 'mathlander', icon: FaRocket, title: 'Math Lander', color: '#FFFFFF',
     categories: MATH_CATEGORIES,
+    nivel: 'inicial',
     description: (a) => `Aterriza en la respuesta correcta ${a}.`,
   },
   {
     id: 'mathsteroids', icon: FaMeteor, title: 'Mathsteroids', color: '#9C27B0',
     categories: MATH_CATEGORIES,
+    nivel: 'inicial',
     description: (a) => `Destruye asteroides con la respuesta correcta ${a}.`,
   },
   {
     id: 'monsterfeeder', icon: FaDragon, title: 'Alimenta al Monstruo', color: '#9B59B6',
     categories: MATH_CATEGORIES,
+    nivel: 'inicial',
     description: (a) => `Arrastra la comida correcta ${a}.`,
   },
   {
     id: 'carracing', icon: FaCar, title: 'Carrera de Coches', color: '#E74C3C',
     categories: MATH_CATEGORIES,
+    nivel: 'inicial',
     description: (a) => `¡Acelera respondiendo correctamente ${a}!`,
   },
   {
@@ -176,6 +200,7 @@ export const GAMES = [
     // Sin 'multiplication': sus cuentas salen de las energies de las cartas de
     // la API de Pokémon TCG, no de la configuración de tablas.
     categories: ['addition', 'subtraction', 'division'],
+    nivel: 'inicial',
     description: (a) => `Usa cartas Pokémon para resolver operaciones ${a}. Sin repetir preguntas y con ranking local.`,
   },
 
@@ -183,21 +208,25 @@ export const GAMES = [
   {
     id: 'knowledgetower', icon: FaBrain, title: 'Torre del Saber', color: '#2196F3',
     categories: ['knowledge'],
+    nivel: 'medio',
     description: 'Construye la torre más alta respondiendo preguntas de cultura general.',
   },
   {
     id: 'spainrivers', icon: FaMapMarkedAlt, title: 'Ríos de España (Mapa)', color: '#1D4ED8',
     categories: ['knowledge'],
+    nivel: 'medio',
     description: 'Localiza 8 ríos principales en el mapa con clic/tap. Incluye modo Rápido y modo Orden.',
   },
   {
     id: 'ylahora', icon: FaClock, title: '¿Y la hora?', color: '#F59E0B',
     categories: ['knowledge'],
+    nivel: 'inicial',
     description: 'Aprende a leer la hora y a sumar/restar 15, 30 y 60 minutos con un reloj grande y rondas rápidas.',
   },
   {
     id: 'inmnunodefender', icon: FaShieldAlt, title: 'InmnunoDefender', color: '#1abc9c',
     categories: ['knowledge'],
+    nivel: 'alto',
     description: 'Sé un glóbulo blanco y elimina virus y bacterias. Entre oleadas, responde preguntas pisando la respuesta correcta.',
   },
 
@@ -205,11 +234,13 @@ export const GAMES = [
   {
     id: 'sudokumath', icon: FaTh, title: 'Sudoku Math', color: '#16A085',
     categories: ['advanced'],
+    nivel: 'alto',
     description: 'Puzzle tipo sudoku: usa cada número una sola vez y completa los huecos para que las operaciones sean correctas.',
   },
   {
     id: 'tsubasa', icon: FaGamepad, title: 'RPG Fútbol (Turnos)', color: '#1D4ED8',
     categories: ['advanced'],
+    nivel: 'medio',
     description: 'Estilo retro: elige Regate/Pase/Tiro y resuelve retos matemáticos para subir la probabilidad de éxito.',
   },
 
@@ -222,41 +253,49 @@ export const GAMES = [
   {
     id: 'tallerfracciones', icon: FaChartPie, title: 'Taller de Fracciones', color: '#C026D3',
     categories: ['fracciones'],
+    nivel: 'medio',
     description: 'Lee, compara y suma fracciones con barras y círculos.',
   },
   {
     id: 'productosparciales', icon: FaThLarge, title: 'Buscador de Productos Parciales', color: '#F97316',
     categories: ['multiplication', 'mixed_math'],
+    nivel: 'medio',
     description: 'Multiplica con el modelo del rectángulo: las decenas por un lado y las unidades por otro.',
   },
   {
     id: 'rectanumerica', icon: FaRulerHorizontal, title: 'La Recta Numérica', color: '#0284C7',
     categories: ['numeros'],
+    nivel: 'inicial',
     description: 'Sitúa, salta y ordena números en una recta que cambia de escala.',
   },
   {
     id: 'basediez', icon: FaCubes, title: 'Base Diez', color: '#7C3AED',
     categories: ['numeros'],
+    nivel: 'inicial',
     description: 'Lee, descompone y compara números con piezas de base diez.',
   },
   {
     id: 'tablanumeros', icon: FaTable, title: 'La Tabla de Números', color: '#0E7490',
     categories: ['numeros'],
+    nivel: 'inicial',
     description: 'Lee una rejilla de números, prever el siguiente y descubrir de cuánto en cuánto avanza.',
   },
   {
     id: 'dinero', icon: FaCoins, title: 'Dinero en euros', color: '#CA8A04',
     categories: ['numeros'],
+    nivel: 'inicial',
     description: 'Suma monedas y billetes, calcula el cambio y combina piezas para pagar.',
   },
   {
     id: 'geoboard', icon: FaThumbtack, title: 'El Geoboard', color: '#B45309',
     categories: ['geometria'],
+    nivel: 'medio',
     description: 'Tira gomas entre clavos: mide el área, el borde y construye figuras.',
   },
   {
     id: 'patrones', icon: FaShapes, title: 'Bloques de Patrones', color: '#15803D',
     categories: ['geometria', 'shapes'],
+    nivel: 'inicial',
     description: 'Cuenta piezas de patrón y descubre cuántas piezas forman cada una.',
   },
 
@@ -264,31 +303,37 @@ export const GAMES = [
   {
     id: 'accenthunter', icon: FaBook, title: 'Cazador de Acentos', color: '#795548',
     categories: ['vocabulary'],
+    nivel: 'alto',
     description: 'Identifica diptongos e hiatos explotando globos.',
   },
   {
     id: 'sintaxis', icon: FaProjectDiagram, title: 'Sintaxis', color: '#0EA5E9',
     categories: ['vocabulary'],
+    nivel: 'alto',
     description: 'Detective sintáctico: encuentra verbo, sujeto, predicado y complementos (CD y CI) en oraciones variadas.',
   },
   {
     id: 'tiemposverbales', icon: FaHourglassHalf, title: 'Tiempos Verbales', color: '#FBBF24',
     categories: ['vocabulary'],
+    nivel: 'medio',
     description: 'Reto rápido: elige la forma verbal correcta. Al acertar, se abre un mini “portal” motivador.',
   },
   {
     id: 'tiposverbos', icon: FaBook, title: 'Tipos de Verbos', color: '#34D399',
     categories: ['vocabulary'],
+    nivel: 'alto',
     description: 'Clasifica verbos en regulares, irregulares y defectivos. Si fallas, verás la norma y un ejemplo.',
   },
   {
     id: 'colgado', icon: FaSkull, title: 'El Colgado', color: '#8B4513',
     categories: ['vocabulary'],
+    nivel: 'inicial',
     description: 'El ahorcado de toda la vida: lee la pista y adivina la palabra letra a letra. Con 7 fallos te cuelgan.',
   },
   {
     id: 'roscopalabras', icon: FaListUl, title: 'Rosco de Palabras', color: '#6D28D9',
     categories: ['vocabulary'],
+    nivel: 'inicial',
     description: 'Escribe la palabra letra a letra contra el reloj. Cuanto más rápido, más puntos.',
   },
 
@@ -296,6 +341,7 @@ export const GAMES = [
   {
     id: 'jeopardy', icon: FaScroll, title: 'Jeopardy', color: '#1D4ED8',
     categories: ['knowledge'],
+    nivel: 'medio',
     description: 'Tablero de categorías y puntajes al estilo clásico: perfecto para repasar unidades completas.',
   },
 
@@ -303,11 +349,13 @@ export const GAMES = [
   {
     id: 'shapegoalkeeper', icon: FaPalette, title: 'Portero de Formas', color: '#E91E63',
     categories: ['shapes'],
+    nivel: 'inicial',
     description: 'Detén las formas y colores correctos en la portería.',
   },
   {
     id: 'geometriaMaster', icon: FaProjectDiagram, title: 'Geometría Master', color: '#845EF7',
     categories: ['geometria'],
+    nivel: 'medio',
     description: 'Ejercicios de geometría (Canal 1) + bonus tipo Flappy por cada acierto.',
   },
 
@@ -315,26 +363,31 @@ export const GAMES = [
   {
     id: 'kitchen', icon: FaFlask, title: 'La Cocina', color: '#607D8B',
     categories: ['mixed_math'],
+    nivel: 'medio',
     description: 'Prepara el antídoto mezclando ingredientes con fracciones y decimales.',
   },
   {
     id: 'hanoikitchen', icon: FaFlask, title: 'Hanoi Kitchen', color: '#16A085',
     categories: ['mixed_math'],
+    nivel: 'medio',
     description: 'Resuelve el puzzle tipo Torre de Hanoi con gancho y vierte la cantidad exacta al caldero.',
   },
   {
     id: 'digilike', icon: FaDragon, title: 'Digilike', color: '#22D3EE',
     categories: ['mixed_math', 'advanced'],
+    nivel: 'alto',
     description: 'Roguelike de caminos con Digimon: completa nodos, responde el portal y gestiona tu energía.',
   },
   {
     id: 'dragontragon', icon: FaDragon, title: 'Dragón Tragón', color: '#E67E22',
     categories: ['english'],
+    nivel: 'inicial',
     description: 'Cóme las palabras correctas para formar la frase en inglés.',
   },
   {
     id: 'firewaterpuzzles', icon: FaGlobe, title: 'Fuego & Agua (Procedural)', color: '#2D9CDB',
     categories: ['puzzles'],
+    nivel: 'inicial',
     description: 'Clon tipo Fireboy & Watergirl: coop local, puertas, botones y niveles por semilla.',
   },
 
@@ -342,16 +395,19 @@ export const GAMES = [
   {
     id: 'numerofalta', icon: FaQuestion, title: '¿Qué Número Falta?', color: '#e05555',
     categories: ['addition', 'subtraction', 'multiplication', 'division', 'mixed_math'],
+    nivel: 'medio',
     description: 'La cuenta con un hueco: 8 + □ = 15. Tienes que producir el número, no reconocerlo.',
   },
   {
     id: 'algebra', icon: FaSuperscript, title: 'Los Números del Álgebra', color: '#4a80c8',
     categories: ['algebra'],
+    nivel: 'alto',
     description: 'Fichas x², x y 1: qué expresión representan, cuánto vale y cómo construirla.',
   },
   {
     id: 'ruleta', icon: FaDice, title: 'La Ruleta y los Dados', color: '#b45309',
     categories: ['probabilidad'],
+    nivel: 'medio',
     description: 'Qué color sale más a menudo y cómo repartir los sectores para que salga la mitad.',
   },
 
@@ -360,6 +416,7 @@ export const GAMES = [
   {
     id: 'typerdungeon', icon: FaKeyboard, title: 'Typer Dungeon', color: '#8B4513',
     categories: [], direct: true,
+    nivel: 'medio',
     description: 'Mazmorra de mecanografía: derrota monstruos escribiendo sus palabras.',
   },
 ];
@@ -369,6 +426,27 @@ export const GAMES = [
 // Los juegos de una categoría, en el orden del catálogo.
 export function gamesByCategory(category) {
   return GAMES.filter((g) => g.categories.includes(category));
+}
+
+// Los juegos de una categoría aptos para el nivel elegido.
+//
+// El nivel es un tope, no una casilla: "3º-4º" muestra también los juegos de
+// 1º-2º (un niño de 3º sigue jugando con el Dinero en euros), y "5º-6º" los
+// muestra todos. Devuelve `null` cuando la categoría no tiene ningún juego
+// para ese nivel, para que la pantalla avise en vez de quedarse vacía.
+export function gamesByCategoryAndLevel(category, nivel) {
+  const juegos = gamesByCategory(category);
+  const tope = NIVELES.findIndex((n) => n.id === nivel);
+  if (tope < 0) return juegos;
+  const aptos = juegos.filter(
+    (g) => NIVELES.findIndex((n) => n.id === g.nivel) <= tope
+  );
+  return aptos.length > 0 ? aptos : null;
+}
+
+// La etiqueta de un nivel: "3º-4º".
+export function nivelLabel(nivel) {
+  return NIVELES.find((n) => n.id === nivel)?.label ?? '';
 }
 
 // La descripción de un juego con la categoría activa ya resuelta.

@@ -5,9 +5,9 @@
 
 import fs from 'fs';
 import path from 'path';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import GameSelector from '../components/GameSelector';
-import { GAMES, CATEGORIES, gamesByCategory, gameDescription } from './games';
+import { GAMES, CATEGORIES, NIVELES, gamesByCategory, gamesByCategoryAndLevel, gameDescription, nivelLabel } from './games';
 
 const raizApp = path.resolve(__dirname, '..');
 const leer = (rel) => fs.readFileSync(path.join(raizApp, rel), 'utf8');
@@ -29,6 +29,12 @@ describe('catálogo de juegos', () => {
     // Un juego directo no tiene categoría; el resto, al menos una.
     const sinCategoria = GAMES.filter((g) => !g.direct && g.categories.length === 0);
     expect(sinCategoria.map((g) => g.id)).toEqual([]);
+  });
+
+  it('todo juego del catálogo declara un nivel válido', () => {
+    for (const g of GAMES) {
+      expect(NIVELES.map((n) => n.id)).toContain(g.nivel);
+    }
   });
 
   it('todo juego del catálogo tiene su vista en App.js', () => {
@@ -108,6 +114,50 @@ describe('descripciones', () => {
     for (const g of GAMES) {
       expect(gameDescription(g, 'jugando').length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('el filtro por nivel', () => {
+  // El nivel elegido se guarda en localStorage, así que hay que limpiarlo:
+  // si no, el filtro se queda puesto para los tests siguientes.
+  afterEach(() => localStorage.removeItem('edutika:nivel'));
+
+  it('subir de nivel nunca deja menos juegos', () => {
+    const cuenta = NIVELES.map(
+      (n) => gamesByCategoryAndLevel('addition', n.id)?.length ?? 0
+    );
+    expect(cuenta[0]).toBeLessThanOrEqual(cuenta[1]);
+    expect(cuenta[1]).toBeLessThanOrEqual(cuenta[2]);
+  });
+
+  it('el nivel más bajo solo deja juegos de ese nivel', () => {
+    const juegos = gamesByCategoryAndLevel('addition', 'inicial');
+    expect(juegos.length).toBeGreaterThan(0);
+    juegos.forEach((g) => expect(g.nivel).toBe('inicial'));
+  });
+
+  it('avisa con null cuando la categoría no tiene juegos de ese nivel', () => {
+    expect(gamesByCategoryAndLevel('algebra', 'inicial')).toBeNull();
+  });
+
+  it('la etiqueta del nivel es la banda de Primaria', () => {
+    expect(nivelLabel('inicial')).toBe('1º-2º');
+    expect(nivelLabel('alto')).toBe('5º-6º');
+  });
+
+  it('el selector filtra la lista al pulsar una pastilla', () => {
+    render(<GameSelector category="knowledge" onNavigate={() => {}} />);
+    // De entrada están todos: el nivel por defecto es "Hasta 6º".
+    expect(screen.getByText('Torre del Saber')).toBeTruthy();
+    expect(screen.getByText('InmnunoDefender')).toBeTruthy();
+
+    fireEvent.click(screen.getByText('Hasta 2º'));
+
+    // "Torre del Saber" es de 3º-4º e "InmnunoDefender" de 5º-6º: se van.
+    expect(screen.queryByText('Torre del Saber')).toBeNull();
+    expect(screen.queryByText('InmnunoDefender')).toBeNull();
+    // "¿Y la hora?" es de 1º-2º: se queda.
+    expect(screen.getByText('¿Y la hora?')).toBeTruthy();
   });
 });
 

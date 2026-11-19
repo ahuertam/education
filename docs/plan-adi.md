@@ -28,15 +28,30 @@ encontrarse "Sintaxis" ni "Álgebra" en su selector.
 | `src/components/GameSelector.js` | fila de pastillas para filtrar por nivel; el filtro se aplica a `gamesByCategory(category)` |
 | `src/components/ActivityCard.js` | distintivo opcional de nivel en la tarjeta (la usa también la landing) |
 
-**Decisiones:**
+**Decisiones tomadas:**
 
-- **1.1** ¿Cómo se etiquetan los niveles? (6 cursos sueltos / 3 bandas / "ciclo inicial-medio-alto")
-- **1.2** ¿Dónde vive el filtro? (solo en el selector / también en la landing / un "mi curso" global)
-- **1.3** ¿El nivel solo etiqueta y filtra, o además **cambia la dificultad dentro del juego**
-  (números de dos cifras, número de decimales, tiempo por ronda)?
-- **1.4** ¿Se recuerda el nivel elegido entre visitas (`localStorage`)?
+- **1.1** Tres bandas: **1º-2º / 3º-4º / 5º-6º**. Cada juego declara la banda en la que se
+  introduce su contenido.
+- **1.2** El filtro vive **en el selector de juegos**, no en la landing.
+- **1.3** El nivel **solo etiqueta y filtra**: no toca la dificultad interna de los juegos
+  (los que ya tienen menú fácil/medio/difícil lo siguen teniendo).
+- **1.4** Se recuerda el nivel elegido en `localStorage` (`edutika:nivel`).
 
-**Coste:** bajo. Un día. Es la base de los pasos 2 y 3.
+**Lo que se decidió al implementar (no estaba en la lista):**
+
+- El nivel es un **tope, no una casilla**: "Hasta 4º" muestra también los juegos de 1º-2º,
+  porque un niño de 3º sigue jugando con el Dinero en euros. Por eso las pastillas son
+  "Hasta 2º / Hasta 4º / Hasta 6º" y no una casilla por banda.
+- La banda de cada juego es la en la que **se introduce su contenido**, no la más alta
+  que admite.
+- Si una categoría no tiene ningún juego para el nivel elegido (Álgebra en 1º-2º), se
+  enseñan todos y se avisa, en vez de dejar una pantalla vacía.
+- El Memorama entra también en "Matemáticas Mixtas": es el único juego de matemáticas
+  mixtas que sirve desde 1º.
+
+**Estado:** hecho. `src/config/games.js` (campo `nivel` en los 41 juegos, `NIVELES`,
+`gamesByCategoryAndLevel`, `nivelLabel`), `src/components/GameSelector.js` (pastillas),
+`src/components/ActivityCard.js` (distintivo) y tests en `src/config/games.test.js`.
 
 ---
 
@@ -168,7 +183,7 @@ momento o no hacerlos.
 
 | Paso | Estado |
 |---|---|
-| 1 · Niveles | ☐ |
+| 1 · Niveles | ✅ hecho |
 | 2 · Bucle ADI | ☐ |
 | 3 · La Mansión | ☐ |
 | 4 · Mi Huerta | ☐ |

@@ -103,6 +103,7 @@ repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 // Un juego
 { id: 'memory', icon: FaGamepad, title: 'Memorama Matemático', color: '#4CAF50',
   categories: ['addition', 'subtraction', 'multiplication', 'division'],
+  nivel: 'inicial',
   description: (accion) => `Encuentra las parejas de operaciones y resultados ${accion}.` }
 
 // Una tarjeta de la landing
@@ -111,7 +112,19 @@ repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 ```
 
 `description` puede ser un texto fijo o una función de la categoría activa, que
-es lo que cambia la frase ("sumando", "resolviendo"...).
+es lo que cambia la frase ("sumando", "resolviendo...").
+
+### Niveles
+
+`nivel` dice en qué banda de Primaria se introduce el contenido del juego:
+`inicial` (1º-2º), `medio` (3º-4º) u `alto` (5º-6º). El selector tiene pastillas
+("Hasta 2º / Hasta 4º / Hasta 6º") que filtran la lista, y el nivel es un
+**tope**: "Hasta 4º" muestra también los juegos de 1º-2º. La elección se guarda
+en `localStorage` (`edutika:nivel`). Si una categoría no tiene juegos para el
+nivel elegido, se enseñan todos y se avisa, para no dejar una pantalla vacía.
+
+Los helpers están en `src/config/games.js`: `NIVELES`, `gamesByCategoryAndLevel`
+y `nivelLabel`. ("sumando", "resolviendo"...).
 
 | id landing | Tarjeta | Categoría |
 |---|---|---|

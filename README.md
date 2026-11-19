@@ -138,6 +138,9 @@ npm start          # http://localhost:3000
   y cada juego baja su trozo al abrirlo, en vez de bajar los 41 de golpe.
 - **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 41 juegos y las
   17 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
+- **Nivel por juego**: cada juego declara en qué banda de Primaria se introduce su
+  contenido (1º-2º, 3º-4º, 5º-6º). El selector filtra con pastillas "Hasta 2º / 4º / 6º"
+  y recuerda la elección en el navegador.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de
