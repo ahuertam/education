@@ -350,14 +350,86 @@ const ActionButton = styled.button`
   }
 `;
 
+// --- El horno y Kiko'ok ---------------------------------------------------
+//
+// La receta no solo dice qué mezclar: también dice cómo hornearlo. El niño
+// tiene que pasar las horas a minutos (1 h = 60 min). Kiko'ok, el monstruo
+// gruñón de ADI, se come la tarta si te equivocas.
+
+const HornoFondo = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+`;
+
+const HornoPanel = styled.div`
+  background: #1a0030;
+  border: 2px solid #00ff00;
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  color: #00ff00;
+  width: min(560px, 92vw);
+  box-shadow: 0 0 40px rgba(0, 255, 0, 0.25);
+`;
+
+const HornoFila = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+  font-size: 1.05rem;
+`;
+
+const HornoInput = styled.input`
+  width: 5.5rem;
+  background: #000;
+  border: 2px solid #00ff00;
+  color: #00ff00;
+  font: inherit;
+  font-size: 1.1rem;
+  padding: 0.3rem 0.5rem;
+  text-align: center;
+
+  &:focus { outline: 2px solid #ffaa00; }
+`;
+
+const Kiko = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+`;
+
+const KikoImagen = styled.img`
+  width: 96px;
+  height: 96px;
+  animation: ${(props) => (props.$contento
+    ? keyframes`from { transform: scale(1); } 50% { transform: scale(1.12) rotate(-4deg); } to { transform: scale(1); }`
+    : 'none')} 0.6s ease;
+`;
+
+const Bocadillo = styled.div`
+  background: #ffffff;
+  color: #2c003e;
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-weight: bold;
+  max-width: 340px;
+`;
+
 const Explosion = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, #ff0000 0%, #ffaa00 50%, transparent 80%);
-  animation: ${fadeIn} 0.5s ease-out reverse;
+  background: radial-gradient(circle, #ff0000 0%, #ffaa00 50%, transparent 80%);  animation: ${fadeIn} 0.5s ease-out reverse;
   pointer-events: none;
   z-index: 20;
 `;
@@ -397,6 +469,11 @@ const KitchenGame = ({ onBack }) => {
   const [touched, setTouched] = useState({ A: false, B: false, C: false });
   const [statusMessage, setStatusMessage] = useState('');
   const [gameMode, setGameMode] = useState('easy');
+  // El horno: lo que hay que poner y lo que dice la receta.
+  const [horno, setHorno] = useState({ temperatura: 200, horas: 1 });
+  const [hornoTemp, setHornoTemp] = useState('');
+  const [hornoMin, setHornoMin] = useState('');
+  const [kiko, setKiko] = useState('idle'); // idle | happy | greedy
   
   const bgMusicRef = useRef(new Audio(`${process.env.PUBLIC_URL}/lab1.m4a`));
   const timeoutsRef = useRef([]);
@@ -454,6 +531,17 @@ const KitchenGame = ({ onBack }) => {
       targetMl: chosen[i].ml,
       targetLabel: chosen[i].label
     }));
+    // El horno: la temperatura y las horas que hay que hornear. Las horas
+    // hay que pasarlas a minutos (1 h = 60 min).
+    const temperaturas = [150, 180, 200, 220];
+    const horas = [0.5, 1, 1.5, 2];
+    setHorno({
+      temperatura: temperaturas[Math.floor(Math.random() * temperaturas.length)],
+      horas: horas[Math.floor(Math.random() * horas.length)],
+    });
+    setHornoTemp('');
+    setHornoMin('');
+    setKiko('idle');
     setRecipe(newRecipe);
     setCurrentMix({ A: 0, B: 0, C: 0 });
     setSelectedIngredient(null);
@@ -539,10 +627,11 @@ const KitchenGame = ({ onBack }) => {
     });
 
     if (isCorrect) {
-      setGameState('success');
-      setStatusMessage('✅ ¡Antídoto perfecto! Nueva receta en 2 segundos...');
-      setScore(s => s + 100);
-      addTimeout(generateRecipe, 2000);
+      // La mezcla está bien: ahora toca hornearlo. Kiko'ok espera al lado
+      // del horno.
+      setGameState('horno');
+      setStatusMessage('✅ ¡Antídoto mezclado! Ahora al horno.');
+      setKiko('idle');
     } else {
       setGameState('exploded');
       setStatusMessage('💥 ¡Explosión! Revisa la receta y vuelve a intentarlo.');
@@ -562,6 +651,58 @@ const KitchenGame = ({ onBack }) => {
   const handleBack = () => {
     clearAllTimeouts();
     onBack();
+  };
+
+  // Hornear: la temperatura tal cual y las horas pasadas a minutos
+  // (1 hora = 60 minutos).
+  const handleBake = () => {
+    const temp = Number(hornoTemp);
+    const min = Number(hornoMin);
+    const minutos = horno.horas * 60;
+
+    if (!hornoTemp || !hornoMin || Number.isNaN(temp) || Number.isNaN(min)) {
+      setStatusMessage('Pon las dos cosas: temperatura y minutos.');
+      return;
+    }
+
+    if (temp === horno.temperatura && min === minutos) {
+      setKiko('happy');
+      setGameState('success');
+      setStatusMessage('🎉 ¡Antídoto perfecto! Nueva receta en 2 segundos...');
+      setScore(s => s + 100);
+      addTimeout(generateRecipe, 2000);
+      return;
+    }
+
+    // Kiko'ok se come la tarta. No se quitan puntos: se vuelve a intentar,
+    // que es lo que hacía ADI: el error es parte del juego.
+    setKiko('greedy');
+    setStatusMessage('😋 Kiko\'ok se come la tarta. ¡Otra vez!');
+    setHornoTemp('');
+    setHornoMin('');
+    addTimeout(() => {
+      setKiko('idle');
+      setStatusMessage('Kiko\'ok se ha calmado. Vuelve a mezclar.');
+      setGameState('playing');
+      setCurrentMix({ A: 0, B: 0, C: 0 });
+      setSelectedIngredient(null);
+      setSliderValue(0);
+      setTouched({ A: false, B: false, C: false });
+      hookBusyRef.current = false;
+    }, 2000);
+  };
+
+  const textoKiko = () => {
+    if (kiko === 'happy') return '¡Ñam! El antídoto está perfecto. ¡Te lo has ganado!';
+    if (kiko === 'greedy') return '¡Me como la tarta! Otra vez.';
+    const horas = horno.horas === 0.5
+      ? 'media hora'
+      : horno.horas === 1
+        ? '1 hora'
+        : horno.horas === 1.5
+          ? 'hora y media'
+          : `${horno.horas} horas`;
+    return `La receta dice ${horas} a ${horno.temperatura} °C. ¿Cuántos minutos son?`;
   };
 
   return (
@@ -610,6 +751,12 @@ const KitchenGame = ({ onBack }) => {
               <span>{gameMode === 'easy' ? `${item.targetLabel} (${item.targetMl} ml)` : item.targetLabel}</span>
             </RecipeItem>
           ))}
+          {gameState === 'horno' && (
+            <RecipeItem>
+              <span>Hornear:</span>
+              <span>{horno.horas.toString().replace('.', ',')} h a {horno.temperatura} °C</span>
+            </RecipeItem>
+          )}
           <MixPanelTitle>Tu mezcla</MixPanelTitle>
           {recipe.map(item => {
             const current = currentMix[item.id] || 0;
@@ -626,6 +773,43 @@ const KitchenGame = ({ onBack }) => {
             );
           })}
         </RecipeBook>
+
+        {gameState === 'horno' && (
+          <HornoFondo>
+            <HornoPanel>
+              <Kiko>
+                <KikoImagen
+                  src={`${process.env.PUBLIC_URL}/kikook.svg`}
+                  alt="Kiko'ok"
+                  $contento={kiko !== 'idle'}
+                />
+                <Bocadillo>{textoKiko()}</Bocadillo>
+              </Kiko>
+              <HornoFila>
+                <span>Temperatura:</span>
+                <HornoInput
+                  type="number"
+                  inputMode="numeric"
+                  value={hornoTemp}
+                  onChange={(e) => setHornoTemp(e.target.value)}
+                  aria-label="Temperatura del horno"
+                />
+                <span>°C</span>
+                <span>Minutos:</span>
+                <HornoInput
+                  type="number"
+                  inputMode="numeric"
+                  value={hornoMin}
+                  onChange={(e) => setHornoMin(e.target.value)}
+                  aria-label="Minutos de horno"
+                />
+              </HornoFila>
+              <ActionButton onClick={handleBake} disabled={gameState !== 'horno'}>
+                HORNEAR
+              </ActionButton>
+            </HornoPanel>
+          </HornoFondo>
+        )}
 
         <InstructionsCard>
           <InstructionTitle>Cómo jugar</InstructionTitle>

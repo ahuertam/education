@@ -207,14 +207,24 @@ con X cajas a la meta y las paredes salen de operaciones.
 horno con temperatura y tiempo, y **Kicook** como personaje que reacciona, convierte un
 ejercicio en una escena. Es el paso 2 aplicado a un juego que ya está.
 
-**Ficheros:** `src/components/KitchenGame.js` (modificar) + la mascota.
+**Ficheros:** `src/components/KitchenGame.js` (modificar) + `public/kikook.svg` (nuevo).
 
-**Decisiones:**
+**Decisiones tomadas:**
 
-- **6.1** ¿La mascota es un SVG/CSS propio o se reutiliza la de `public/logo22.png`?
-- **6.2** ¿La mascota tiene texto (habla) o solo imagen y sonido?
+- **6.1** La mascota es un **SVG propio** (`public/kikook.svg`), con su nombre: Kiko'ok.
+- **6.2** La mascota **habla**: un bocadillo con la pregunta o su reacción.
 
-**Coste:** bajo, pero depende del paso 2 para el marco de rondas.
+**Lo que se decidió al implementar (no estaba en la lista):**
+
+- La receta ahora tiene una línea más: **"Hornear: 1,5 h a 180 °C"**. El niño tiene
+  que poner la temperatura y **pasar las horas a minutos** (1 h = 60 min).
+- Si acierta, el antídoto es perfecto (+100). Si falla, **Kiko'ok se come la tarta**
+  y se vuelve a mezclar, **sin quitar puntos**: el error es parte del juego, como en
+  ADI.
+- El horno es una **ventana encima** de la cocina, para que se vea el monstruo y los
+  campos sin que los tape la receta.
+
+**Estado:** hecho. `src/components/KitchenGame.js` y `public/kikook.svg`.
 
 ---
 
@@ -239,4 +249,4 @@ momento o no hacerlos.
 | 3 · Progreso | ✅ hecho (panel en la landing, sin hub) |
 | 4 · Mi Huerta | ✅ hecho |
 | 5 · Cajas y Números | ✅ hecho |
-| 6 · Kicook | ☐ |
+| 6 · Kiko'ok | ✅ hecho |

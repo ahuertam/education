@@ -223,6 +223,7 @@ PantallaFinal (ui/JuegoBase.js)
 | [`src/components/rivers/`](../src/components/rivers/) | Mapa SVG de España y sus ríos |
 | [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/) | Motor de Fuego & Agua |
 | [`src/components/puzzles/cajas/`](../src/components/puzzles/cajas/) | Sokoban con puertas de multiplicación |
+| [`public/kikook.svg`](../public/kikook.svg) | El monstruo gruñón de La Cocina |
 | [`src/config/support.js`](../src/config/support.js) | Enlaces de soporte / donación |
 
 ---

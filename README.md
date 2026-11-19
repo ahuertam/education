@@ -89,7 +89,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 
 | Juego | Qué hace |
 |---|---|
-| **La Cocina** | Prepara el antídoto mezclando ingredientes con fracciones y decimales. |
+| **La Cocina** | Prepara el antídoto mezclando ingredientes con fracciones y decimales, y hornéalo antes de que Kiko'ok se lo coma. |
 | **Hanoi Kitchen** | Torre de Hanoi: vierte la cantidad exacta en el caldero. |
 | **Digilike** | Roguelike de caminos: completa nodos, responde el portal y gestiona tu energía. |
 | **Sudoku Math** | Sudoku donde cada número se usa una vez para que las operaciones cuadren. |
