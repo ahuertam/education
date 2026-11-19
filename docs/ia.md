@@ -167,6 +167,7 @@ categoría tenga su juego y su tarjeta.
 | [`ui/JuegoBase.js`](../src/components/ui/JuegoBase.js) | Marco común de los juegos de rondas: barra, tarjeta, opciones, feedback y pantalla final |
 | [`ColeccionGame.js`](../src/components/ColeccionGame.js) | Álbum de pegatinas y logros (pantalla `coleccion`) |
 | [`Ajustes.js`](../src/components/Ajustes.js) | Interruptores del aula, en la landing |
+| [`ProgresoPanel.js`](../src/components/ProgresoPanel.js) | Barra de progreso: qué juegos se han probado |
 | [`ui/MiniJuego.js`](../src/components/ui/MiniJuego.js) | Minijuego de premio en canvas (20 s, tres variantes) |
 
 ---
@@ -210,6 +211,7 @@ PantallaFinal (ui/JuegoBase.js)
 | [`src/utils/probabilidad.js`](../src/utils/probabilidad.js) | Ruletas y dados: casos, fracciones y comparación por producto cruzado |
 | [`src/utils/pegatinas.js`](../src/utils/pegatinas.js) | Álbum de pegatinas y contadores en `localStorage` |
 | [`src/utils/ajustes.js`](../src/utils/ajustes.js) | Ajustes del aula en `localStorage` |
+| [`src/utils/progreso.js`](../src/utils/progreso.js) | Qué juegos ha probado el niño, en `localStorage` |
 | [`src/utils/matematicas.js`](../src/utils/matematicas.js) | Fracciones, modelo de área y valor posicional (funciones puras, con test) |
 | [`src/components/data/`](../src/components/data/) | Datasets: preguntas de conocimiento, sintaxis, ríos, geometría, formas |
 | [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |

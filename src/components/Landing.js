@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import Header from './Header';
 import Ajustes from './Ajustes';
+import ProgresoPanel from './ProgresoPanel';
 import { CATEGORIES, CATEGORY_NEEDS_CONFIG } from '../config/games';
 import { cargarPegatinas } from '../utils/pegatinas';
 
@@ -170,6 +171,7 @@ const Landing = ({ onNavigate }) => {
         🏅 Mi colección ({pegatinas})
       </ColeccionBoton>
       <Ajustes />
+      <ProgresoPanel />
       <ActivitiesSection>
         <SectionTitle>🎯 Elige tu Actividad</SectionTitle>
         {/* Original CardsGrid for basic math and general knowledge */}

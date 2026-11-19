@@ -146,6 +146,7 @@ npm start          # http://localhost:3000
   guarda en el navegador y se ve desde la portada.
 - **Ajustes del aula**: desde la portada, el educador puede apagar el minijuego de
   premio para que la sesión sea solo de práctica.
+- **Progreso**: la portada enseña cuántos de los 41 juegos has probado y cuáles.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de

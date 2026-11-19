@@ -106,29 +106,31 @@ propia pantalla de fin y quedan fuera: para ellos hay que añadir el botón
 
 ---
 
-## Paso 3 · La Mansión de Adi
+## Paso 3 · El progreso (antes "La Mansión de Adi")
 
-**Qué:** el hub de ADI aplicado a lo que ya existe. Una casa con una puerta por tema
-(Números, Fracciones, Lengua, Mundo, Formas). Cada puerta abre un juego que ya existe;
-cada ronda acertada da una llave y abre la siguiente. **Cero juegos nuevos**, pero le da
-al sitio un eje de progreso y una razón para volver.
+**Qué:** el hub de ADI aplicado a lo que ya existe, pero **sin hub**. En la landing se ve
+una barra con los juegos que el niño ya ha probado y sus iconos. No bloquea nada y no da
+puntos: es un espejo que enseña que quedan cosas por descubrir.
 
 **Ficheros:**
 
 | Fichero | Cambio |
 |---|---|
-| `src/components/MansionGame.js` | (nuevo) la casa, las puertas, las llaves |
-| `src/utils/progreso.js` | (nuevo) estado en `localStorage` (claves abiertas por tema), al estilo de `src/utils/rankings.js` |
-| `src/App.js` | una vista más en el `switch` + un `onTerminar` que los juegos puedan llamar |
+| `src/components/ProgresoPanel.js` | (nuevo) la barra y los iconos de los juegos probados |
+| `src/utils/progreso.js` | (nuevo) los ids jugados en `localStorage` |
+| `src/App.js` | al abrir un juego se anota (aquí ya se sabe cuál es, sin tocar los 41 juegos) |
+| `src/components/Landing.js` | el panel va en la landing |
 
-**Decisiones:**
+**Decisiones tomadas:**
 
-- **3.1** ¿La mansión es **un hub al que se entra** (la landing sigue ahí) o **sustituye** a la landing?
-- **3.2** ¿Cómo sabe la mansión que un juego se ha superado? (los juegos tienen que avisar →
-  toca tocar 41 ficheros, o se usa un evento global, o el progreso se guarda al volver)
-- **3.3** ¿Las llaves son por juego o por tema? ¿Y el progreso se comparte entre niveles?
+- **3.1** **No hay mansión ni hub.** Se eligió "solo progreso, sin hub": la navegación
+  actual no se estorba y el panel se puede abrir y cerrar.
+- **3.2** Se anota el juego **al abrirlo**, no al terminarlo. Así no hay que tocar los 41
+  juegos para que informen de nada.
+- **3.3** No hay llaves ni desbloqueos: el progreso no bloquea el acceso a ningún juego.
 
-**Coste:** medio. Lo más rentable de la lista: reutiliza los 41 juegos.
+**Estado:** hecho. `src/utils/progreso.js`, `src/components/ProgresoPanel.js` y la
+anotación en `src/App.js`. Tests en `src/utils/progreso.test.js`.
 
 ---
 
@@ -211,7 +213,7 @@ momento o no hacerlos.
 |---|---|
 | 1 · Niveles | ✅ hecho |
 | 2 · Bucle ADI | ✅ hecho (en los 11 juegos del marco común) |
-| 3 · La Mansión | ☐ |
+| 3 · Progreso | ✅ hecho (panel en la landing, sin hub) |
 | 4 · Mi Huerta | ☐ |
 | 5 · Cajas y Números | ☐ |
 | 6 · Kicook | ☐ |

@@ -5,6 +5,8 @@ import Landing from './components/Landing';
 import GameSelector from './components/GameSelector';
 import MultiplicationConfig from './components/MultiplicationConfig';
 import SupportFab from './components/SupportFab';
+import { GAMES } from './config/games';
+import { registrarJuegoJugado } from './utils/progreso';
 
 // Los juegos se cargan bajo demanda. Con imports estáticos el bundle principal
 // se llevaba los 26 juegos, Phaser y Matter.js: 566 KB comprimidos que un niño
@@ -82,6 +84,9 @@ function App() {
 
   const handleNavigate = (view, operation = null) => {
     if (operation) setSelectedOperation(operation);
+    // Al abrir un juego se anota en el progreso de la landing. Aquí se sabe
+    // qué juego es sin tocar los 41 juegos.
+    if (GAMES.some((g) => g.id === view)) registrarJuegoJugado(view);
     setCurrentView(view);
   };
 
