@@ -144,17 +144,28 @@ anotación en `src/App.js`. Tests en `src/utils/progreso.test.js`.
 - recoges y vendes en el mercado → **dinero** (reutiliza la lógica de "Dinero en euros");
 - el paso de los días usa la **recta numérica**.
 
-**Ficheros:** `src/components/HuertaGame.js` (nuevo) + datos propios. Reutiliza
-`src/utils/matematicas.js` y lo que ya hay de fracciones, dinero y recta numérica.
+**Ficheros:** `src/components/HuertaGame.js` (nuevo) + `src/components/huerta/logic.js`
+(nuevo, con test) + `src/utils/huerta.js` (nuevo) + los sprites en `public/huerto/`.
 
-**Decisiones:**
+**Decisiones tomadas:**
 
-- **4.1** ¿Qué matemáticas son obligatorias para que la huerta crezca? (tablas, fracciones,
-  dinero, tiempo) y cuáles son opcionales
-- **4.2** ¿La huerta guarda el estado entre sesiones (`localStorage`) o cada partida empieza de cero?
-- **4.3** ¿Arte con SVG/CSS propio, o sprites de `public/`?
+- **4.1** Las matemáticas obligatorias son **multiplicar para plantar** (filas × columnas
+  de plantones) y **fracción por planta para regar** (N plantas × ½ = botellas). La
+  cosecha es un conteo y cada planta da una moneda.
+- **4.2** El huerto **guarda el estado**: se guarda en `localStorage` y sigue mañana.
+- **4.3** El arte son **sprites propios en `public/huerto/`**, dibujados en SVG (semilla,
+  brote, planta, planta con fruto, regadera, gota, sol y luna).
 
-**Coste:** medio-alto. Es el primer género nuevo (simulación) en el repo.
+**Lo que se decidió al implementar (no estaba en la lista):**
+
+- El día tiene **dos cuentas**: plantar y regar. Después llega la noche, las plantas
+  crecen un paso y al día siguiente dan una moneda cada una.
+- Las **opciones de respuesta** son cuatro botones, como en el resto del repo.
+- El denominador de la fracción se elige de modo que **siempre salga un número entero
+  de botellas**.
+- La huerta dura **5 días** y el objetivo son 100 plantas y 50 monedas.
+
+**Estado:** hecho. Aparte de los 42 juegos, es la primera simulación del repo.
 
 ---
 
@@ -214,6 +225,6 @@ momento o no hacerlos.
 | 1 · Niveles | ✅ hecho |
 | 2 · Bucle ADI | ✅ hecho (en los 11 juegos del marco común) |
 | 3 · Progreso | ✅ hecho (panel en la landing, sin hub) |
-| 4 · Mi Huerta | ☐ |
+| 4 · Mi Huerta | ✅ hecho |
 | 5 · Cajas y Números | ☐ |
 | 6 · Kicook | ☐ |

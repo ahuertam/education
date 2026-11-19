@@ -27,7 +27,7 @@ import {
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
   FaFlask, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
   FaRulerHorizontal, FaCubes, FaThumbtack, FaShapes, FaTable, FaCoins,
-  FaSuperscript, FaDice, FaQuestion,
+  FaSuperscript, FaDice, FaQuestion, FaSeedling,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -409,6 +409,14 @@ export const GAMES = [
     categories: ['probabilidad'],
     nivel: 'medio',
     description: 'Qué color sale más a menudo y cómo repartir los sectores para que salga la mitad.',
+  },
+
+  // Simulación
+  {
+    id: 'huerta', icon: FaSeedling, title: 'Mi Huerta', color: '#3f9e4d',
+    categories: ['numeros', 'mixed_math'],
+    nivel: 'medio',
+    description: 'Siembra con la tabla de multiplicar y riega con fracciones. El huerto sigue mañana.',
   },
 
   // Se abre directo desde la landing, sin pasar por el selector: por eso no
