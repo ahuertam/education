@@ -7,10 +7,18 @@
 //
 // Cada juego sigue siendo dueña de su lógica: esto solo es el marco.
 
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft, FaRedo, FaTrophy } from 'react-icons/fa';
 import { formatRankDate } from '../../utils/rankings';
+import MiniJuego from './MiniJuego';
+import { ESTRELLAS_PARA_PEGATINA, PEGATINAS } from '../data/pegatinas';
+import {
+  registrarPartida,
+  registrarPremio,
+} from '../../utils/pegatinas';
+import { varianteAleatoria } from './minijuego/logic';
+import { premioActivado } from '../../utils/ajustes';
 
 export const TEAL = '#12b3b0';
 export const NARANJA = '#ff8a2a';
@@ -277,36 +285,136 @@ export const Vacio = styled.p`
 `;
 
 // La pantalla de fin de partida: la comparten todos los juegos.
-export const PantallaFinal = ({ puntos, aciertos, rondas, mejorRacha, ranking, onReiniciar, onVolver }) => (
-  <Tarjeta>
-    <Enunciado>¡Partida terminada!</Enunciado>
-    <Ayuda>
-      Acertaste {aciertos} de {rondas} rondas. Tu mejor racha: {mejorRacha}.
-    </Ayuda>
-    <Visual>
-      <Pastilla $tono={TEAL}>Puntos: {puntos}</Pastilla>
-    </Visual>
-    <Ranking>
-      {(ranking?.top || []).length === 0 && (
-        <Vacio>Todavía no hay partidas registradas. ¡Esta es la primera!</Vacio>
-      )}
-      {(ranking?.top || []).map((r, i) => (
-        <RankingFila key={`${r.at}-${i}`}>
-          <span>#{i + 1} — {r.score} pts</span>
-          <span>{formatRankDate(r.at)}</span>
-        </RankingFila>
-      ))}
-    </Ranking>
-    <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-      <Accion type="button" onClick={onReiniciar}>
-        <FaRedo /> Otra partida
-      </Accion>
-      <Accion type="button" onClick={onVolver} style={{ background: NAVY }}>
-        <FaTrophy /> Volver al menú
-      </Accion>
-    </div>
-  </Tarjeta>
-);
+//
+// Aquí vive el bucle de ADI: en vez de "otra cuenta", el niño se gana un
+// minijuego de veinte segundos. Y si lo consigue bien, cae una pegatina en su
+// álbum. El premio es opcional: se puede ir al menú sin jugar.
+export const PantallaFinal = ({
+  puntos, aciertos, rondas, mejorRacha, ranking, onReiniciar, onVolver,
+}) => {
+  const [fase, setFase] = useState('resumen'); // resumen | premio | resultado
+  const [variante, setVariante] = useState('atrapa');
+  const [resultado, setResultado] = useState(null);
+  const [pegatina, setPegatina] = useState(null);
+  // El educador puede haber apagado el minijuego de premio para la sesión.
+  const [conPremio] = useState(() => premioActivado());
+
+  const empezarPremio = () => {
+    setVariante(varianteAleatoria());
+    setFase('premio');
+    registrarPartida();
+  };
+
+  const terminarPremio = (res) => {
+    const estado = registrarPremio(res.estrellas, res.puntos);
+    const idNuevo = estado.nuevas[estado.nuevas.length - 1];
+    setPegatina(idNuevo ? PEGATINAS.find((p) => p.id === idNuevo) : null);
+    setResultado(res);
+    setFase('resultado');
+  };
+
+  if (fase === 'premio') {
+    return (
+      <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+        <Tarjeta style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <Enunciado>🎁 Tu premio</Enunciado>
+          <Ayuda>
+            Veinte segundos. Si consigues {ESTRELLAS_PARA_PEGATINA} estrellas, cae una
+            pegatina nueva en tu álbum.
+          </Ayuda>
+        </Tarjeta>
+        <MiniJuego variante={variante} onFin={terminarPremio} />
+        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+          <Accion type="button" onClick={() => setFase('resumen')} style={{ background: NAVY }}>
+            Ahora no
+          </Accion>
+        </div>
+      </div>
+    );
+  }
+
+  if (fase === 'resultado') {
+    const estrellas = resultado.estrellas;
+    const albumLleno = !pegatina;
+    return (
+      <Tarjeta style={{ textAlign: 'center' }}>
+        <Enunciado>
+          {estrellas >= ESTRELLAS_PARA_PEGATINA ? '¡Premio!' : '¡Bien jugado!'}
+        </Enunciado>
+        <Visual>
+          <span style={{ fontSize: '2.6rem', letterSpacing: '0.2rem' }}>
+            {'⭐'.repeat(estrellas)}
+            {'☆'.repeat(ESTRELLAS_PARA_PEGATINA - estrellas)}
+          </span>
+        </Visual>
+        {pegatina ? (
+          <>
+            <Ayuda>¡Nueva pegatina para tu colección!</Ayuda>
+            <Visual>
+              <span style={{ fontSize: '4.5rem' }}>{pegatina.emoji}</span>
+            </Visual>
+            <Explicacion>{pegatina.nombre}</Explicacion>
+          </>
+        ) : (
+          <Ayuda>
+            {albumLleno
+              ? '¡Ya tienes todas las pegatinas del álbum! Eres un crack.'
+              : `Con ${ESTRELLAS_PARA_PEGATINA} estrellas cae una pegatina. ¡Vuelve a intentarlo!`}
+          </Ayuda>
+        )}
+        <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {estrellas < ESTRELLAS_PARA_PEGATINA && (
+            <Accion type="button" onClick={empezarPremio}>
+              <FaRedo /> Otra vez
+            </Accion>
+          )}
+          <Accion type="button" onClick={onReiniciar}>
+            <FaRedo /> Otra partida
+          </Accion>
+          <Accion type="button" onClick={onVolver} style={{ background: NAVY }}>
+            <FaTrophy /> Volver al menú
+          </Accion>
+        </div>
+      </Tarjeta>
+    );
+  }
+
+  return (
+    <Tarjeta>
+      <Enunciado>¡Partida terminada!</Enunciado>
+      <Ayuda>
+        Acertaste {aciertos} de {rondas} rondas. Tu mejor racha: {mejorRacha}.
+      </Ayuda>
+      <Visual>
+        <Pastilla $tono={TEAL}>Puntos: {puntos}</Pastilla>
+      </Visual>
+      <Ranking>
+        {(ranking?.top || []).length === 0 && (
+          <Vacio>Todavía no hay partidas registradas. ¡Esta es la primera!</Vacio>
+        )}
+        {(ranking?.top || []).map((r, i) => (
+          <RankingFila key={`${r.at}-${i}`}>
+            <span>#{i + 1} — {r.score} pts</span>
+            <span>{formatRankDate(r.at)}</span>
+          </RankingFila>
+        ))}
+      </Ranking>
+      <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        {conPremio && (
+          <Accion type="button" onClick={empezarPremio}>
+            🎁 Minijuego de premio
+          </Accion>
+        )}
+        <Accion type="button" onClick={onReiniciar}>
+          <FaRedo /> Otra partida
+        </Accion>
+        <Accion type="button" onClick={onVolver} style={{ background: NAVY }}>
+          <FaTrophy /> Volver al menú
+        </Accion>
+      </div>
+    </Tarjeta>
+  );
+};
 
 // La barra de arriba, con las pastillas de progreso.
 export const BarraJuego = ({ onBack, titulo, ronda, rondas, puntos, racha, extra }) => (

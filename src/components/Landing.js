@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import Header from './Header';
+import Ajustes from './Ajustes';
 import { CATEGORIES, CATEGORY_NEEDS_CONFIG } from '../config/games';
+import { cargarPegatinas } from '../utils/pegatinas';
 
 const LandingContainer = styled.div`
   min-height: 100vh;
@@ -101,8 +103,28 @@ const ManifestoContent = styled.div`
   }
 `;
 
+// El botón del álbum. Va en la landing porque es la pantalla que siempre
+// vuelve el niño: desde aquí se ve cuántas pegatinas lleva.
+const ColeccionBoton = styled.button`
+  display: block;
+  margin: 0 auto 1rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover { background: rgba(255, 255, 255, 0.3); }
+`;
+
 const Landing = ({ onNavigate }) => {
   const donationUrl = process.env.REACT_APP_DONATION_URL;
+  const [pegatinas, setPegatinas] = useState(() => cargarPegatinas().pegatinas.length);
 
   const activities = CATEGORIES;
 
@@ -137,6 +159,17 @@ const Landing = ({ onNavigate }) => {
   return (
     <LandingContainer>
       <Header />
+      <ColeccionBoton
+        type="button"
+        onClick={() => {
+          // Al volver del álbum el contador tiene que estar al día.
+          setPegatinas(cargarPegatinas().pegatinas.length);
+          onNavigate('coleccion');
+        }}
+      >
+        🏅 Mi colección ({pegatinas})
+      </ColeccionBoton>
+      <Ajustes />
       <ActivitiesSection>
         <SectionTitle>🎯 Elige tu Actividad</SectionTitle>
         {/* Original CardsGrid for basic math and general knowledge */}

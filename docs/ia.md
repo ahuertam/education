@@ -32,7 +32,8 @@ Landing  ──►  game-selector  ──►  <juego>
    │               ▲
    │               └── MultiplicationConfig ◄─┘  (solo multiplicación)
    │
-   └──────────►  typerdungeon        (abre directo, sin selector)
+   ├──────────►  typerdungeon        (abre directo, sin selector)
+   └──────────►  coleccion            (el álbum de pegatinas)
 ```
 
 - `handleNavigate(view, operation)` fija la vista y, opcionalmente, la categoría.
@@ -49,6 +50,7 @@ Landing  ──►  game-selector  ──►  <juego>
 | `landing` | Landing | [`Landing.js`](../src/components/Landing.js) |
 | `multiplication-config` | MultiplicationConfig | [`MultiplicationConfig.js`](../src/components/MultiplicationConfig.js) |
 | `game-selector` | GameSelector | [`GameSelector.js`](../src/components/GameSelector.js) |
+| `coleccion` | Álbum de pegatinas | [`ColeccionGame.js`](../src/components/ColeccionGame.js) |
 | `memory` | Memorama Matemático | [`MemoryGame.js`](../src/components/MemoryGame.js) |
 | `space` | Defensor Espacial | [`SpaceDefenderGame.js`](../src/components/SpaceDefenderGame.js) |
 | `frog` | El Salto de la Rana | [`FrogJumpGame.js`](../src/components/FrogJumpGame.js) |
@@ -163,6 +165,38 @@ categoría tenga su juego y su tarjeta.
 | [`SupportFab.js`](../src/components/SupportFab.js) | Botón de donación Ko-fi |
 | [`FlappyBonusLevel.js`](../src/components/FlappyBonusLevel.js) | Nivel extra del juego Flappy |
 | [`ui/JuegoBase.js`](../src/components/ui/JuegoBase.js) | Marco común de los juegos de rondas: barra, tarjeta, opciones, feedback y pantalla final |
+| [`ColeccionGame.js`](../src/components/ColeccionGame.js) | Álbum de pegatinas y logros (pantalla `coleccion`) |
+| [`Ajustes.js`](../src/components/Ajustes.js) | Interruptores del aula, en la landing |
+| [`ui/MiniJuego.js`](../src/components/ui/MiniJuego.js) | Minijuego de premio en canvas (20 s, tres variantes) |
+
+---
+
+## 5b. El minijuego de premio y el álbum
+
+El bucle de ADI: al terminar una partida, el niño se gana un juego de 20
+segundos en vez de "otra cuenta".
+
+```
+PantallaFinal (ui/JuegoBase.js)
+   └─ resumen ──"🎁 Minijuego de premio"──► premio ──► resultado
+                                              │           │
+                                       MiniJuego      3 estrellas
+                                       (canvas)       → pegatina nueva
+```
+
+- La lógica del minijuego está en
+  [`src/components/ui/minijuego/logic.js`](../src/components/ui/minijuego/logic.js)
+  (puntos, choques, estrellas) y es lo único que se testea; el canvas solo
+  dibuja. Variantes: `atrapa`, `esquiva`, `golpea`.
+- El álbum y sus logros están en
+  [`src/components/data/pegatinas.js`](../src/components/data/pegatinas.js);
+  el estado, en [`src/utils/pegatinas.js`](../src/utils/pegatinas.js)
+  (`localStorage`, clave `edutika:pegatinas`).
+- **El educador puede apagarlo**: `src/utils/ajustes.js` (clave
+  `edutika:ajustes`) y el panel de la landing. Apagado, los juegos no ofrecen
+  el minijuego ni dan pegatinas.
+- Solo los 11 juegos que usan `PantallaFinal` tienen el premio. Los que
+  tienen su propia pantalla de fin hay que añadirlos a mano.
 
 ---
 
@@ -174,6 +208,8 @@ categoría tenga su juego y su tarjeta.
 | [`src/utils/rankings.js`](../src/utils/rankings.js) | Ranking local en `localStorage` |
 | [`src/utils/algebra.js`](../src/utils/algebra.js) | Fichas x², x y 1: multiconjuntos, expresiones y el modelo del área de (x+k)² |
 | [`src/utils/probabilidad.js`](../src/utils/probabilidad.js) | Ruletas y dados: casos, fracciones y comparación por producto cruzado |
+| [`src/utils/pegatinas.js`](../src/utils/pegatinas.js) | Álbum de pegatinas y contadores en `localStorage` |
+| [`src/utils/ajustes.js`](../src/utils/ajustes.js) | Ajustes del aula en `localStorage` |
 | [`src/utils/matematicas.js`](../src/utils/matematicas.js) | Fracciones, modelo de área y valor posicional (funciones puras, con test) |
 | [`src/components/data/`](../src/components/data/) | Datasets: preguntas de conocimiento, sintaxis, ríos, geometría, formas |
 | [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |

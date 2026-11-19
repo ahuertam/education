@@ -66,17 +66,43 @@ nada: solo suena la reacción de la mascota.
 
 | Fichero | Cambio |
 |---|---|
-| `src/components/ui/JuegoBase.js` | usar el `Explicacion` que ya existe + nuevo `PantallaRecompensa` |
-| `src/components/ui/MiniRecompensa.js` | (nuevo) el arcade de premio, 20-30 s, reutilizando el `Page`/`BarraJuego` del marco común |
-| los 8 juegos del marco `JuegoBase` | primer escalón: son los que ya tienen rondas, racha y explicación |
+| `src/components/ui/JuegoBase.js` | `PantallaFinal` gana el flujo del premio (resumen → minijuego → resultado) |
+| `src/components/ui/MiniJuego.js` | (nuevo) el arcade de premio en canvas, 20 s, tres variantes |
+| `src/components/ui/minijuego/logic.js` | (nuevo) la lógica pura: puntos, choques, estrellas |
+| `src/components/data/pegatinas.js` | (nuevo) las pegatinas del álbum y los logros |
+| `src/utils/pegatinas.js` | (nuevo) el estado del álbum en `localStorage` |
+| `src/components/ColeccionGame.js` | (nuevo) la pantalla del álbum |
+| `src/components/Ajustes.js` | (nuevo) el interruptor del aula: apagar el premio |
+| `src/utils/ajustes.js` | (nuevo) los ajustes en `localStorage` |
+| `src/components/Landing.js` | botón de la colección + panel de ajustes |
+| `src/App.js` | una vista más: `coleccion` |
 
-**Decisiones:**
+**Decisiones tomadas:**
 
-- **2.1** ¿Por dónde se empieza? (los 8 juegos del `JuegoBase` son los baratos; después el resto)
-- **2.2** ¿El premio es **un único minijuego compartido** por todos los juegos, o uno por familia?
-- **2.3** ¿El premio **sustituye** al botón "Siguiente" o viene **después** de él?
+- **2.1** El premio aparece **al final de cada partida**, en la pantalla final
+  compartida: no hay que tocar el bucle de rondas de cada juego.
+- **2.2** El premio es una **mezcla**: un minijuego de 20 segundos (el regalo)
+  y una pegatina (el progreso). La pegatina solo cae con 3 estrellas.
+- **2.3** El álbum se ve **desde la landing**, con un botón "Mi colección (N)".
+- **2.4** El minijuego es **un motor con tres variantes** que salen al azar:
+  atrapar estrellas, esquivar bombas y pinchar dianas.
+- **2.5** El educador puede **apagar el minijuego de premio** desde "Ajustes
+  del aula" en la landing. Apagado, los juegos ni lo ofrecen ni dan pegatinas.
 
-**Coste:** medio. Es lo que más "`divertido`" aporta por el mismo código.
+**Lo que se decidió al implementar (no estaba en la lista):**
+
+- La pegatina se gana **solo con 3 estrellas**. Hay un botón "Otra vez" para
+  reintentar el minijuego sin perder la partida.
+- El arte de las pegatinas son **emojis**: no hay ficheros que cargar.
+- Las pegatinas son de 4 temas (animales, dinosaurios, espacio, universo) y
+  hay 5 logros aparte.
+- El ajuste se guarda en `localStorage` (`edutika:ajustes`), así que el
+  educador lo toca una vez y dura para toda la sesión del alumno.
+
+**Estado:** hecho para los 11 juegos que usan el marco `JuegoBase` (los de
+rondas: fracciones, números, álgebra, ruleta...). Los demás juegos tienen su
+propia pantalla de fin y quedan fuera: para ellos hay que añadir el botón
+"Minijuego de premio" a mano.
 
 ---
 
@@ -184,7 +210,7 @@ momento o no hacerlos.
 | Paso | Estado |
 |---|---|
 | 1 · Niveles | ✅ hecho |
-| 2 · Bucle ADI | ☐ |
+| 2 · Bucle ADI | ✅ hecho (en los 11 juegos del marco común) |
 | 3 · La Mansión | ☐ |
 | 4 · Mi Huerta | ☐ |
 | 5 · Cajas y Números | ☐ |

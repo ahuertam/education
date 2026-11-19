@@ -48,9 +48,9 @@ describe('catálogo de juegos', () => {
     const vistas = [...app.matchAll(/case '([a-zA-Z]+)':\s*\n\s*return <(\w+)/g)]
       .map((m) => ({ vista: m[1], componente: m[2] }));
     const idsCatalogo = new Set(GAMES.map((g) => g.id));
-    // Las vistas que no son juegos: la landing, el selector y las pantallas
-    // intermedias.
-    const sinJuego = ['landing', 'game-selector', 'multiplication-config'];
+    // Las vistas que no son juegos: la landing, el selector, las pantallas
+    // intermedias y el álbum de pegatinas.
+    const sinJuego = ['landing', 'game-selector', 'multiplication-config', 'coleccion'];
     const huerfanas = vistas
       .filter((v) => !idsCatalogo.has(v.vista) && !sinJuego.includes(v.vista))
       .map((v) => `${v.vista} (${v.componente})`);

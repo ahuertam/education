@@ -141,6 +141,11 @@ npm start          # http://localhost:3000
 - **Nivel por juego**: cada juego declara en qué banda de Primaria se introduce su
   contenido (1º-2º, 3º-4º, 5º-6º). El selector filtra con pastillas "Hasta 2º / 4º / 6º"
   y recuerda la elección en el navegador.
+- **Minijuego de premio y álbum**: al terminar una partida se ofrece un arcade de 20
+  segundos (tres variantes). Con tres estrellas cae una pegatina en el álbum, que se
+  guarda en el navegador y se ve desde la portada.
+- **Ajustes del aula**: desde la portada, el educador puede apagar el minijuego de
+  premio para que la sesión sea solo de práctica.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de
