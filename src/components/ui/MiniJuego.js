@@ -18,6 +18,7 @@ import {
   moverJugador,
   tocar,
 } from './minijuego/logic';
+import { dibujar } from './minijuego/dibujar';
 
 const Contenedor = styled.div`
   position: relative;
@@ -78,13 +79,16 @@ const AYUDA = {
   golpea: 'Pincha las dianas 🦖 antes de que se vayan. Cuidado con los mosquitos.',
 };
 
-const JUGADOR = { atrapa: '🧺', esquiva: '🚀', golpea: '☝️' };
-
 const MiniJuego = ({ variante, onFin }) => {
   const canvasRef = useRef(null);
   const estadoRef = useRef(null);
   const terminadoRef = useRef(false);
+  const onFinRef = useRef(onFin);
   const [hud, setHud] = useState({ puntos: 0, vidas: 3, tiempo: DURACION });
+
+  // El callback se guarda en una ref: si no, el efecto del bucle de dibujo se
+  // reiniciaría cada vez que el padre repintara.
+  onFinRef.current = onFin;
 
   // El estado del juego vive en una ref: cambia 60 veces por segundo y no
   // puede ir por el estado de React.
@@ -95,7 +99,9 @@ const MiniJuego = ({ variante, onFin }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
-    const ctx = canvas.getContext('2d');
+    // En jsdom no hay canvas de verdad: se sale antes de tocar el contexto.
+    const ctx = canvas.getContext && canvas.getContext('2d');
+    if (!ctx) return undefined;
     let animacion = 0;
     let ultimo = performance.now();
     let cuadros = 0;
@@ -111,28 +117,8 @@ const MiniJuego = ({ variante, onFin }) => {
       estado.alto = caja.height;
     };
 
-    const dibujar = () => {
-      const estado = estadoRef.current;
-      const regla = REGLAS[estado.variante];
-
-      ctx.clearRect(0, 0, estado.ancho, estado.alto);
-
-      estado.entidades.forEach((e) => {
-        const emoji = e.tipo === 'bien' ? regla.bien.emoji : regla.mal.emoji;
-        ctx.font = `${e.r * 2}px serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(emoji, e.x, e.y);
-      });
-
-      if (estado.variante !== 'golpea') {
-        ctx.font = `${estado.jugador.r * 2}px serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.globalAlpha = estado.invulnerable > 0 ? 0.4 : 1;
-        ctx.fillText(JUGADOR[estado.variante], estado.jugador.x, estado.jugador.y);
-        ctx.globalAlpha = 1;
-      }
+    const dibujarEscena = () => {
+      dibujar(ctx, estadoRef.current);
     };
 
     const paso = (ahora) => {
@@ -144,7 +130,7 @@ const MiniJuego = ({ variante, onFin }) => {
         estadoRef.current = actualizar(estado, dt);
       }
 
-      dibujar();
+      dibujarEscena();
 
       // El HUD se refresca 10 veces por segundo: a 60 el navegador se pasa el
       // rato pintando texto que no ha cambiado.
@@ -160,7 +146,7 @@ const MiniJuego = ({ variante, onFin }) => {
       if (haTerminado(estadoRef.current) && !terminadoRef.current) {
         terminadoRef.current = true;
         const puntos = estadoRef.current.puntos;
-        onFin?.({
+        onFinRef.current?.({
           puntos,
           estrellas: estrellasDe(puntos, variante),
           variante,
@@ -179,7 +165,7 @@ const MiniJuego = ({ variante, onFin }) => {
       cancelAnimationFrame(animacion);
       window.removeEventListener('resize', dimensionar);
     };
-  }, [variante, onFin]);
+  }, [variante]);
 
   // El ratón o el dedo mueven la mano; un toque pincha.
   const apuntar = (evento) => {

@@ -3,8 +3,9 @@
 // Aquí vive el bucle de ADI: en vez de "otra cuenta", el niño se gana un
 // minijuego. Y el educador puede apagarlo desde los ajustes del aula.
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { PantallaFinal } from './JuegoBase';
+import { cargarPegatinas } from '../../utils/pegatinas';
 
 const props = {
   puntos: 10,
@@ -17,7 +18,10 @@ const props = {
 };
 
 describe('la pantalla final', () => {
-  afterEach(() => localStorage.removeItem('edutika:ajustes'));
+  afterEach(() => {
+    localStorage.removeItem('edutika:ajustes');
+    localStorage.removeItem('edutika:pegatinas');
+  });
 
   it('cuenta lo que el niño ha hecho', () => {
     render(<PantallaFinal {...props} />);
@@ -33,5 +37,18 @@ describe('la pantalla final', () => {
     localStorage.setItem('edutika:ajustes', JSON.stringify({ premio: false }));
     render(<PantallaFinal {...props} />);
     expect(screen.queryByText(/Minijuego de premio/)).toBeNull();
+  });
+
+  it('el botón del premio abre el minijuego', () => {
+    render(<PantallaFinal {...props} />);
+    fireEvent.click(screen.getByText(/Minijuego de premio/));
+    expect(screen.getByText(/Tu premio/)).toBeTruthy();
+    expect(screen.getByText(/Veinte segundos/)).toBeTruthy();
+  });
+
+  it('la partida cuenta en el álbum al pedir el premio', () => {
+    render(<PantallaFinal {...props} />);
+    fireEvent.click(screen.getByText(/Minijuego de premio/));
+    expect(cargarPegatinas().partidas).toBe(1);
   });
 });

@@ -10,7 +10,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
-import { Page, TopBar, Volver, Titulo, Tarjeta, Pastilla, VERDE, GRIS, NARANJA } from './ui/JuegoBase';
+import { Page, TopBar, Volver, Titulo, Pastilla, VERDE, GRIS, NARANJA } from './ui/JuegoBase';
 import { LOGROS, PEGATINAS, TEMAS } from './data/pegatinas';
 import { cargarPegatinas, limpiarNuevas, logrosDesbloqueados } from '../utils/pegatinas';
 
@@ -87,7 +87,7 @@ const Logro = styled.div`
 `;
 
 const ColeccionGame = ({ onBack }) => {
-  const [estado, setEstado] = useState(() => cargarPegatinas());
+  const [estado] = useState(() => cargarPegatinas());
 
   // Abrir el álbum es ver las pegatinas nuevas: dejan de estar "nuevas".
   useEffect(() => {
