@@ -1,6 +1,6 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **42 minijuegos**
+Web de juegos matemáticos, de lengua y de conocimiento general. **43 minijuegos**
 en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
@@ -106,6 +106,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | Juego | Qué hace |
 |---|---|
 | **Fuego & Agua (Procedural)** | Fireboy & Watergirl: coop local, puertas, botones y niveles generados por semilla. |
+| **Cajas y Números** | Sokoban: empuja las cajas hasta sus marcas. La puerta del medio se abre con una multiplicación. |
 
 ### ⌨️ Mecanografía
 
@@ -136,8 +137,8 @@ npm start          # http://localhost:3000
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
 - **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
-  y cada juego baja su trozo al abrirlo, en vez de bajar los 42 de golpe.
-- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 42 juegos y las
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 43 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 43 juegos y las
   17 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
 - **Nivel por juego**: cada juego declara en qué banda de Primaria se introduce su
   contenido (1º-2º, 3º-4º, 5º-6º). El selector filtra con pastillas "Hasta 2º / 4º / 6º"
@@ -147,7 +148,7 @@ npm start          # http://localhost:3000
   guarda en el navegador y se ve desde la portada.
 - **Ajustes del aula**: desde la portada, el educador puede apagar el minijuego de
   premio para que la sesión sea solo de práctica.
-- **Progreso**: la portada enseña cuántos de los 42 juegos has probado y cuáles.
+- **Progreso**: la portada enseña cuántos de los 43 juegos has probado y cuáles.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de

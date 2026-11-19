@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **42 juegos**, 45 vistas, 51 componentes.
+Datos a fecha de la última revisión: **43 juegos**, 46 vistas, 53 componentes.
 
 ---
 
@@ -78,6 +78,7 @@ Landing  ──►  game-selector  ──►  <juego>
 | `algebra` | Los Números del Álgebra | [`AlgebraGame.js`](../src/components/AlgebraGame.js) |
 | `ruleta` | La Ruleta y los Dados | [`RuletaDadosGame.js`](../src/components/RuletaDadosGame.js) |
 | `huerta` | Mi Huerta | [`HuertaGame.js`](../src/components/HuertaGame.js) |
+| `cajas` | Cajas y Números | [`puzzles/cajas/CajasGame.js`](../src/components/puzzles/cajas/CajasGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -98,7 +99,7 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Todo el catálogo —los 42 juegos y las 17 tarjetas de la landing— está en un
+Todo el catálogo —los 43 juegos y las 17 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -221,6 +222,7 @@ PantallaFinal (ui/JuegoBase.js)
 | [`src/components/styles/`](../src/components/styles/) | Estilos sueltos de juegos grandes |
 | [`src/components/rivers/`](../src/components/rivers/) | Mapa SVG de España y sus ríos |
 | [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/) | Motor de Fuego & Agua |
+| [`src/components/puzzles/cajas/`](../src/components/puzzles/cajas/) | Sokoban con puertas de multiplicación |
 | [`src/config/support.js`](../src/config/support.js) | Enlaces de soporte / donación |
 
 ---

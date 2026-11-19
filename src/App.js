@@ -55,6 +55,7 @@ const AlgebraGame = lazy(() => import('./components/AlgebraGame'));
 const RuletaDadosGame = lazy(() => import('./components/RuletaDadosGame'));
 const ColeccionGame = lazy(() => import('./components/ColeccionGame'));
 const HuertaGame = lazy(() => import('./components/HuertaGame'));
+const CajasGame = lazy(() => import('./components/puzzles/cajas/CajasGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -296,6 +297,10 @@ function App() {
         />;
       case 'huerta':
         return <HuertaGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'cajas':
+        return <CajasGame
           onBack={() => setCurrentView('game-selector')}
         />;
       default:

@@ -27,7 +27,7 @@ import {
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
   FaFlask, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
   FaRulerHorizontal, FaCubes, FaThumbtack, FaShapes, FaTable, FaCoins,
-  FaSuperscript, FaDice, FaQuestion, FaSeedling,
+  FaSuperscript, FaDice, FaQuestion, FaSeedling, FaBoxes,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -417,6 +417,14 @@ export const GAMES = [
     categories: ['numeros', 'mixed_math'],
     nivel: 'medio',
     description: 'Siembra con la tabla de multiplicar y riega con fracciones. El huerto sigue mañana.',
+  },
+  {
+    id: 'cajas', icon: FaBoxes, title: 'Cajas y Números', color: '#8b5a2b',
+    // Solo en 'puzzles': la categoría de multiplicación pasa antes por la
+    // pantalla de elegir tablas y cifras, que aquí no serviría de nada.
+    categories: ['puzzles'],
+    nivel: 'medio',
+    description: 'Empuja las cajas hasta sus marcas. La puerta del medio se abre con una multiplicación.',
   },
 
   // Se abre directo desde la landing, sin pasar por el selector: por eso no

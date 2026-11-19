@@ -179,13 +179,25 @@ con X cajas a la meta y las paredes salen de operaciones.
 **Ficheros:** `src/components/puzzles/cajas/` (nuevo) siguiendo la estructura de
 `src/components/puzzles/firewater/`.
 
-**Decisiones:**
+**Decisiones tomadas:**
 
-- **5.1** ¿Qué papel tiene la operación matemática? (número de cajas que hay que mover /
-  puertas que se abren según el resultado / el nivel se genera a partir de la cuenta)
-- **5.2** ¿El generador valida que el nivel tiene solución (como `solvability.js`)?
+- **5.1** La cuenta abre una **puerta**: el nivel son dos cuartos separados por una
+  pared con una puerta, y la puerta lleva una multiplicación. Sin resolverla no se
+  pasa al otro cuarto, donde está la segunda caja.
+- **5.2** El generador **no necesita solucionador**: la caja y su marca se colocan en
+  línea recta, con el hueco de detrás libre, así que basta con empujarla. Un test
+  comprueba con 40 semillas que el nivel siempre tiene solución.
 
-**Coste:** medio.
+**Lo que se decidió al implementar (no estaba en la lista):**
+
+- El tablero es de **6x11** con un cuarto de 4x4 a cada lado de la pared.
+- Las teclas de **flechas y WASD** mueven; al chocar con la puerta se abre un
+  teclado numérico con la cuenta.
+- Los niveles salen de una **semilla**: al superar uno, el siguiente es el número
+  siguiente.
+
+**Estado:** hecho. `src/components/puzzles/cajas/logic.js` (con test) y
+`src/components/puzzles/cajas/CajasGame.js`.
 
 ---
 
@@ -226,5 +238,5 @@ momento o no hacerlos.
 | 2 · Bucle ADI | ✅ hecho (en los 11 juegos del marco común) |
 | 3 · Progreso | ✅ hecho (panel en la landing, sin hub) |
 | 4 · Mi Huerta | ✅ hecho |
-| 5 · Cajas y Números | ☐ |
+| 5 · Cajas y Números | ✅ hecho |
 | 6 · Kicook | ☐ |
