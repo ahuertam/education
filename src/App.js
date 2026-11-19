@@ -48,6 +48,9 @@ const TablaNumerosGame = lazy(() => import('./components/TablaNumerosGame'));
 const DineroGame = lazy(() => import('./components/DineroGame'));
 const GeoboardGame = lazy(() => import('./components/GeoboardGame'));
 const PatronesGame = lazy(() => import('./components/PatronesGame'));
+const NumeroFaltaGame = lazy(() => import('./components/NumeroFaltaGame'));
+const AlgebraGame = lazy(() => import('./components/AlgebraGame'));
+const RuletaDadosGame = lazy(() => import('./components/RuletaDadosGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -266,6 +269,18 @@ function App() {
         />;
       case 'patrones':
         return <PatronesGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'numerofalta':
+        return <NumeroFaltaGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'algebra':
+        return <AlgebraGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'ruleta':
+        return <RuletaDadosGame
           onBack={() => setCurrentView('game-selector')}
         />;
       default:

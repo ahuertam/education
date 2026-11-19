@@ -102,6 +102,10 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
         return { title: 'Fracciones', action: 'fraccionando' };
       case 'numeros':
         return { title: 'Números', action: 'contando' };
+      case 'algebra':
+        return { title: 'Álgebra', action: 'operando con letras' };
+      case 'probabilidad':
+        return { title: 'Probabilidad', action: 'girando la ruleta' };
       default:
         return { title: 'Selecciona un Juego', action: 'jugando' };
     }

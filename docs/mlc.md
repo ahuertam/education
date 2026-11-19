@@ -46,6 +46,9 @@ porque la barra llega más lejos" enseña más que un acierto sin más.
 | **Pattern Shapes** | [Bloques de Patrones](../src/components/PatronesGame.js) | `geometria`, `shapes` | Las piezas de patrón y sus equivalencias (rombo = 2 triángulos, hexágono = 6). |
 | **Number Chart** | [La Tabla de Números](../src/components/TablaNumerosGame.js) | `numeros` | Leer una serie en una rejilla y prever el número que sigue. |
 | **Money Pieces** | [Dinero en euros](../src/components/DineroGame.js) | `numeros` | Combinar piezas de dinero. **Adaptada**: la app es en dólares y aquí es en euros, con los céntimos y los colores reales. |
+| **Algebra Tiles** (de Polypad) | [Los Números del Álgebra](../src/components/AlgebraGame.js) | `algebra` | Las fichas x², x y 1, y el modelo del área de (x + k)². No había nada de álgebra en el repo. |
+| **Missing Number** (de Toy Theater) | [¿Qué Número Falta?](../src/components/NumeroFaltaGame.js) | las cuatro operaciones | La cuenta con un hueco: hay que **producir** el número, no reconocerlo entre opciones. |
+| **Dice & Spinners** (de Polypad) | [La Ruleta y los Dados](../src/components/RuletaDadosGame.js) | `probabilidad` | La probabilidad. Con 40 juegos no había ni una pregunta sobre ella. |
 
 ### Descartadas
 
@@ -56,6 +59,21 @@ porque la barra llega más lejos" enseña más que un acierto sin más.
 | **Colección de fichas sueltas** | Se ha traducido el juego de Pattern Shapes, no una galería de fichas para imprimir. |
 | **Whiteboard App** | No es un juego: es un lienzo en blanco. |
 | **Apps Launcher** | Es un lanzador de apps, no un juego. |
+
+### De dónde vinieron las tres últimas
+
+Las tres últimas no son del MLC sino de dos sitios que se miraron buscando huecos:
+
+- **Polypad** (polypad.mathlearning.org), el manipulativo virtual del MLC.
+  Sus fichas de álgebra son las del juego de álgebra.
+- **Toy Theater** (toytheater.com), una colección de juegos interactivos
+  gratuitos para el aula. De sus 82 juegos, casi todos o ya estaban cubiertos o
+  son juegos de docente con proyector y móviles, que no encajan aquí. Se quedó
+  el de "qué número falta".
+
+Las dos webs son la referencia, **no la fuente**: ni el código ni las imágenes
+se pueden reutilizar, así que los modelos se han reimplementado con el marco de
+este repo.
 
 ### La siguiente tanda
 

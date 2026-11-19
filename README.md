@@ -1,6 +1,6 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **38 minijuegos**
+Web de juegos matemáticos, de lengua y de conocimiento general. **41 minijuegos**
 en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
@@ -45,6 +45,14 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Base Diez** | Lee, descompone y compara números con piezas de base diez. |
 | **La Tabla de Números** | Lee una rejilla de números, prevé el siguiente y descubre de cuánto en cuánto avanza. |
 | **Dinero en euros** | Suma monedas y billetes, calcula el cambio y combina piezas para pagar. |
+| **¿Qué Número Falta?** | La cuenta con un hueco: 8 + □ = 15. Tienes que producir el número, no reconocerlo. |
+
+### 🎲 Álgebra y probabilidad
+
+| Juego | Qué hace |
+|---|---|
+| **Los Números del Álgebra** | Fichas x², x y 1: qué expresión representan, cuánto vale y cómo construirla. |
+| **La Ruleta y los Dados** | Qué color sale más a menudo y cómo repartir los sectores para que salga la mitad. |
 
 ### 🧠 Conocimiento general
 
@@ -127,9 +135,9 @@ npm start          # http://localhost:3000
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
 - **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
-  y cada juego baja su trozo al abrirlo, en vez de bajar los 38 de golpe.
-- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 38 juegos y las
-  15 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 41 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 41 juegos y las
+  17 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de

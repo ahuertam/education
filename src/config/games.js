@@ -26,6 +26,7 @@ import {
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
   FaFlask, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
   FaRulerHorizontal, FaCubes, FaThumbtack, FaShapes, FaTable, FaCoins,
+  FaSuperscript, FaDice, FaQuestion,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -108,6 +109,16 @@ export const CATEGORIES = [
     id: 15, icon: FaRulerHorizontal, title: 'Números', color: '#0284C7',
     category: 'numeros',
     description: 'Sentido numérico: rectas numéricas, valor posicional, tablas y dinero.',
+  },
+  {
+    id: 16, icon: FaSuperscript, title: 'Álgebra', color: '#4a80c8',
+    category: 'algebra',
+    description: 'Fichas de álgebra: qué significa una expresión, cuánto vale y cómo construirla.',
+  },
+  {
+    id: 17, icon: FaDice, title: 'Probabilidad', color: '#b45309',
+    category: 'probabilidad',
+    description: 'Ruletas y dados: qué color sale más a menudo y cómo repartirlos.',
   },
 ];
 
@@ -325,6 +336,23 @@ export const GAMES = [
     id: 'firewaterpuzzles', icon: FaGlobe, title: 'Fuego & Agua (Procedural)', color: '#2D9CDB',
     categories: ['puzzles'],
     description: 'Clon tipo Fireboy & Watergirl: coop local, puertas, botones y niveles por semilla.',
+  },
+
+  // Álgebra y probabilidad
+  {
+    id: 'numerofalta', icon: FaQuestion, title: '¿Qué Número Falta?', color: '#e05555',
+    categories: ['addition', 'subtraction', 'multiplication', 'division', 'mixed_math'],
+    description: 'La cuenta con un hueco: 8 + □ = 15. Tienes que producir el número, no reconocerlo.',
+  },
+  {
+    id: 'algebra', icon: FaSuperscript, title: 'Los Números del Álgebra', color: '#4a80c8',
+    categories: ['algebra'],
+    description: 'Fichas x², x y 1: qué expresión representan, cuánto vale y cómo construirla.',
+  },
+  {
+    id: 'ruleta', icon: FaDice, title: 'La Ruleta y los Dados', color: '#b45309',
+    categories: ['probabilidad'],
+    description: 'Qué color sale más a menudo y cómo repartir los sectores para que salga la mitad.',
   },
 
   // Se abre directo desde la landing, sin pasar por el selector: por eso no

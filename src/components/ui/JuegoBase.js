@@ -321,3 +321,36 @@ export const BarraJuego = ({ onBack, titulo, ronda, rondas, puntos, racha, extra
     <Pastilla $tono={racha > 0 ? NARANJA : undefined}>Racha: {racha}</Pastilla>
   </TopBar>
 );
+
+// La casilla con hueco de una operación: el "?" de 3 + □ = 7.
+export const CajaOperacion = styled.div`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.4rem;
+  height: 3.8rem;
+  padding: 0 0.7rem;
+  border-radius: 14px;
+  border: 3px dashed ${(props) => (props.$lleno ? TEAL : 'rgba(11, 43, 69, 0.25)')};
+  background: ${(props) => (props.$lleno ? 'rgba(18, 179, 176, 0.12)' : '#f7fafc')};
+  color: ${NAVY};
+  font-size: 1.6rem;
+  font-weight: 800;
+`;
+
+// La tira donde se compone una cuenta: 3 × 8 = 24.
+export const TiraOperacion = styled.div`
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: ${NAVY};
+  background: #f7fafc;
+  border: 2px solid rgba(11, 43, 69, 0.08);
+  border-radius: 20px;
+  padding: 0.7rem 1rem;
+  min-height: 4.2rem;
+`;
