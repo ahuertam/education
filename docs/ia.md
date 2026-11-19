@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **38 juegos**, 41 vistas, 46 componentes.
+Datos a fecha de la última revisión: **41 juegos**, 44 vistas, 49 componentes.
 
 ---
 
@@ -72,6 +72,9 @@ Landing  ──►  game-selector  ──►  <juego>
 | `dinero` | Dinero en euros | [`DineroGame.js`](../src/components/DineroGame.js) |
 | `geoboard` | El Geoboard | [`GeoboardGame.js`](../src/components/GeoboardGame.js) |
 | `patrones` | Bloques de Patrones | [`PatronesGame.js`](../src/components/PatronesGame.js) |
+| `numerofalta` | ¿Qué Número Falta? | [`NumeroFaltaGame.js`](../src/components/NumeroFaltaGame.js) |
+| `algebra` | Los Números del Álgebra | [`AlgebraGame.js`](../src/components/AlgebraGame.js) |
+| `ruleta` | La Ruleta y los Dados | [`RuletaDadosGame.js`](../src/components/RuletaDadosGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -92,7 +95,7 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Todo el catálogo —los 38 juegos y las 15 tarjetas de la landing— está en un
+Todo el catálogo —los 41 juegos y las 17 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -127,6 +130,8 @@ es lo que cambia la frase ("sumando", "resolviendo"...).
 | 13 | Mecanografía | abre `typerdungeon` directo |
 | 14 | Fracciones | `fracciones` |
 | 15 | Números | `numeros` |
+| 16 | Álgebra | `algebra` |
+| 17 | Probabilidad | `probabilidad` |
 
 Hay tests que comprueban la coherencia: que todo juego del catálogo tenga su
 vista en `App.js`, que toda vista de juego esté en el catálogo y que cada
@@ -154,6 +159,8 @@ categoría tenga su juego y su tarjeta.
 |---|---|
 | [`src/utils/multiplicationProblem.js`](../src/utils/multiplicationProblem.js) | Generador compartido de cuentas de multiplicar |
 | [`src/utils/rankings.js`](../src/utils/rankings.js) | Ranking local en `localStorage` |
+| [`src/utils/algebra.js`](../src/utils/algebra.js) | Fichas x², x y 1: multiconjuntos, expresiones y el modelo del área de (x+k)² |
+| [`src/utils/probabilidad.js`](../src/utils/probabilidad.js) | Ruletas y dados: casos, fracciones y comparación por producto cruzado |
 | [`src/utils/matematicas.js`](../src/utils/matematicas.js) | Fracciones, modelo de área y valor posicional (funciones puras, con test) |
 | [`src/components/data/`](../src/components/data/) | Datasets: preguntas de conocimiento, sintaxis, ríos, geometría, formas |
 | [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |

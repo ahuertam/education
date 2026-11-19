@@ -49,6 +49,9 @@ import DragonTragonGame from './DragonTragonGame';
 import FireWaterPuzzlesGame from './FireWaterPuzzlesGame';
 import GeoboardGame from './GeoboardGame';
 import PatronesGame from './PatronesGame';
+import NumeroFaltaGame from './NumeroFaltaGame';
+import AlgebraGame from './AlgebraGame';
+import RuletaDadosGame from './RuletaDadosGame';
 import TyperDungeonGame from './TyperDungeon/TyperDungeonGame';
 
 const COMPONENTES = {
@@ -89,6 +92,9 @@ const COMPONENTES = {
   firewaterpuzzles: FireWaterPuzzlesGame,
   geoboard: GeoboardGame,
   patrones: PatronesGame,
+  numerofalta: NumeroFaltaGame,
+  algebra: AlgebraGame,
+  ruleta: RuletaDadosGame,
   typerdungeon: TyperDungeonGame,
 };
 

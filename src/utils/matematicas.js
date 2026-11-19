@@ -94,3 +94,59 @@ export const perimetroPoligono = (puntos) => {
   }
   return total;
 };
+
+// --- El número que falta ---------------------------------------------------
+
+/**
+ * Las cuatro operaciones, con los signos tipográficos que se usan en la
+ * libreta. OJO: el signo menos es U+2212 (−), no el guion ASCII (-). Si se
+ * mezclan, las comparaciones fallan en silencio.
+ */
+export const OPERACIONES = ['+', '−', '×', '÷'];
+
+/** Aplica una operación. Devuelve null si no se puede (dividir por cero). */
+export const aplicarOperacion = (op, a, b) => {
+  switch (op) {
+    case '+': return a + b;
+    case '−': return a - b;
+    case '×': return a * b;
+    case '÷': return b === 0 ? null : a / b;
+    default: return null;
+  }
+};
+
+/**
+ * La operación inversa: dado "a op b = c", el número que falta.
+ * Devuelve null si no hay solución entera (o si no se puede dividir).
+ */
+export const despejarOperando = (op, a, c) => {
+  switch (op) {
+    case '+': return c - a;
+    case '−': return a - c;
+    case '×': return a === 0 || c % a !== 0 ? null : c / a;
+    case '÷': return c === 0 || a % c !== 0 ? null : a / c;
+    default: return null;
+  }
+};
+
+/**
+ * Qué operaciones de las cuatro cumplen "a op b = c".
+ * Puede haber más de una: 2 + 2 = 4 y también 2 × 2 = 4. El generador de
+ * preguntas tiene que descartar esos casos o la pregunta es ambigua.
+ */
+export const operacionesQueCumplen = (a, b, c) =>
+  OPERACIONES.filter((op) => {
+    const resultado = aplicarOperacion(op, a, b);
+    return resultado !== null && resultado === c;
+  });
+
+/**
+ * Todas las formas de partir n en dos números positivos.
+ * Se usa para las familias numéricas: 4, 6 y 10 son familia porque
+ * 4 + 6 = 10.
+ */
+export const particionesDe = (n) => {
+  const salida = [];
+  for (let a = 1; a < n; a++) salida.push({ a, b: n - a });
+  return salida;
+};
