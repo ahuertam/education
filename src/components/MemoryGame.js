@@ -5,6 +5,7 @@ import {
   generateProblem as makeProblem,
   memoryProfile,
 } from '../utils/problemGenerator';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -59,6 +60,8 @@ const Card = styled.div`
   transition: transform 0.6s;
   transform: ${props => props.flipped ? 'rotateY(180deg)' : 'rotateY(0)'};
   cursor: pointer;
+
+  ${focoVisible}
 `;
 
 const CardFace = styled.div`
@@ -204,10 +207,14 @@ const MemoryGame = ({ onBack, level = 1, operation = 'multiplication', multiplic
       ) : (
         <Grid>
           {cards.map(card => (
-            <Card 
-              key={card.id} 
+            <Card
+              key={card.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`Carta ${card.content}`}
               flipped={flipped.includes(card.id) || solved.includes(card.id)}
               onClick={() => handleClick(card.id)}
+              onKeyDown={activarConTeclado(() => handleClick(card.id))}
             >
               <CardFront>?</CardFront>
               <CardBack>{card.content}</CardBack>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { FaArrowLeft, FaFlask, FaCheck, FaTimes } from 'react-icons/fa';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 // --- Styled Components ---
 
@@ -120,6 +121,8 @@ const Jar = styled.div`
     background-color: ${props => props.$color};
     opacity: 0.8;
   }
+
+  ${focoVisible}
 `;
 
 const JarLabel = styled.span`
@@ -732,10 +735,14 @@ const KitchenGame = ({ onBack }) => {
           {INGREDIENTS.map((ing, index) => (
             <Shelf key={ing.id}>
               <JarLabel>{ing.name}</JarLabel>
-              <Jar 
-                $color={ing.color} 
+              <Jar
+                $color={ing.color}
                 ref={(el) => { jarRefs.current[ing.id] = el; }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Bote de ${ing.name}`}
                 onClick={() => handleJarClick(ing)}
+                onKeyDown={activarConTeclado(() => handleJarClick(ing))}
               >
                 {/* Visual fill level could go here */}
               </Jar>

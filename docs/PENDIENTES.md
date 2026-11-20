@@ -8,37 +8,21 @@ Prioridad: 🔴 urgente · 🟠 importante · 🟡 mejora · ⚪ decisión pendi
 
 ---
 
-## 🔴 Accesibilidad: las tarjetas no se pueden usar con teclado
+## ✅ Arreglado
 
-**Dónde**: [`src/components/ActivityCard.js`](../src/components/ActivityCard.js) — el
-`CardContainer` es un `styled.div` con `onClick`, sin `role`, sin `tabIndex` y
-sin manejo de teclado. Pasa por todas las tarjetas de la landing y del selector
-de juegos.
+- **Accesibilidad con teclado** (era 🔴): los elementos que se pulsan con el
+  ratón ya se pulsan también con el teclado. `src/components/ui/Teclado.js`
+  tiene el helper (`activarConTeclado` y el anillo de foco `focoVisible`), y lo
+  usan las tarjetas de la landing y del selector (`ActivityCard.js`), las cartas
+  del memorama (`MemoryGame.js`), los nenúfares (`FrogJumpGame.js`), las
+  burbujas (`BubblePopGame.js`), las sílabas de los globos (`AccentHunterGame.js`),
+  los botes (`KitchenGame.js`), las torres (`HanoiKitchenGame.js`), los
+  asteroides (`SpaceDefenderGame.js`) y los bloques de respuesta
+  (`styles/KnowledgeTowerStyles.js`).
 
-**Por qué importa**: **ninguno de los 26 juegos se puede abrir con el teclado**.
-Es el fallo más grave de la lista porque afecta a la navegación entera, no a un
-juego suelto.
-
-**Cómo se arregla**: cambiar `CardContainer` a `styled.button` (con
-`type="button"` y reset de estilos), o añadir `role="button"`, `tabIndex={0}` y
-un `onKeyDown` que responda a Enter y Espacio.
-
-**El patrón correcto ya está en el repo**, en
-[`src/components/rivers/SpainRiversMap.js`](../src/components/rivers/SpainRiversMap.js):
-
-```jsx
-tabIndex={hoverable ? 0 : -1}
-role="button"
-aria-label={...}
-onKeyDown={(e) => {
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(); }
-}}
-```
-
-Otros sitios con el mismo problema: `MemoryGame.js` (las cartas del memorama),
-`FrogJumpGame.js` (los nenúfares), `AccentHunterGame.js` (los globos),
-`BubblePopGame.js` (las burbujas), `KitchenGame.js` (los botes) y
-`styles/KnowledgeTowerStyles.js` (los bloques de respuesta).
+  Queda fuera: los fondos de los modales (`JeopardyGame.js`,
+  `PokemonMathsGame.js`, `TiemposVerbalesGame.js`), que se cierran con un clic
+  fuera. Esos son el punto de los diálogos sin `Escape` de más abajo.
 
 ---
 
@@ -211,7 +195,5 @@ abrir, atraparlo dentro y cerrar con Escape.
   `twitter:card`, así que al compartir un enlace no sale nada.
 - **`public/manifest.json`**: `theme_color` en negro, `start_url` en `"."` y
   un `favicon.ico` que declara cuatro tamaños siendo un solo fichero.
-- **`.gitignore`**: falta `.claude/`, que ahora aparece en `git status` y
-  acabaría en cualquier `git add -A`.
 - **`MultiplicationSelector.js`** ya no existe: se borró al centralizar el
   catálogo.

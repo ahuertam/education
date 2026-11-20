@@ -7,6 +7,7 @@ import {
   difficultyRanges,
 } from '../utils/problemGenerator';
 import DifficultyTablesHint from './DifficultyTablesHint';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -93,7 +94,9 @@ const Asteroid = styled.div`
   clip-path: polygon(
     20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%
   );
-  
+
+  ${focoVisible}
+
   &::before {
     content: '';
     position: absolute;
@@ -482,13 +485,17 @@ const SpaceDefenderGame = ({ onBack, operation = 'multiplication', multiplicatio
 
       <PlayArea>
         {gamePhase === 'playing' && asteroids.map(ast => (
-          <Asteroid 
+          <Asteroid
             key={ast.id}
-            top={ast.top} 
-            left={ast.left} 
+            top={ast.top}
+            left={ast.left}
             $borderRadius={ast.borderRadius}
             $rotation={ast.rotation}
+            role="button"
+            tabIndex={0}
+            aria-label={`Asteroide ${ast.number}`}
             onClick={() => handleAsteroidClick(ast)}
+            onKeyDown={activarConTeclado(() => handleAsteroidClick(ast))}
             style={{ cursor: 'pointer' }}
           >
             {ast.number}

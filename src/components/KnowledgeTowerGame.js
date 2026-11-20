@@ -19,6 +19,7 @@ import {
   CategoryCard,
   GameOverOverlay
 } from './styles/KnowledgeTowerStyles';
+import { activarConTeclado } from './ui/Teclado';
 
 const LEVELS = [
   { id: 'level-1', name: 'Nivel 1', blocksToWin: 10, color: '#4A90E2' },
@@ -497,8 +498,12 @@ const KnowledgeTowerGame = ({ onBack }) => {
               {currentQuestion.a.map((answer, index) => (
                 <AnswerBlock
                   key={index}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Respuesta ${answer}`}
                   color={categoryData?.color}
                   onClick={() => handleAnswer(index)}
+                  onKeyDown={activarConTeclado(() => handleAnswer(index))}
                 >
                   {answer}
                 </AnswerBlock>

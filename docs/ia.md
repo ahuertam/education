@@ -356,7 +356,6 @@ Tres juegos ya no son un fichero monster:
 - `npm run build` emite warnings de `eslint` preexistentes en varios juegos
   (`useEffect` con dependencias faltantes, imports sin usar). No bloquean el build
   salvo que se ejecute con `CI=true`, que los convierte en errores.
-- Las tarjetas de la landing y las del selector son `div` con `onClick`: no
-  tienen `role`, `tabIndex` ni manejo de teclado, así que con teclado no se
-  llega a ningún juego. El patrón correcto ya está en
-  [`SpainRiversMap.js`](../src/components/rivers/SpainRiversMap.js).
+- Los fondos de los modales (`JeopardyGame.js`, `PokemonMathsGame.js`,
+  `TiemposVerbalesGame.js`) se cierran con un clic fuera, pero no con
+  `Escape`, y no atrapan el foco.

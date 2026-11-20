@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 const CardContainer = styled.div`
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(245, 250, 250, 0.92));
@@ -22,6 +23,8 @@ const CardContainer = styled.div`
     transform: translateY(-4px);
     box-shadow: 0 10px 26px rgba(11, 43, 69, 0.24);
   }
+
+  ${focoVisible}
 `;
 
 const IconContainer = styled.div`
@@ -76,7 +79,12 @@ const Nivel = styled.span`
 
 const ActivityCard = ({ icon, title, description, color, nivel, onClick }) => {
   return (
-    <CardContainer onClick={onClick}>
+    <CardContainer
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={activarConTeclado(onClick)}
+    >
       <IconContainer color={color}>
         {icon}
       </IconContainer>
