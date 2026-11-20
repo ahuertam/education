@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 const rise = keyframes`
   from {
@@ -151,6 +152,8 @@ const Syllable = styled.div`
       background: rgba(255,255,255,0.2);
     `}
   }
+
+  ${focoVisible}
 `;
 
 const ClassificationButtons = styled.div`
@@ -522,9 +525,13 @@ const AccentHunterGame = ({ onBack }) => {
                     return (
                       <Syllable
                         key={index}
+                        role="button"
+                        tabIndex={balloon.awaitingClassification ? -1 : 0}
+                        aria-label={`Sílaba ${displaySyllable}`}
                         $isSelected={balloon.selectedSyllableIndex === index}
                         $disabled={balloon.awaitingClassification}
                         onClick={() => handleSyllableClick(balloon, index)}
+                        onKeyDown={activarConTeclado(() => handleSyllableClick(balloon, index))}
                       >
                         {displaySyllable}
                       </Syllable>

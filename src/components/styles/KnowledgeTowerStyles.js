@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+import { focoVisible } from '../ui/Teclado';
 
 export const GameContainer = styled.div`
   min-height: 100vh;
@@ -108,15 +109,17 @@ export const AnswerBlock = styled.div`
   min-width: 150px;
   text-align: center;
   border: 3px solid rgba(255,255,255,0.5);
-  
+
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.4);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
+
+  ${focoVisible}
 `;
 
 export const FeedbackPanel = styled.div`

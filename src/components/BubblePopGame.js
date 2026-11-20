@@ -7,6 +7,7 @@ import {
   difficultyRanges,
 } from '../utils/problemGenerator';
 import DifficultyTablesHint from './DifficultyTablesHint';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 
 
@@ -135,6 +136,8 @@ const Bubble = styled.div`
     transform: scale(1.1);
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3) 20%, rgba(255, 255, 255, 0.2) 60%, rgba(255, 255, 255, 0.5) 100%);
   }
+
+  ${focoVisible}
 `;
 
 const BubbleNumber = styled.span`
@@ -360,7 +363,13 @@ const BubblePopGame = ({ onBack, operation = 'multiplication', multiplicationCon
               onAnimationEnd={() => setBubbles(prev => prev.filter(b => b.id !== bubble.id))}
             >
               <BubbleWobble $wobbleDuration={bubble.wobbleDuration} $wobbleDelay={bubble.wobbleDelay}>
-                <Bubble onClick={(e) => handleBubbleClick(bubble, e)}>
+                <Bubble
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Burbuja ${bubble.number}`}
+                  onClick={(e) => handleBubbleClick(bubble, e)}
+                  onKeyDown={activarConTeclado((e) => handleBubbleClick(bubble, e))}
+                >
                   <BubbleNumber>{bubble.number}</BubbleNumber>
                 </Bubble>
               </BubbleWobble>

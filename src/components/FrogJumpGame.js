@@ -7,6 +7,7 @@ import {
   difficultyRanges,
 } from '../utils/problemGenerator';
 import DifficultyTablesHint from './DifficultyTablesHint';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 const jumpAnimation = keyframes`
   0% { transform: translateY(0) scale(1); }
@@ -186,6 +187,8 @@ const LilyPad = styled.div`
   &:hover {
     transform: scale(1.1);
   }
+
+  ${focoVisible}
 
   &:active {
     transform: scale(0.95);
@@ -429,7 +432,13 @@ const FrogJumpGame = ({ onBack, operation = 'multiplication', multiplicationConf
           <LilyPadContainer>
             {currentProblem.options.map((opt, index) => (
               <LilyPadWrapper key={index} left={POSITIONS[index]}>
-                <LilyPad onClick={() => handleAnswer(opt, index)}>
+                <LilyPad
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Saltar a ${opt}`}
+                  onClick={() => handleAnswer(opt, index)}
+                  onKeyDown={activarConTeclado(() => handleAnswer(opt, index))}
+                >
                   <Number>{opt}</Number>
                 </LilyPad>
               </LilyPadWrapper>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft } from 'react-icons/fa';
+import { activarConTeclado, focoVisible } from './ui/Teclado';
 
 const GameContainer = styled.div`
   min-height: 100vh;
@@ -179,6 +180,8 @@ const TowerBase = styled.div`
   border: 2px solid rgba(255,255,255,0.18);
   border-radius: 12px;
   cursor: pointer;
+
+  ${focoVisible}
 `;
 
 const Pole = styled.div`
@@ -449,7 +452,13 @@ const HanoiKitchenGame = ({ onBack }) => {
             {['A', 'B', 'C'].map((towerId) => (
               <TowerCol key={towerId}>
                 <TowerName>Torre {towerId}</TowerName>
-                <TowerBase onClick={() => handleTowerClick(towerId)}>
+                <TowerBase
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Torre ${towerId}`}
+                  onClick={() => handleTowerClick(towerId)}
+                  onKeyDown={activarConTeclado(() => handleTowerClick(towerId))}
+                >
                   <Pole />
                   <Base />
                   {towers[towerId].map((disc, idx) => {
