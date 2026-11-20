@@ -1,6 +1,6 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **41 minijuegos**
+Web de juegos matemáticos, de lengua y de conocimiento general. **43 minijuegos**
 en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
@@ -46,6 +46,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **La Tabla de Números** | Lee una rejilla de números, prevé el siguiente y descubre de cuánto en cuánto avanza. |
 | **Dinero en euros** | Suma monedas y billetes, calcula el cambio y combina piezas para pagar. |
 | **¿Qué Número Falta?** | La cuenta con un hueco: 8 + □ = 15. Tienes que producir el número, no reconocerlo. |
+| **Mi Huerta** | Simulación: siembras con la tabla de multiplicar y riegas con fracciones. El huerto sigue mañana. |
 
 ### 🎲 Álgebra y probabilidad
 
@@ -88,7 +89,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 
 | Juego | Qué hace |
 |---|---|
-| **La Cocina** | Prepara el antídoto mezclando ingredientes con fracciones y decimales. |
+| **La Cocina** | Prepara el antídoto mezclando ingredientes con fracciones y decimales, y hornéalo antes de que Kiko'ok se lo coma. |
 | **Hanoi Kitchen** | Torre de Hanoi: vierte la cantidad exacta en el caldero. |
 | **Digilike** | Roguelike de caminos: completa nodos, responde el portal y gestiona tu energía. |
 | **Sudoku Math** | Sudoku donde cada número se usa una vez para que las operaciones cuadren. |
@@ -105,6 +106,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | Juego | Qué hace |
 |---|---|
 | **Fuego & Agua (Procedural)** | Fireboy & Watergirl: coop local, puertas, botones y niveles generados por semilla. |
+| **Cajas y Números** | Sokoban: empuja las cajas hasta sus marcas. La puerta del medio se abre con una multiplicación. |
 
 ### ⌨️ Mecanografía
 
@@ -135,9 +137,18 @@ npm start          # http://localhost:3000
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
 - **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
-  y cada juego baja su trozo al abrirlo, en vez de bajar los 41 de golpe.
-- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 41 juegos y las
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 43 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 43 juegos y las
   17 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
+- **Nivel por juego**: cada juego declara en qué banda de Primaria se introduce su
+  contenido (1º-2º, 3º-4º, 5º-6º). El selector filtra con pastillas "Hasta 2º / 4º / 6º"
+  y recuerda la elección en el navegador.
+- **Minijuego de premio y álbum**: al terminar una partida se ofrece un arcade de 20
+  segundos (tres variantes). Con tres estrellas cae una pegatina en el álbum, que se
+  guarda en el navegador y se ve desde la portada.
+- **Ajustes del aula**: desde la portada, el educador puede apagar el minijuego de
+  premio para que la sesión sea solo de práctica.
+- **Progreso**: la portada enseña cuántos de los 43 juegos has probado y cuáles.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de

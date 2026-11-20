@@ -55,19 +55,33 @@ const Description = styled.p`
   line-height: 1.5;
   font-size: 1rem;
   transition: color 0.2s ease;
-  
+
   ${CardContainer}:hover & {
     color: #555;
   }
 `;
 
-const ActivityCard = ({ icon, title, description, color, onClick }) => {
+// La banda de Primaria del juego. Solo la pinta el selector de juegos; la
+// landing enseña categorías, no juegos, y ahí no dice nada.
+const Nivel = styled.span`
+  display: inline-block;
+  background: rgba(11, 43, 69, 0.08);
+  color: #5b7286;
+  border-radius: 20px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+`;
+
+const ActivityCard = ({ icon, title, description, color, nivel, onClick }) => {
   return (
     <CardContainer onClick={onClick}>
       <IconContainer color={color}>
         {icon}
       </IconContainer>
       <Title>{title}</Title>
+      {nivel && <Nivel>{nivel}</Nivel>}
       <Description>{description}</Description>
     </CardContainer>
   );

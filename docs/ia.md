@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **41 juegos**, 44 vistas, 49 componentes.
+Datos a fecha de la última revisión: **43 juegos**, 46 vistas, 53 componentes.
 
 ---
 
@@ -32,7 +32,8 @@ Landing  ──►  game-selector  ──►  <juego>
    │               ▲
    │               └── MultiplicationConfig ◄─┘  (solo multiplicación)
    │
-   └──────────►  typerdungeon        (abre directo, sin selector)
+   ├──────────►  typerdungeon        (abre directo, sin selector)
+   └──────────►  coleccion            (el álbum de pegatinas)
 ```
 
 - `handleNavigate(view, operation)` fija la vista y, opcionalmente, la categoría.
@@ -49,6 +50,7 @@ Landing  ──►  game-selector  ──►  <juego>
 | `landing` | Landing | [`Landing.js`](../src/components/Landing.js) |
 | `multiplication-config` | MultiplicationConfig | [`MultiplicationConfig.js`](../src/components/MultiplicationConfig.js) |
 | `game-selector` | GameSelector | [`GameSelector.js`](../src/components/GameSelector.js) |
+| `coleccion` | Álbum de pegatinas | [`ColeccionGame.js`](../src/components/ColeccionGame.js) |
 | `memory` | Memorama Matemático | [`MemoryGame.js`](../src/components/MemoryGame.js) |
 | `space` | Defensor Espacial | [`SpaceDefenderGame.js`](../src/components/SpaceDefenderGame.js) |
 | `frog` | El Salto de la Rana | [`FrogJumpGame.js`](../src/components/FrogJumpGame.js) |
@@ -75,6 +77,8 @@ Landing  ──►  game-selector  ──►  <juego>
 | `numerofalta` | ¿Qué Número Falta? | [`NumeroFaltaGame.js`](../src/components/NumeroFaltaGame.js) |
 | `algebra` | Los Números del Álgebra | [`AlgebraGame.js`](../src/components/AlgebraGame.js) |
 | `ruleta` | La Ruleta y los Dados | [`RuletaDadosGame.js`](../src/components/RuletaDadosGame.js) |
+| `huerta` | Mi Huerta | [`HuertaGame.js`](../src/components/HuertaGame.js) |
+| `cajas` | Cajas y Números | [`puzzles/cajas/CajasGame.js`](../src/components/puzzles/cajas/CajasGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -95,7 +99,7 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Todo el catálogo —los 41 juegos y las 17 tarjetas de la landing— está en un
+Todo el catálogo —los 43 juegos y las 17 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -103,6 +107,7 @@ repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 // Un juego
 { id: 'memory', icon: FaGamepad, title: 'Memorama Matemático', color: '#4CAF50',
   categories: ['addition', 'subtraction', 'multiplication', 'division'],
+  nivel: 'inicial',
   description: (accion) => `Encuentra las parejas de operaciones y resultados ${accion}.` }
 
 // Una tarjeta de la landing
@@ -111,7 +116,19 @@ repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 ```
 
 `description` puede ser un texto fijo o una función de la categoría activa, que
-es lo que cambia la frase ("sumando", "resolviendo"...).
+es lo que cambia la frase ("sumando", "resolviendo...").
+
+### Niveles
+
+`nivel` dice en qué banda de Primaria se introduce el contenido del juego:
+`inicial` (1º-2º), `medio` (3º-4º) u `alto` (5º-6º). El selector tiene pastillas
+("Hasta 2º / Hasta 4º / Hasta 6º") que filtran la lista, y el nivel es un
+**tope**: "Hasta 4º" muestra también los juegos de 1º-2º. La elección se guarda
+en `localStorage` (`edutika:nivel`). Si una categoría no tiene juegos para el
+nivel elegido, se enseñan todos y se avisa, para no dejar una pantalla vacía.
+
+Los helpers están en `src/config/games.js`: `NIVELES`, `gamesByCategoryAndLevel`
+y `nivelLabel`.
 
 | id landing | Tarjeta | Categoría |
 |---|---|---|
@@ -150,6 +167,39 @@ categoría tenga su juego y su tarjeta.
 | [`SupportFab.js`](../src/components/SupportFab.js) | Botón de donación Ko-fi |
 | [`FlappyBonusLevel.js`](../src/components/FlappyBonusLevel.js) | Nivel extra del juego Flappy |
 | [`ui/JuegoBase.js`](../src/components/ui/JuegoBase.js) | Marco común de los juegos de rondas: barra, tarjeta, opciones, feedback y pantalla final |
+| [`ColeccionGame.js`](../src/components/ColeccionGame.js) | Álbum de pegatinas y logros (pantalla `coleccion`) |
+| [`Ajustes.js`](../src/components/Ajustes.js) | Interruptores del aula, en la landing |
+| [`ProgresoPanel.js`](../src/components/ProgresoPanel.js) | Barra de progreso: qué juegos se han probado |
+| [`ui/MiniJuego.js`](../src/components/ui/MiniJuego.js) | Minijuego de premio en canvas (20 s, tres variantes) |
+
+---
+
+## 5b. El minijuego de premio y el álbum
+
+El bucle de ADI: al terminar una partida, el niño se gana un juego de 20
+segundos en vez de "otra cuenta".
+
+```
+PantallaFinal (ui/JuegoBase.js)
+   └─ resumen ──"🎁 Minijuego de premio"──► premio ──► resultado
+                                              │           │
+                                       MiniJuego      3 estrellas
+                                       (canvas)       → pegatina nueva
+```
+
+- La lógica del minijuego está en
+  [`src/components/ui/minijuego/logic.js`](../src/components/ui/minijuego/logic.js)
+  (puntos, choques, estrellas) y es lo único que se testea; el canvas solo
+  dibuja. Variantes: `atrapa`, `esquiva`, `golpea`.
+- El álbum y sus logros están en
+  [`src/components/data/pegatinas.js`](../src/components/data/pegatinas.js);
+  el estado, en [`src/utils/pegatinas.js`](../src/utils/pegatinas.js)
+  (`localStorage`, clave `edutika:pegatinas`).
+- **El educador puede apagarlo**: `src/utils/ajustes.js` (clave
+  `edutika:ajustes`) y el panel de la landing. Apagado, los juegos no ofrecen
+  el minijuego ni dan pegatinas.
+- Solo los 11 juegos que usan `PantallaFinal` tienen el premio. Los que
+  tienen su propia pantalla de fin hay que añadirlos a mano.
 
 ---
 
@@ -161,12 +211,19 @@ categoría tenga su juego y su tarjeta.
 | [`src/utils/rankings.js`](../src/utils/rankings.js) | Ranking local en `localStorage` |
 | [`src/utils/algebra.js`](../src/utils/algebra.js) | Fichas x², x y 1: multiconjuntos, expresiones y el modelo del área de (x+k)² |
 | [`src/utils/probabilidad.js`](../src/utils/probabilidad.js) | Ruletas y dados: casos, fracciones y comparación por producto cruzado |
+| [`src/utils/pegatinas.js`](../src/utils/pegatinas.js) | Álbum de pegatinas y contadores en `localStorage` |
+| [`src/utils/ajustes.js`](../src/utils/ajustes.js) | Ajustes del aula en `localStorage` |
+| [`src/utils/progreso.js`](../src/utils/progreso.js) | Qué juegos ha probado el niño, en `localStorage` |
 | [`src/utils/matematicas.js`](../src/utils/matematicas.js) | Fracciones, modelo de área y valor posicional (funciones puras, con test) |
 | [`src/components/data/`](../src/components/data/) | Datasets: preguntas de conocimiento, sintaxis, ríos, geometría, formas |
+| [`src/components/huerta/`](../src/components/huerta/) | Lógica de Mi Huerta: cuentas del día, crecimiento y cosecha |
+| [`src/utils/huerta.js`](../src/utils/huerta.js) | El estado del huerto en `localStorage` (sigue mañana) |
 | [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |
 | [`src/components/styles/`](../src/components/styles/) | Estilos sueltos de juegos grandes |
 | [`src/components/rivers/`](../src/components/rivers/) | Mapa SVG de España y sus ríos |
 | [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/) | Motor de Fuego & Agua |
+| [`src/components/puzzles/cajas/`](../src/components/puzzles/cajas/) | Sokoban con puertas de multiplicación |
+| [`public/kikook.svg`](../public/kikook.svg) | El monstruo gruñón de La Cocina |
 | [`src/config/support.js`](../src/config/support.js) | Enlaces de soporte / donación |
 
 ---

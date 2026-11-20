@@ -52,6 +52,8 @@ import PatronesGame from './PatronesGame';
 import NumeroFaltaGame from './NumeroFaltaGame';
 import AlgebraGame from './AlgebraGame';
 import RuletaDadosGame from './RuletaDadosGame';
+import HuertaGame from './HuertaGame';
+import CajasGame from './puzzles/cajas/CajasGame';
 import TyperDungeonGame from './TyperDungeon/TyperDungeonGame';
 
 const COMPONENTES = {
@@ -95,6 +97,8 @@ const COMPONENTES = {
   numerofalta: NumeroFaltaGame,
   algebra: AlgebraGame,
   ruleta: RuletaDadosGame,
+  huerta: HuertaGame,
+  cajas: CajasGame,
   typerdungeon: TyperDungeonGame,
 };
 

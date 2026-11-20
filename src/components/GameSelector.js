@@ -1,7 +1,14 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import ActivityCard from './ActivityCard';
 import { FaArrowLeft } from 'react-icons/fa';
-import { gamesByCategory, gameDescription } from '../config/games';
+import {
+  NIVELES,
+  gamesByCategory,
+  gamesByCategoryAndLevel,
+  gameDescription,
+  nivelLabel,
+} from '../config/games';
 
 const SelectorContainer = styled.div`
   min-height: 100vh;
@@ -71,7 +78,61 @@ const Grid = styled.div`
   gap: 2rem;
 `;
 
+// Las pastillas de nivel. El filtro va aquí, no en la landing: se elige el
+// nivel una vez y el selector recuerda la elección.
+const NivelBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+`;
+
+const NivelPastilla = styled.button`
+  background: ${(props) => (props.activo ? '#ff8a2a' : 'rgba(255, 255, 255, 0.18)')};
+  border: none;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  padding: 0.5rem 1.1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover { background: ${(props) => (props.activo ? '#ff8a2a' : 'rgba(255, 255, 255, 0.3)')}; }
+`;
+
+const AvisoNivel = styled.p`
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 1.5rem;
+`;
+
 const GameSelector = ({ onNavigate, onBack, category }) => {
+  // 'alto' = "hasta 6º" = todos los juegos, que es lo que se veía antes de
+  // que existiera el filtro. Lo que venga del navegador se comprueba: si no
+  // es un nivel válido, se empieza por el de arriba.
+  const [nivel, setNivel] = useState(() => {
+    try {
+      const guardado = localStorage.getItem('edutika:nivel');
+      return NIVELES.some((n) => n.id === guardado) ? guardado : 'alto';
+    } catch (e) {
+      return 'alto';
+    }
+  });
+
+  const cambiarNivel = (nuevo) => {
+    setNivel(nuevo);
+    try {
+      localStorage.setItem('edutika:nivel', nuevo);
+    } catch (e) {
+      // Sin localStorage (modo privado) el filtro solo vive en esta sesión.
+    }
+  };
+
   const getCategoryInfo = () => {
     switch(category) {
       case 'addition':
@@ -113,9 +174,12 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
 
   const info = getCategoryInfo();
 
-  // Define all available games
-  // Filter games based on category
-  const games = gamesByCategory(category);
+  // Los juegos aptos para el nivel elegido. Si la categoría no tiene ninguno
+  // (Álgebra en 1º-2º), se enseñan todos y se avisa: mejor eso que una
+  // pantalla vacía.
+  const aptos = gamesByCategoryAndLevel(category, nivel);
+  const sinJuegosDeEseNivel = aptos === null;
+  const games = sinJuegosDeEseNivel ? gamesByCategory(category) : aptos;
 
   return (
     <SelectorContainer>
@@ -132,7 +196,28 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
           }}
         />
       </Header>
-      
+
+      <NivelBar>
+        <span>Nivel:</span>
+        {NIVELES.map((n) => (
+          <NivelPastilla
+            key={n.id}
+            type="button"
+            activo={n.id === nivel}
+            aria-pressed={n.id === nivel}
+            onClick={() => cambiarNivel(n.id)}
+          >
+            Hasta {n.hasta}º
+          </NivelPastilla>
+        ))}
+      </NivelBar>
+
+      {sinJuegosDeEseNivel && (
+        <AvisoNivel>
+          En esta categoría no hay juegos de {nivelLabel(nivel)}. Te enseñamos todos.
+        </AvisoNivel>
+      )}
+
       <Grid>
         {games.map(game => (
           <ActivityCard
@@ -141,6 +226,7 @@ const GameSelector = ({ onNavigate, onBack, category }) => {
             title={game.title}
             description={gameDescription(game, info.action)}
             color={game.color}
+            nivel={nivelLabel(game.nivel)}
             onClick={() => onNavigate(game.id, category)}
           />
         ))}
