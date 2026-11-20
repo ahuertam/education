@@ -61,5 +61,8 @@ export function progresoPorCategoria(games) {
     // desde la landing (la mazmorra de tecleo), que no tiene categoría.
     total: games.length,
     porCategoria,
+    // Los ids de los juegos probados: para no leer el almacenamiento otra
+    // vez y que el número y la lista no puedan discrepar.
+    ids: games.filter((g) => jugados.has(g.id)).map((g) => g.id),
   };
 }

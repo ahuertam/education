@@ -14,11 +14,22 @@ export const AJUSTES_INICIALES = {
   premio: true,
 };
 
+// El interruptor tiene que ser un booleano de verdad: si un guardado
+// tuviera "false" como texto en vez de false, el checkbox se quedaría
+// pillado. Solo se apaga con false (o su texto).
+const aBooleano = (v) => v !== false && v !== 'false';
+
 export function cargarAjustes() {
   try {
     const texto = localStorage.getItem(CLAVE);
     if (!texto) return { ...AJUSTES_INICIALES };
-    return { ...AJUSTES_INICIALES, ...JSON.parse(texto) };
+    const datos = JSON.parse(texto);
+    if (!datos || typeof datos !== 'object') return { ...AJUSTES_INICIALES };
+    return {
+      ...AJUSTES_INICIALES,
+      ...datos,
+      premio: aBooleano(datos.premio),
+    };
   } catch (e) {
     // Sin localStorage o con el JSON corrupto: los ajustes por defecto.
     return { ...AJUSTES_INICIALES };
@@ -26,7 +37,7 @@ export function cargarAjustes() {
 }
 
 export function guardarAjustes(ajustes) {
-  const nuevo = { ...AJUSTES_INICIALES, ...ajustes };
+  const nuevo = { ...AJUSTES_INICIALES, ...ajustes, premio: aBooleano(ajustes.premio) };
   try {
     localStorage.setItem(CLAVE, JSON.stringify(nuevo));
   } catch (e) {
@@ -37,5 +48,5 @@ export function guardarAjustes(ajustes) {
 
 // ¿Se muestra el minijuego de premio al terminar una partida?
 export function premioActivado() {
-  return cargarAjustes().premio !== false;
+  return cargarAjustes().premio;
 }

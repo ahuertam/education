@@ -73,12 +73,12 @@ const Ajustes = () => {
   const [ajustes, setAjustes] = useState(() => cargarAjustes());
 
   const cambiarPremio = (activo) => {
-    setAjustes(guardarAjustes({ ...ajustes, premio: activo }));
+    setAjustes((prev) => guardarAjustes({ ...prev, premio: activo }));
   };
 
   return (
     <Zona>
-      <Boton type="button" onClick={() => setAbierto(!abierto)} aria-expanded={abierto}>
+      <Boton type="button" onClick={() => setAbierto((prev) => !prev)} aria-expanded={abierto}>
         <FaCog /> Ajustes del aula
       </Boton>
 

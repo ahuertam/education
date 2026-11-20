@@ -90,12 +90,6 @@ const MiniJuego = ({ variante, onFin }) => {
   // reiniciaría cada vez que el padre repintara.
   onFinRef.current = onFin;
 
-  // El estado del juego vive en una ref: cambia 60 veces por segundo y no
-  // puede ir por el estado de React.
-  if (!estadoRef.current) {
-    estadoRef.current = crearJuego({ variante, ancho: 640, alto: 400 });
-  }
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
@@ -105,9 +99,16 @@ const MiniJuego = ({ variante, onFin }) => {
     let animacion = 0;
     let ultimo = performance.now();
     let cuadros = 0;
+    // Si el componente se desmonta mientras hay un frame en marcha, ese frame
+    // sigue hasta el final: sin esta marca, el premio se giveaway a un
+    // juego que ya no está en pantalla.
+    let vivo = true;
 
     const dimensionar = () => {
       const caja = canvas.parentElement.getBoundingClientRect();
+      // Un contenedor de tamaño cero (una pestaña en segundo plano) dejaría
+      // al jugador con coordenadas negativas.
+      if (caja.width < 10 || caja.height < 10) return;
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.round(caja.width * dpr);
       canvas.height = Math.round(caja.height * dpr);
@@ -132,36 +133,52 @@ const MiniJuego = ({ variante, onFin }) => {
 
       dibujarEscena();
 
-      // El HUD se refresca 10 veces por segundo: a 60 el navegador se pasa el
-      // rato pintando texto que no ha cambiado.
+      // El HUD solo se repinta cuando cambia algo: a 60 fotogramas por
+      // segundo, React repinta 200 veces una partida de 20 segundos.
       cuadros += 1;
       if (cuadros % 6 === 0) {
-        setHud({
-          puntos: estadoRef.current.puntos,
-          vidas: estadoRef.current.vidas,
-          tiempo: Math.ceil(estadoRef.current.tiempo),
-        });
+        const actual = estadoRef.current;
+        const nuevo = {
+          puntos: actual.puntos,
+          vidas: actual.vidas,
+          tiempo: Math.ceil(actual.tiempo),
+        };
+        setHud((prev) => (
+          prev.puntos === nuevo.puntos
+          && prev.vidas === nuevo.vidas
+          && prev.tiempo === nuevo.tiempo
+            ? prev
+            : nuevo
+        ));
       }
 
       if (haTerminado(estadoRef.current) && !terminadoRef.current) {
         terminadoRef.current = true;
         const puntos = estadoRef.current.puntos;
-        onFinRef.current?.({
-          puntos,
-          estrellas: estrellasDe(puntos, variante),
-          variante,
-        });
+        if (vivo) {
+          onFinRef.current?.({
+            puntos,
+            estrellas: estrellasDe(puntos, variante),
+            variante,
+          });
+        }
         return;
       }
 
       animacion = requestAnimationFrame(paso);
     };
 
+    // Si cambia la variante, la partida empieza de cero: si no, el estado
+    // seguiría siendo el de la variante anterior.
+    estadoRef.current = crearJuego({ variante, ancho: 640, alto: 400 });
+    terminadoRef.current = false;
+
     dimensionar();
     window.addEventListener('resize', dimensionar);
     animacion = requestAnimationFrame(paso);
 
     return () => {
+      vivo = false;
       cancelAnimationFrame(animacion);
       window.removeEventListener('resize', dimensionar);
     };

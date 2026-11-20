@@ -228,6 +228,36 @@ ejercicio en una escena. Es el paso 2 aplicado a un juego que ya está.
 
 ---
 
+## Paso 7 · El repasón (bugs y datos guardados)
+
+**Qué:** los seis pasos de arriba funcionaban, pero al usarlos de verdad salieron
+fallos: estados que se pisaban entre sí, pulsaciones dobles que contaban dos
+veces y guardados en `localStorage` que, si venían raro, dejaban el juego en
+blanco. Nada de esto es una función nueva: es que lo que ya estaba, no fallara.
+
+**Ficheros:** `src/utils/{ajustes,huerta,pegatinas,progreso,cajas}.js`,
+`src/components/{Landing,ProgresoPanel,Ajustes,GameSelector,HuertaGame}.js`,
+`src/components/ui/{JuegoBase,MiniJuego}.js`,
+`src/components/puzzles/cajas/CajasGame.js`.
+
+**Lo que se decidió al implementar:**
+
+- **Lo guardado se valida al leerlo.** Un `localStorage` con un json raro, un
+  número como texto o una fase sin sus cuentas no puede dejar el juego en
+  blanco: se vuelve al inicio.
+- **El nivel de Cajas y Números se guarda.** El sokoban es un juego de pensar y
+  perder lo colocado al cerrar la pestaña es una burrada (`src/utils/cajas.js`).
+- **Una partida cuenta una vez**, aunque el niño juegue al premio varias veces
+  con el botón "Otra vez".
+- **El estado que cambia a destiempo va en una ref**, no en el estado de React:
+  el temporizador del riego, el manejador de teclas del sokoban y el bucle del
+  minijuego necesitan el estado del momento, no el del último render.
+
+**Estado:** hecho. Tests en `src/utils/{cajas,pegatinas,ajustes,progreso}.test.js`
+y `src/components/huerta/logic.test.js`.
+
+---
+
 ## Orden recomendado
 
 1. **Niveles** — barato y es la base de todo lo demás.
@@ -250,3 +280,4 @@ momento o no hacerlos.
 | 4 · Mi Huerta | ✅ hecho |
 | 5 · Cajas y Números | ✅ hecho |
 | 6 · Kiko'ok | ✅ hecho |
+| 7 · El repasón | ✅ hecho |

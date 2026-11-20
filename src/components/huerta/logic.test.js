@@ -86,6 +86,14 @@ describe('el huerto', () => {
     expect(totalPlantas(h)).toBe(12);
   });
 
+  it('plantar dos veces el mismo día no duplica las plantas', () => {
+    let h = crearHuerta();
+    h = plantar(h, 1, 12);
+    h = plantar(h, 1, 12);
+    expect(totalPlantas(h)).toBe(12);
+    expect(h.plantones).toHaveLength(1);
+  });
+
   it('las plantas crecen con los días', () => {
     expect(etapaDe(1, 1)).toBe(ETAPAS[0]);
     expect(etapaDe(1, 2)).toBe(ETAPAS[1]);

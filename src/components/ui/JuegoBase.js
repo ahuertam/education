@@ -7,13 +7,14 @@
 //
 // Cada juego sigue siendo dueña de su lógica: esto solo es el marco.
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FaArrowLeft, FaRedo, FaTrophy } from 'react-icons/fa';
 import { formatRankDate } from '../../utils/rankings';
 import MiniJuego from './MiniJuego';
 import { ESTRELLAS_PARA_PEGATINA, PEGATINAS } from '../data/pegatinas';
 import {
+  cargarPegatinas,
   registrarPartida,
   registrarPremio,
 } from '../../utils/pegatinas';
@@ -296,19 +297,30 @@ export const PantallaFinal = ({
   const [variante, setVariante] = useState('atrapa');
   const [resultado, setResultado] = useState(null);
   const [pegatina, setPegatina] = useState(null);
-  // El educador puede haber apagado el minijuego de premio para la sesión.
-  const [conPremio] = useState(() => premioActivado());
+  const [album, setAlbum] = useState(() => cargarPegatinas().pegatinas.length);
+  // El educador puede apagar el minijuego en cualquier momento: se lee
+  // ahora y no al montar, para que el cambio se vea al terminar la partida.
+  const conPremio = premioActivado();
+  // Una partida terminada cuenta una vez, aunque el niño juegue al premio
+  // varias veces ("Otra vez").
+  const partidaContada = useRef(false);
+
+  useEffect(() => {
+    if (partidaContada.current) return;
+    partidaContada.current = true;
+    registrarPartida();
+  }, []);
 
   const empezarPremio = () => {
     setVariante(varianteAleatoria());
     setFase('premio');
-    registrarPartida();
   };
 
   const terminarPremio = (res) => {
     const estado = registrarPremio(res.estrellas, res.puntos);
     const idNuevo = estado.nuevas[estado.nuevas.length - 1];
     setPegatina(idNuevo ? PEGATINAS.find((p) => p.id === idNuevo) : null);
+    setAlbum(estado.pegatinas.length);
     setResultado(res);
     setFase('resultado');
   };
@@ -335,7 +347,10 @@ export const PantallaFinal = ({
 
   if (fase === 'resultado') {
     const estrellas = resultado.estrellas;
-    const albumLleno = !pegatina;
+    // El álbum está lleno cuando ya no queda ninguna pegatina por ganar, no
+    // cuando este premio no ha dado pegatina: si no, un niño que saca dos
+    // estrellas leería "ya tienes todas".
+    const albumLleno = album >= PEGATINAS.length;
     return (
       <Tarjeta style={{ textAlign: 'center' }}>
         <Enunciado>

@@ -113,10 +113,12 @@ const AvisoNivel = styled.p`
 
 const GameSelector = ({ onNavigate, onBack, category }) => {
   // 'alto' = "hasta 6º" = todos los juegos, que es lo que se veía antes de
-  // que existiera el filtro.
+  // que existiera el filtro. Lo que venga del navegador se comprueba: si no
+  // es un nivel válido, se empieza por el de arriba.
   const [nivel, setNivel] = useState(() => {
     try {
-      return localStorage.getItem('edutika:nivel') || 'alto';
+      const guardado = localStorage.getItem('edutika:nivel');
+      return NIVELES.some((n) => n.id === guardado) ? guardado : 'alto';
     } catch (e) {
       return 'alto';
     }

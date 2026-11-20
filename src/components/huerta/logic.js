@@ -122,11 +122,14 @@ export function etapaDe(diaPlantado, diaActual) {
   return ETAPAS[Math.min(ETAPAS.length - 1, Math.max(0, etapa))];
 }
 
-// Plantar lo que dice la cuenta del día.
+// Plantar lo que dice la cuenta del día. Si ese día ya estaba plantado, se
+// sustituye en vez de añadir: así un doble clic en "Continuar" no duplica las
+// plantas ni las monedas.
 export function plantar(estado, dia, cantidad) {
+  const plantones = estado.plantones.filter((p) => p.dia !== dia);
   return {
     ...estado,
-    plantones: [...estado.plantones, { dia, cantidad }],
+    plantones: [...plantones, { dia, cantidad }],
   };
 }
 

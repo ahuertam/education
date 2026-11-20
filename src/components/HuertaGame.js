@@ -114,16 +114,27 @@ const HuertaGame = ({ onBack }) => {
   const [elegido, setElegido] = useState(null);
   const [regando, setRegando] = useState(false);
   const temporizador = useRef(null);
+  // El estado también en una ref: el temporizador del riego necesita el
+  // estado de ese momento y no el que había al pulsar el botón.
+  const estadoRef = useRef(estado);
 
   useEffect(() => () => clearTimeout(temporizador.current), []);
 
+  // Guarda el estado. Acepta un valor o una función que lo calcula a partir
+  // del estado actual.
   const guardar = (nuevo) => {
-    setEstado(nuevo);
-    guardarHuerta(nuevo);
+    const siguiente = typeof nuevo === 'function' ? nuevo(estadoRef.current) : nuevo;
+    estadoRef.current = siguiente;
+    setEstado(siguiente);
+    guardarHuerta(siguiente);
   };
 
   const tareas = estado.tareas;
   const fase = estado.fase;
+  // Cinturón: si la fase necesita las cuentas del día y no las hay (un
+  // guardado de una versión antigua), se vuelve al inicio en vez de
+  // quedarse en blanco.
+  const faseSegura = (fase === 'plantar' || fase === 'regar') && !tareas ? 'inicio' : fase;
   const falta = faltaParaObjetivo(estado);
 
   // --- Acciones -----------------------------------------------------------
@@ -164,10 +175,15 @@ const HuertaGame = ({ onBack }) => {
   };
 
   const regarAhora = () => {
+    // Si el niño pulsa dos veces, se cancela el temporizador anterior: si no,
+    // se quedarían dos writes con el estado viejo.
+    clearTimeout(temporizador.current);
     setRegando(true);
     temporizador.current = setTimeout(() => {
       setRegando(false);
-      guardar({ ...estado, fase: 'crecer' });
+      // Se usa el estado del momento, no el que había al pulsar: si el niño
+      // ha tocado algo mientras se riega, no se pisa.
+      guardar((prev) => ({ ...prev, fase: 'crecer' }));
     }, 1400);
   };
 
@@ -279,7 +295,7 @@ const HuertaGame = ({ onBack }) => {
     );
   };
 
-  if (fase === 'plantar') {
+  if (faseSegura === 'plantar') {
     const t = tareas.plantar;
     return (
       <Page>
@@ -298,7 +314,7 @@ const HuertaGame = ({ onBack }) => {
     );
   }
 
-  if (fase === 'regar') {
+  if (faseSegura === 'regar') {
     const t = tareas.regar;
     return (
       <Page>
@@ -317,7 +333,7 @@ const HuertaGame = ({ onBack }) => {
     );
   }
 
-  if (fase === 'crecer') {
+  if (faseSegura === 'crecer') {
     const plantasDelDia = estado.plantones
       .filter((p) => p.dia === estado.dia)
       .reduce((s, p) => s + p.cantidad, 0);
@@ -344,7 +360,7 @@ const HuertaGame = ({ onBack }) => {
     );
   }
 
-  if (fase === 'final') {
+  if (faseSegura === 'final') {
     const completo = objetivoCumplido(estado);
     return (
       <Page>

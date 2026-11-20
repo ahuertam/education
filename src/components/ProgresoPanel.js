@@ -4,10 +4,10 @@
 // y cuáles. No bloquea nada ni da puntos: solo muestra que quedan cosas por
 // descubrir. Es la versión barata de la "mansión" de ADI, sin hub ni mapa.
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { GAMES } from '../config/games';
-import { cargarProgreso, progresoPorCategoria } from '../utils/progreso';
+import { progresoPorCategoria } from '../utils/progreso';
 
 const Panel = styled.div`
   max-width: 760px;
@@ -61,15 +61,11 @@ const Vacio = styled.p`
 `;
 
 const ProgresoPanel = () => {
-  const [progreso, setProgreso] = useState(() => progresoPorCategoria(GAMES));
+  // El progreso se lee una vez al montar: al volver de un juego, la
+  // pantalla de la portada se vuelve a montar y lo lee actualizado.
+  const [progreso] = useState(() => progresoPorCategoria(GAMES));
 
-  // Al volver de un juego, el contador tiene que estar al día.
-  useEffect(() => {
-    setProgreso(progresoPorCategoria(GAMES));
-  }, []);
-
-  const jugados = new Set(cargarProgreso());
-  const juegosProbados = GAMES.filter((g) => jugados.has(g.id));
+  const juegosProbados = GAMES.filter((g) => progreso.ids.includes(g.id));
   const porcentaje = progreso.total ? (progreso.jugados / progreso.total) * 100 : 0;
 
   return (

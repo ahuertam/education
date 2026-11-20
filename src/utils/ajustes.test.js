@@ -30,4 +30,11 @@ describe('los ajustes del aula', () => {
     localStorage.setItem('edutika:ajustes', 'esto no es json');
     expect(premioActivado()).toBe(true);
   });
+
+  it('el interruptor siempre es un booleano de verdad', () => {
+    localStorage.setItem('edutika:ajustes', JSON.stringify({ premio: 'false' }));
+    expect(cargarAjustes().premio).toBe(false);
+    localStorage.setItem('edutika:ajustes', JSON.stringify({ premio: 0 }));
+    expect(cargarAjustes().premio).toBe(true);
+  });
 });

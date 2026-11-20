@@ -42,12 +42,18 @@ const guardar = (estado) => {
 // El estado guardado, con los campos que falten rellenados.
 export function cargarPegatinas() {
   const bruto = leerBruto();
-  if (!bruto) return { ...ESTADO_INICIAL };
+  if (!bruto || typeof bruto !== 'object') return { ...ESTADO_INICIAL };
+  // Los contadores se fuerzan a número: si un guardado tuviera un "5" en
+  // vez de un 5, al sumar un 1 saldría "51" y el contador se iría al garete.
+  const numero = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
   return {
     ...ESTADO_INICIAL,
     ...bruto,
     pegatinas: Array.isArray(bruto.pegatinas) ? bruto.pegatinas : [],
     nuevas: Array.isArray(bruto.nuevas) ? bruto.nuevas : [],
+    partidas: numero(bruto.partidas),
+    estrellasPerfectas: numero(bruto.estrellasPerfectas),
+    mejorPuntos: numero(bruto.mejorPuntos),
   };
 }
 
@@ -94,9 +100,4 @@ export function limpiarNuevas(estado = cargarPegatinas()) {
 // Los logros que ya están desbloqueados.
 export function logrosDesbloqueados(estado = cargarPegatinas()) {
   return LOGROS.filter((l) => l.cumple(estado));
-}
-
-// Cuántas pegatinas hay en total y cuántas faltan.
-export function progresoAlbum(estado = cargarPegatinas()) {
-  return {总计: PEGATINAS.length, tengo: estado.pegatinas.length};
 }

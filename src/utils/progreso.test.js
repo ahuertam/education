@@ -47,4 +47,12 @@ describe('el progreso', () => {
     registrarJuegoJugado('no-existe');
     expect(progresoPorCategoria(GAMES).jugados).toBe(0);
   });
+
+  it('la lista de ids probados cuadra con el número', () => {
+    registrarJuegoJugado('memory');
+    registrarJuegoJugado('no-existe');
+    const progreso = progresoPorCategoria(GAMES);
+    expect(progreso.ids).toEqual(['memory']);
+    expect(progreso.ids).toHaveLength(progreso.jugados);
+  });
 });

@@ -125,7 +125,9 @@ const ColeccionBoton = styled.button`
 
 const Landing = ({ onNavigate }) => {
   const donationUrl = process.env.REACT_APP_DONATION_URL;
-  const [pegatinas, setPegatinas] = useState(() => cargarPegatinas().pegatinas.length);
+  // El contador se lee al montar. La landing se vuelve a montar al volver de
+  // un juego, así que ya sale al día sin ningún refresco a mano.
+  const [pegatinas] = useState(() => cargarPegatinas().pegatinas.length);
 
   const activities = CATEGORIES;
 
@@ -160,14 +162,7 @@ const Landing = ({ onNavigate }) => {
   return (
     <LandingContainer>
       <Header />
-      <ColeccionBoton
-        type="button"
-        onClick={() => {
-          // Al volver del álbum el contador tiene que estar al día.
-          setPegatinas(cargarPegatinas().pegatinas.length);
-          onNavigate('coleccion');
-        }}
-      >
+      <ColeccionBoton type="button" onClick={() => onNavigate('coleccion')}>
         🏅 Mi colección ({pegatinas})
       </ColeccionBoton>
       <Ajustes />
