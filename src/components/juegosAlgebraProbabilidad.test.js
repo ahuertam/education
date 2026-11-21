@@ -171,4 +171,33 @@ describe('La Ruleta y los Dados', () => {
       fireEvent.click(screen.getByText('Siguiente'));
     }
   });
+
+  it('repartir 2 y 2 los sectores da el reparto por bueno', () => {
+    render(<RuletaDadosGame onBack={() => {}} />);
+    // Las rondas van: leer, relacionar, comparar, construir.
+    for (let ronda = 0; ronda < 3; ronda++) {
+      fireEvent.click(botonesDeJuego()[0]);
+      fireEvent.click(screen.getByText('Siguiente'));
+    }
+    montar();
+    fireEvent.click(screen.getByText('Comprobar'));
+    expect(screen.getByText(/Lo has conseguido/)).toBeTruthy();
+  });
+
+  it('la ronda de dados enseña los ocho dados', () => {
+    render(<RuletaDadosGame onBack={() => {}} />);
+    // Las rondas van: leer, relacionar, comparar, construir, dados.
+    for (let ronda = 0; ronda < 4; ronda++) {
+      const construir = screen.queryByText('Comprobar');
+      if (construir) {
+        montar();
+        fireEvent.click(screen.getByText('Comprobar'));
+      } else {
+        fireEvent.click(botonesDeJuego()[0]);
+      }
+      fireEvent.click(screen.getByText('Siguiente'));
+    }
+    expect(screen.getByText('¿Qué número sale más a menudo?')).toBeTruthy();
+    expect(screen.getAllByLabelText(/^Dado \d/)).toHaveLength(8);
+  });
 });

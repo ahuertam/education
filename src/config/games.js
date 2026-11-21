@@ -408,7 +408,7 @@ export const GAMES = [
     id: 'ruleta', icon: FaDice, title: 'La Ruleta y los Dados', color: '#b45309',
     categories: ['probabilidad'],
     nivel: 'medio',
-    description: 'Qué color sale más a menudo y cómo repartir los sectores para que salga la mitad.',
+    description: 'Qué color sale más a menudo en la ruleta, qué número en los dados y cómo repartir los sectores para que salga la mitad.',
   },
 
   // Simulación
