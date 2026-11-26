@@ -67,6 +67,38 @@ export const redondear = (n, orden) => {
   return Math.round(n / paso) * paso;
 };
 
+/**
+ * Cuatro opciones numéricas: la correcta y tres parecidas.
+ *
+ * `candidatas` son los fallos que tienen sentido para esa cuenta (sumar en vez
+ * de restar, cambiar el orden de las cifras...). Si no llegan a cuatro, se
+ * inventan alrededor de la correcta.
+ */
+export const opcionesNumericas = (correcto, candidatas = []) => {
+  const vistas = new Set([String(correcto)]);
+  const out = [correcto];
+  for (const c of candidatas) {
+    if (out.length >= 4) break;
+    if (!Number.isFinite(c) || c < 0 || vistas.has(String(c))) continue;
+    vistas.add(String(c));
+    out.push(c);
+  }
+  let intentos = 0;
+  while (out.length < 4 && intentos < 60) {
+    intentos++;
+    const c = correcto + Math.floor(Math.random() * 81) - 40;
+    if (c < 0 || vistas.has(String(c))) continue;
+    vistas.add(String(c));
+    out.push(c);
+  }
+  // Barajadas: la correcta no siempre en el mismo sitio.
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+};
+
 // --- Geoboard -------------------------------------------------------------
 
 /**

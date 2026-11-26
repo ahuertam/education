@@ -58,6 +58,7 @@ const HuertaGame = lazy(() => import('./components/HuertaGame'));
 const CajasGame = lazy(() => import('./components/puzzles/cajas/CajasGame'));
 const HojaQuinzetGame = lazy(() => import('./components/HojaQuinzetGame'));
 const MercadilloQuinzetGame = lazy(() => import('./components/MercadilloQuinzetGame'));
+const QuinzetDeriveGame = lazy(() => import('./components/QuinzetDeriveGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -313,6 +314,10 @@ function App() {
         />;
       case 'mercadilloquinzet':
         return <MercadilloQuinzetGame
+          onBack={() => setCurrentView('game-selector')}
+        />;
+      case 'quinzetderive':
+        return <QuinzetDeriveGame
           onBack={() => setCurrentView('game-selector')}
         />;
       default:

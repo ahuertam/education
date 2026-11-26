@@ -1,6 +1,6 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **45 minijuegos**
+Web de juegos matemáticos, de lengua y de conocimiento general. **46 minijuegos**
 en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
@@ -44,6 +44,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Taller de Fracciones** | Lee, compara y suma fracciones con barras y círculos. |
 | **La Recta Numérica** | Sitúa, salta y ordena números en una recta que cambia de escala. |
 | **Base Diez** | Lee, descompone y compara números con piezas de base diez. |
+| **Quinzet Derive** | La fábrica de cifras: monta el número con fichas de base diez y cambia unas por otras. |
 | **La Tabla de Números** | Lee una rejilla de números, prevé el siguiente y descubre de cuánto en cuánto avanza. |
 | **Dinero en euros** | Suma monedas y billetes, calcula el cambio y combina piezas para pagar. |
 | **¿Qué Número Falta?** | La cuenta con un hueco: 8 + □ = 15. Tienes que producir el número, no reconocerlo. |
@@ -139,8 +140,8 @@ npm start          # http://localhost:3000
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
 - **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
-  y cada juego baja su trozo al abrirlo, en vez de bajar los 45 de golpe.
-- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 45 juegos y las
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 46 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 46 juegos y las
   17 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
 - **Nivel por juego**: cada juego declara en qué banda de Primaria se introduce su
   contenido (1º-2º, 3º-4º, 5º-6º). El selector filtra con pastillas "Hasta 2º / 4º / 6º"
@@ -150,7 +151,7 @@ npm start          # http://localhost:3000
   guarda en el navegador y se ve desde la portada.
 - **Ajustes del aula**: desde la portada, el educador puede apagar el minijuego de
   premio para que la sesión sea solo de práctica.
-- **Progreso**: la portada enseña cuántos de los 45 juegos has probado y cuáles.
+- **Progreso**: la portada enseña cuántos de los 46 juegos has probado y cuáles.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de
@@ -158,6 +159,7 @@ npm start          # http://localhost:3000
 - **Datasets** en [`src/components/data/`](src/components/data/): preguntas de conocimiento,
   sintaxis, ríos, geometría y formas.
 - **Ranking local** en `localStorage` ([`src/utils/rankings.js`](src/utils/rankings.js)).
+- **Tres juegos del método Quinzet**: la **Hoja Quinzet** (cálculo mental automatizado: 60 cuentas en dos minutos), el **Mercadillo Quinzet** (cálculo global: elegir la estrategia y aplicar sus pasos) y **Quinzet Derive** (matemática manipulativa: montar el número con fichas de base diez). Los tres comparten [`src/components/data/quinzet.js`](src/components/data/quinzet.js) y las fichas de [`src/components/ui/FichasBaseDiez.js`](src/components/ui/FichasBaseDiez.js), que usa también Base Diez.
 - **Ocho juegos salidos de las apps del Math Learning Center** (Fractions, Partial Product
   Finder, Number Line, Number Pieces, Geoboard, Pattern Shapes, Number Chart y Money
   Pieces): allí son herramientas para explorar; aquí son rondas con puntos, racha y

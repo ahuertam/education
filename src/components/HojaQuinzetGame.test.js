@@ -5,7 +5,7 @@
 // cuenta sale al azar, así que el test la lee de la pantalla y calcula lo que
 // tiene que ser.
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import HojaQuinzetGame from './HojaQuinzetGame';
 
 const props = {
@@ -52,5 +52,20 @@ describe('la hoja Quinzet', () => {
       opcionesEnPantalla().find((b) => b.textContent !== String(elCorrecto))
     );
     expect(screen.getByText(`Era ${texto} = ${elCorrecto}`)).toBeTruthy();
+  });
+
+  it('acabada la hoja, ofrece el minijuego de premio', () => {
+    // La hoja dura dos minutos: se adelanta el reloj y la partida termina.
+    jest.useFakeTimers();
+    try {
+      render(<HojaQuinzetGame {...props} />);
+      fireEvent.click(screen.getByText(/Hoja 1 · 1º/));
+      act(() => {
+        jest.advanceTimersByTime(120000);
+      });
+      expect(screen.getByText('🎁 Minijuego de premio')).toBeTruthy();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });

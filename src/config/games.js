@@ -296,6 +296,14 @@ export const GAMES = [
     description: 'Lee, descompone y compara números con piezas de base diez.',
   },
   {
+    id: 'quinzetderive', icon: FaCubes, title: 'Quinzet Derive', color: '#5B21B6',
+    // La parte manipulativa del método: el número se construye con fichas.
+    // Comparte la mesa de Base Diez.
+    categories: ['numeros', 'mixed_math'],
+    nivel: 'inicial',
+    description: 'La fábrica de cifras: monta el número con fichas de base diez y cambia unas por otras.',
+  },
+  {
     id: 'tablanumeros', icon: FaTable, title: 'La Tabla de Números', color: '#0E7490',
     categories: ['numeros'],
     nivel: 'inicial',

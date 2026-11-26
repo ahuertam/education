@@ -56,6 +56,7 @@ import HuertaGame from './HuertaGame';
 import CajasGame from './puzzles/cajas/CajasGame';
 import HojaQuinzetGame from './HojaQuinzetGame';
 import MercadilloQuinzetGame from './MercadilloQuinzetGame';
+import QuinzetDeriveGame from './QuinzetDeriveGame';
 import TyperDungeonGame from './TyperDungeon/TyperDungeonGame';
 
 const COMPONENTES = {
@@ -103,6 +104,7 @@ const COMPONENTES = {
   cajas: CajasGame,
   hojaquinzet: HojaQuinzetGame,
   mercadilloquinzet: MercadilloQuinzetGame,
+  quinzetderive: QuinzetDeriveGame,
   typerdungeon: TyperDungeonGame,
 };
 

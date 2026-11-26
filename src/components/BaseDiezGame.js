@@ -19,9 +19,9 @@ import {
   Tarjeta,
   Visual,
 } from './ui/JuegoBase';
-import styled from 'styled-components';
 import { FaCheck } from 'react-icons/fa';
-import { baseDiez, componerBaseDiez, numeroES, redondear } from '../utils/matematicas';
+import { Mesa, MesaLeyenda } from './ui/FichasBaseDiez';
+import { baseDiez, componerBaseDiez, numeroES, opcionesNumericas, redondear } from '../utils/matematicas';
 import { loadGameRanking, recordGameRun, updateGameBestStreak } from '../utils/rankings';
 
 // Base Diez.
@@ -39,174 +39,15 @@ import { loadGameRanking, recordGameRun, updateGameBestStreak } from '../utils/r
 // rayado en 10×10 y una barra de 10 es una columna de 10 casillas. Pinta igual
 // que la libreta del niño y no son 900 rectos.
 
-const TEAL = '#12b3b0';
-const NARANJA = '#ff8a2a';
-const NAVY = '#0b2b45';
 const VERDE = '#2e9e5b';
 const ROJO = '#e05555';
 const RONDAS = 10;
-const CELDA = 10;
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-const revuelto = (lista) => {
-  const a = [...lista];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
-
 // --- Estilos --------------------------------------------------------------
 
-const MesaLeyenda = styled.div`
-  text-align: center;
-  font-weight: 800;
-  font-size: 1.35rem;
-  margin-top: 0.4rem;
-`;
-
-// --- La mesa de valor posicional -----------------------------------------
-
-const COLOR_CIEN = '#845ef7';
-const COLOR_DIEZ = TEAL;
-const COLOR_UNO = NARANJA;
-
-// Bloque de 100: un cuadrado con la cuadrícula de 10×10.
-const BloqueCien = ({ x, y }) => (
-  <g transform={`translate(${x}, ${y})`}>
-    <rect x={0} y={0} width={CELDA * 10} height={CELDA * 10} fill={COLOR_CIEN} rx="2" />
-    <rect x={0} y={0} width={CELDA * 10} height={CELDA * 10} fill="url(#cuadricula-base-diez)" rx="2" />
-    <rect x={0} y={0} width={CELDA * 10} height={CELDA * 10} fill="none" stroke={NAVY} strokeWidth="1" rx="2" />
-  </g>
-);
-
-// Barra de 10: una columna de 10 casillas.
-const BarraDiez = ({ x, y }) => (
-  <g transform={`translate(${x}, ${y})`}>
-    <rect x={0} y={0} width={CELDA} height={CELDA * 10} fill={COLOR_DIEZ} rx="2" />
-    <rect x={0} y={0} width={CELDA} height={CELDA * 10} fill="url(#cuadricula-base-diez)" rx="2" />
-    <rect x={0} y={0} width={CELDA} height={CELDA * 10} fill="none" stroke={NAVY} strokeWidth="1" rx="2" />
-  </g>
-);
-
-// Cubo de 1.
-const Cubo = ({ x, y }) => (
-  <rect
-    x={x}
-    y={y}
-    width={CELDA}
-    height={CELDA}
-    fill={COLOR_UNO}
-    stroke={NAVY}
-    strokeWidth="1"
-    rx="1.5"
-  />
-);
-
-// Una columna de la mesa: los bloques y, debajo, el nombre de la posición.
-const Columna = ({ titulo, ancho, alto, children }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.45rem' }}>
-    <div style={{ minWidth: ancho, display: 'flex', justifyContent: 'center' }}>
-      <svg
-        width={ancho}
-        height={alto}
-        viewBox={`0 0 ${ancho} ${alto}`}
-        style={{ maxWidth: '100%', height: 'auto' }}
-        aria-hidden="true"
-      >
-        {children}
-      </svg>
-    </div>
-    {titulo && (
-      <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#5b7286', whiteSpace: 'nowrap' }}>
-        {titulo}
-      </div>
-    )}
-  </div>
-);
-
-// La cuadrícula de 10×10 con la que se rayan los bloques de 100 y las barras
-// de 10. Es un patrón, así que un bloque de 100 son dos rectos y no cien.
-const Cuadricula = () => (
-  <defs>
-    <pattern id="cuadricula-base-diez" width={CELDA} height={CELDA} patternUnits="userSpaceOnUse">
-      <path
-        d={`M ${CELDA} 0 L 0 0 0 ${CELDA}`}
-        fill="none"
-        stroke="rgba(255,255,255,0.9)"
-        strokeWidth="0.9"
-      />
-    </pattern>
-  </defs>
-);
-
-// La mesa entera: columnas de centenas, decenas y unidades, todas apoyadas en
-// la misma base para que se lean como una tabla de valor posicional.
-const Mesa = ({ partes, titulos = true }) => {
-  const { centenas, decenas, unidades } = partes;
-  const porFila = 4;
-  const filasCien = Math.ceil(centenas / porFila);
-  const anchoCien = Math.min(centenas, porFila) * CELDA * 10;
-  const anchoDiez = decenas * CELDA;
-  const anchoUno = unidades * CELDA;
-  const alto = Math.max(filasCien * CELDA * 10, CELDA * 10, CELDA);
-
-  return (
-    <div
-      style={{ display: 'flex', gap: '1.2rem', alignItems: 'flex-end', justifyContent: 'center' }}
-      role="img"
-      aria-label={`${centenas} centenas, ${decenas} decenas y ${unidades} unidades`}
-    >
-      <Columna titulo={titulos ? 'Centenas' : ''} ancho={Math.max(anchoCien, CELDA)} alto={alto}>
-        <Cuadricula />
-        {Array.from({ length: centenas }, (_, i) => (
-          <BloqueCien
-            key={`c${i}`}
-            x={(i % porFila) * CELDA * 10}
-            y={alto - (filasCien - Math.floor(i / porFila)) * CELDA * 10}
-          />
-        ))}
-      </Columna>
-
-      <Columna titulo={titulos ? 'Decenas' : ''} ancho={Math.max(anchoDiez, CELDA)} alto={alto}>
-        <Cuadricula />
-        {Array.from({ length: decenas }, (_, i) => (
-          <BarraDiez key={`d${i}`} x={i * CELDA} y={alto - CELDA * 10} />
-        ))}
-      </Columna>
-
-      <Columna titulo={titulos ? 'Unidades' : ''} ancho={Math.max(anchoUno, CELDA)} alto={alto}>
-        {Array.from({ length: unidades }, (_, i) => (
-          <Cubo key={`u${i}`} x={i * CELDA} y={alto - CELDA} />
-        ))}
-      </Columna>
-    </div>
-  );
-};
-
 // --- Generación de rondas ------------------------------------------------
-
-const opcionesDesde = (correcto, candidatas) => {
-  const vistas = new Set([String(correcto)]);
-  const out = [correcto];
-  for (const c of candidatas) {
-    if (out.length >= 4) break;
-    if (!Number.isFinite(c) || c < 0 || vistas.has(String(c))) continue;
-    vistas.add(String(c));
-    out.push(c);
-  }
-  let intentos = 0;
-  while (out.length < 3 && intentos < 40) {
-    intentos++;
-    const c = correcto + rnd(-40, 40);
-    if (c < 0 || vistas.has(String(c))) continue;
-    vistas.add(String(c));
-    out.push(c);
-  }
-  return revuelto(out);
-};
 
 // ¿Qué número forman las piezas?
 const rondaLee = () => {
@@ -220,7 +61,7 @@ const rondaLee = () => {
     enunciado: '¿Qué número forman estas piezas?',
     ayuda: 'Cada bloque grande son 100, cada barra son 10 y cada cubito es 1.',
     mesa: partes,
-    opciones: opcionesDesde(numero, [
+    opciones: opcionesNumericas(numero, [
       numero + 10,
       numero - 10,
       numero + 100,
@@ -261,7 +102,7 @@ const rondaCompara = () => {
     mesa: null,
     mesas: [baseDiez(a), baseDiez(b)],
     numeros: [a, b],
-    opciones: opcionesDesde(correcta, [a, b, correcta + 1]),
+    opciones: opcionesNumericas(correcta, [a, b, correcta + 1]),
     correcta,
     explicacion: iguales
       ? `Los dos números valen ${numeroES(a)}.`
@@ -283,7 +124,7 @@ const rondaRedondea = () => {
       ? 'Mira la cifra de las decenas: si es 5 o más, sube a la centena siguiente.'
       : 'Mira la cifra de las unidades: si es 5 o más, sube a la decena siguiente.',
     mesa: baseDiez(numero),
-    opciones: opcionesDesde(correcto, [
+    opciones: opcionesNumericas(correcto, [
       correcto + (centena ? 100 : 10),
       correcto - (centena ? 100 : 10),
       numero,

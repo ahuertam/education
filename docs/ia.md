@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **45 juegos**, 48 vistas, 55 componentes.
+Datos a fecha de la última revisión: **46 juegos**, 49 vistas, 56 componentes.
 
 ---
 
@@ -81,6 +81,7 @@ Landing  ──►  game-selector  ──►  <juego>
 | `cajas` | Cajas y Números | [`puzzles/cajas/CajasGame.js`](../src/components/puzzles/cajas/CajasGame.js) |
 | `hojaquinzet` | Hoja Quinzet | [`HojaQuinzetGame.js`](../src/components/HojaQuinzetGame.js) |
 | `mercadilloquinzet` | El Mercadillo Quinzet | [`MercadilloQuinzetGame.js`](../src/components/MercadilloQuinzetGame.js) |
+| `quinzetderive` | Quinzet Derive | [`QuinzetDeriveGame.js`](../src/components/QuinzetDeriveGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -101,7 +102,7 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Todo el catálogo —los 45 juegos y las 17 tarjetas de la landing— está en un
+Todo el catálogo —los 46 juegos y las 17 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -170,6 +171,7 @@ categoría tenga su juego y su tarjeta.
 | [`FlappyBonusLevel.js`](../src/components/FlappyBonusLevel.js) | Nivel extra del juego Flappy |
 | [`ui/JuegoBase.js`](../src/components/ui/JuegoBase.js) | Marco común de los juegos de rondas: barra, tarjeta, opciones, feedback y pantalla final |
 | [`ui/DineroPiezas.js`](../src/components/ui/DineroPiezas.js) | Monedas y billetes de euro que usan Dinero en euros y el Mercadillo Quinzet |
+| [`ui/FichasBaseDiez.js`](../src/components/ui/FichasBaseDiez.js) | La mesa de fichas de base diez (bloques de 100, barras de 10 y cubitos), compartida por Base Diez y Quinzet Derive |
 | [`ColeccionGame.js`](../src/components/ColeccionGame.js) | Álbum de pegatinas y logros (pantalla `coleccion`) |
 | [`Ajustes.js`](../src/components/Ajustes.js) | Interruptores del aula, en la landing |
 | [`ProgresoPanel.js`](../src/components/ProgresoPanel.js) | Barra de progreso: qué juegos se han probado |
@@ -306,6 +308,25 @@ Fases del reducer: `exploring` → `pre_battle` → `battle` → `monster_dying`
 El detalle de diseño está en [`TyperDungeon-plan.md`](TyperDungeon-plan.md).
 
 ---
+
+## 9b. Los tres juegos del método Quinzet
+
+El método tiene dos mitades, y aquí hay un juego para cada una:
+
+| Juego | Qué es |
+|---|---|
+| `hojaquinzet` | **Cálculo mental automatizado**: la hoja del método (4 columnas de 15 cuentas) en dos minutos, con sus umbrales (55 para subir, 15 para repetir). |
+| `mercadilloquinzet` | **Cálculo global**: elegir la estrategia (doble y mitad, ×10, complemento, número redondo, reparto) y aplicar sus pasos, uno a uno. |
+| `quinzetderive` | **Matemática manipulativa**: montar el número con fichas de base diez y cambiar unas por otras. |
+
+- Los datos del método —hojas, rangos, distractores, umbrales y estrategias— están
+  en [`src/components/data/quinzet.js`](../src/components/data/quinzet.js).
+- Las fichas de base diez están en
+  [`src/components/ui/FichasBaseDiez.js`](../src/components/ui/FichasBaseDiez.js)
+  y las usa también Base Diez.
+- Las piezas de euro están en
+  [`src/components/ui/DineroPiezas.js`](../src/components/ui/DineroPiezas.js)
+  y las usa también Dinero en euros.
 
 ## 10. Añadir un juego
 
