@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **43 juegos**, 46 vistas, 53 componentes.
+Datos a fecha de la última revisión: **44 juegos**, 47 vistas, 54 componentes.
 
 ---
 
@@ -79,6 +79,7 @@ Landing  ──►  game-selector  ──►  <juego>
 | `ruleta` | La Ruleta y los Dados | [`RuletaDadosGame.js`](../src/components/RuletaDadosGame.js) |
 | `huerta` | Mi Huerta | [`HuertaGame.js`](../src/components/HuertaGame.js) |
 | `cajas` | Cajas y Números | [`puzzles/cajas/CajasGame.js`](../src/components/puzzles/cajas/CajasGame.js) |
+| `hojaquinzet` | Hoja Quinzet | [`HojaQuinzetGame.js`](../src/components/HojaQuinzetGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -99,7 +100,7 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Todo el catálogo —los 43 juegos y las 17 tarjetas de la landing— está en un
+Todo el catálogo —los 44 juegos y las 17 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -219,6 +220,7 @@ PantallaFinal (ui/JuegoBase.js)
 | [`src/components/huerta/`](../src/components/huerta/) | Lógica de Mi Huerta: cuentas del día, crecimiento y cosecha |
 | [`src/utils/huerta.js`](../src/utils/huerta.js) | El estado del huerto en `localStorage` (sigue mañana) |
 | [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |
+| [`src/components/data/quinzet.js`](../src/components/data/quinzet.js) | Hojas del método Quinzet: 4 columnas × 15 cuentas, rangos por curso, distractores y umbrales (55 / 15) |
 | [`src/components/styles/`](../src/components/styles/) | Estilos sueltos de juegos grandes |
 | [`src/components/rivers/`](../src/components/rivers/) | Mapa SVG de España y sus ríos |
 | [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/) | Motor de Fuego & Agua |

@@ -27,7 +27,7 @@ import {
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
   FaFlask, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
   FaRulerHorizontal, FaCubes, FaThumbtack, FaShapes, FaTable, FaCoins,
-  FaSuperscript, FaDice, FaQuestion, FaSeedling, FaBoxes,
+  FaSuperscript, FaDice, FaQuestion, FaSeedling, FaBoxes, FaStopwatch,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -202,6 +202,17 @@ export const GAMES = [
     categories: ['addition', 'subtraction', 'division'],
     nivel: 'inicial',
     description: (a) => `Usa cartas Pokémon para resolver operaciones ${a}. Sin repetir preguntas y con ranking local.`,
+  },
+
+  // Cálculo mental (método Quinzet)
+  {
+    id: 'hojaquinzet', icon: FaStopwatch, title: 'Hoja Quinzet', color: '#9F1239',
+    // El método es de cálculo mental, así que entra en las cuatro
+    // operaciones y en las mixtas. Las hojas las elige el niño: cada una es
+    // una familia de cuentas y un curso.
+    categories: ['addition', 'subtraction', 'multiplication', 'mixed_math'],
+    nivel: 'inicial',
+    description: (a) => `Cálculo mental cronometrado: 60 cuentas en dos minutos, como en el método Quinzet ${a}.`,
   },
 
   // Conocimiento general

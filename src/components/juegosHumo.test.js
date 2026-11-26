@@ -54,6 +54,7 @@ import AlgebraGame from './AlgebraGame';
 import RuletaDadosGame from './RuletaDadosGame';
 import HuertaGame from './HuertaGame';
 import CajasGame from './puzzles/cajas/CajasGame';
+import HojaQuinzetGame from './HojaQuinzetGame';
 import TyperDungeonGame from './TyperDungeon/TyperDungeonGame';
 
 const COMPONENTES = {
@@ -99,6 +100,7 @@ const COMPONENTES = {
   ruleta: RuletaDadosGame,
   huerta: HuertaGame,
   cajas: CajasGame,
+  hojaquinzet: HojaQuinzetGame,
   typerdungeon: TyperDungeonGame,
 };
 
