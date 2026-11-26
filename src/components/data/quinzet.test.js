@@ -8,6 +8,7 @@
 import {
   HOJAS, hoja, opciones, veredicto, tablasDe, textoCuenta,
   OPERACIONES_HOJA, COLUMNAS, POR_COLUMNA, UMBRAL_SUBIR, UMBRAL_REPETIR,
+  ESTRATEGIAS, PUESTOS, mercado,
 } from './quinzet';
 
 describe('la hoja', () => {
@@ -71,7 +72,7 @@ describe('las opciones', () => {
   it('ofrecen la correcta y tres fallos distintos y válidos', () => {
     for (const h of HOJAS) {
       for (const c of hoja(h.id)) {
-        const ops = opciones(c);
+        const ops = opciones(c.answer, [c.a - c.b, c.a + c.b]);
         expect(ops).toHaveLength(4);
         expect(new Set(ops).size).toBe(4);
         expect(ops).toContain(c.answer);
@@ -99,5 +100,55 @@ describe('la cuenta escrita', () => {
   it('se lee como en la hoja', () => {
     expect(textoCuenta({ a: 8, b: 3, operator: '+' })).toBe('8 + 3');
     expect(textoCuenta({ a: 12, b: 4, operator: '÷' })).toBe('12 ÷ 4');
+  });
+});
+
+describe('el mercadillo', () => {
+  it('cada ronda trae un problema con sus pasos y tres tarjetas', () => {
+    const rondas = mercado();
+    expect(rondas).toHaveLength(8);
+    for (const r of rondas) {
+      expect(r.enunciado).toBeTruthy();
+      expect(r.pasos.length).toBeGreaterThanOrEqual(1);
+      expect(r.tarjetas).toHaveLength(3);
+      // Una de las tres tarjetas es la estrategia buena, y solo una.
+      expect(r.tarjetas.filter((e) => e.id === r.estrategia)).toHaveLength(1);
+      // Los dos señuelos son estrategias que existen.
+      for (const e of r.tarjetas) {
+        expect(ESTRATEGIAS.map((s) => s.id)).toContain(e.id);
+      }
+      // Cada paso tiene su respuesta, y el último es la respuesta del problema.
+      for (const p of r.pasos) {
+        expect(Number.isInteger(p.respuesta)).toBe(true);
+        expect(p.respuesta).toBeGreaterThanOrEqual(0);
+        expect(p.texto).toBeTruthy();
+      }
+      expect(r.pasos[r.pasos.length - 1].respuesta).toBe(r.resultado);
+    }
+  });
+
+  it('los pasos de cada estrategia dan el total de la compra', () => {
+    for (const r of mercado(40)) {
+      if (r.estrategia === 'doble') {
+        // Multiplicar por 2 es un solo duplicado; por 4, dos.
+        if (r.pasos.length === 1) expect(r.total % 2).toBe(0);
+        else expect(r.total % 4).toBe(0);
+      }
+      if (r.estrategia === 'x10') expect(r.total % 10).toBe(0);
+      if (r.estrategia === 'complemento') expect(r.total).toBeGreaterThan(10);
+      if (r.estrategia === 'redondo') expect(r.total).toBeGreaterThan(0);
+      if (r.estrategia === 'reparto') {
+        // El total sale justo en las partes: "Reparte 24 en 4 partes iguales".
+        const partes = Number(r.pasos[0].texto.match(/ en (\d+) partes/)[1]);
+        expect(r.total % partes).toBe(0);
+      }
+    }
+  });
+
+  it('cada problema se compra en un puesto que existe', () => {
+    for (const r of mercado(20)) {
+      expect(PUESTOS.map((p) => p.nombre)).toContain(r.puesto.nombre);
+      expect(r.puesto.svg).toMatch(/\.svg$/);
+    }
   });
 });

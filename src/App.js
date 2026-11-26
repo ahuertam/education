@@ -57,6 +57,7 @@ const ColeccionGame = lazy(() => import('./components/ColeccionGame'));
 const HuertaGame = lazy(() => import('./components/HuertaGame'));
 const CajasGame = lazy(() => import('./components/puzzles/cajas/CajasGame'));
 const HojaQuinzetGame = lazy(() => import('./components/HojaQuinzetGame'));
+const MercadilloQuinzetGame = lazy(() => import('./components/MercadilloQuinzetGame'));
 
 const DEFAULT_MULT_TABLES = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
@@ -309,6 +310,10 @@ function App() {
           onBack={() => setCurrentView('game-selector')}
           operation={selectedOperation}
           multiplicationConfig={multiplicationConfig}
+        />;
+      case 'mercadilloquinzet':
+        return <MercadilloQuinzetGame
+          onBack={() => setCurrentView('game-selector')}
         />;
       default:
         return <Landing onNavigate={handleNavigate} />;

@@ -3,7 +3,7 @@
 Índice para cualquier persona (o agente) que necesite **qué juegos hay**, **cómo se
 navega** y **dónde tocar** para añadir o modificar uno, sin recorrer el proyecto entero.
 
-Datos a fecha de la última revisión: **44 juegos**, 47 vistas, 54 componentes.
+Datos a fecha de la última revisión: **45 juegos**, 48 vistas, 55 componentes.
 
 ---
 
@@ -80,6 +80,7 @@ Landing  ──►  game-selector  ──►  <juego>
 | `huerta` | Mi Huerta | [`HuertaGame.js`](../src/components/HuertaGame.js) |
 | `cajas` | Cajas y Números | [`puzzles/cajas/CajasGame.js`](../src/components/puzzles/cajas/CajasGame.js) |
 | `hojaquinzet` | Hoja Quinzet | [`HojaQuinzetGame.js`](../src/components/HojaQuinzetGame.js) |
+| `mercadilloquinzet` | El Mercadillo Quinzet | [`MercadilloQuinzetGame.js`](../src/components/MercadilloQuinzetGame.js) |
 | `accenthunter` | Cazador de Acentos | [`AccentHunterGame.js`](../src/components/AccentHunterGame.js) |
 | `sintaxis` | Sintaxis | [`SintaxisGame.js`](../src/components/SintaxisGame.js) |
 | `tiemposverbales` | Tiempos Verbales | [`TiemposVerbalesGame.js`](../src/components/TiemposVerbalesGame.js) |
@@ -100,7 +101,7 @@ Landing  ──►  game-selector  ──►  <juego>
 
 ## 4. Categorías
 
-Todo el catálogo —los 44 juegos y las 17 tarjetas de la landing— está en un
+Todo el catálogo —los 45 juegos y las 17 tarjetas de la landing— está en un
 único sitio: [`src/config/games.js`](../src/config/games.js). Antes estaba
 repartido en tres ficheros y añadir un juego obligaba a tocarlos todos.
 
@@ -168,6 +169,7 @@ categoría tenga su juego y su tarjeta.
 | [`SupportFab.js`](../src/components/SupportFab.js) | Botón de donación Ko-fi |
 | [`FlappyBonusLevel.js`](../src/components/FlappyBonusLevel.js) | Nivel extra del juego Flappy |
 | [`ui/JuegoBase.js`](../src/components/ui/JuegoBase.js) | Marco común de los juegos de rondas: barra, tarjeta, opciones, feedback y pantalla final |
+| [`ui/DineroPiezas.js`](../src/components/ui/DineroPiezas.js) | Monedas y billetes de euro que usan Dinero en euros y el Mercadillo Quinzet |
 | [`ColeccionGame.js`](../src/components/ColeccionGame.js) | Álbum de pegatinas y logros (pantalla `coleccion`) |
 | [`Ajustes.js`](../src/components/Ajustes.js) | Interruptores del aula, en la landing |
 | [`ProgresoPanel.js`](../src/components/ProgresoPanel.js) | Barra de progreso: qué juegos se han probado |
@@ -220,7 +222,7 @@ PantallaFinal (ui/JuegoBase.js)
 | [`src/components/huerta/`](../src/components/huerta/) | Lógica de Mi Huerta: cuentas del día, crecimiento y cosecha |
 | [`src/utils/huerta.js`](../src/utils/huerta.js) | El estado del huerto en `localStorage` (sigue mañana) |
 | [`src/components/data/ahorcadoPalabras.js`](../src/components/data/ahorcadoPalabras.js) | 69 palabras con pista, para El Colgado y Rosco de Palabras |
-| [`src/components/data/quinzet.js`](../src/components/data/quinzet.js) | Hojas del método Quinzet: 4 columnas × 15 cuentas, rangos por curso, distractores y umbrales (55 / 15) |
+| [`src/components/data/quinzet.js`](../src/components/data/quinzet.js) | Método Quinzet: hojas (4 columnas × 15), rangos por curso, distractores, umbrales (55 / 15) y las estrategias del mercadillo |
 | [`src/components/styles/`](../src/components/styles/) | Estilos sueltos de juegos grandes |
 | [`src/components/rivers/`](../src/components/rivers/) | Mapa SVG de España y sus ríos |
 | [`src/components/puzzles/firewater/`](../src/components/puzzles/firewater/) | Motor de Fuego & Agua |

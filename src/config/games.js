@@ -27,7 +27,7 @@ import {
   FaBolt, FaMapMarkedAlt, FaClock, FaShieldAlt, FaTh, FaHourglassHalf,
   FaFlask, FaScroll, FaSkull, FaListUl, FaChartPie, FaThLarge,
   FaRulerHorizontal, FaCubes, FaThumbtack, FaShapes, FaTable, FaCoins,
-  FaSuperscript, FaDice, FaQuestion, FaSeedling, FaBoxes, FaStopwatch,
+  FaSuperscript, FaDice, FaQuestion, FaSeedling, FaBoxes, FaStopwatch, FaStore,
 } from 'react-icons/fa';
 
 // --- Categorías de la landing ---------------------------------------------
@@ -213,6 +213,16 @@ export const GAMES = [
     categories: ['addition', 'subtraction', 'multiplication', 'mixed_math'],
     nivel: 'inicial',
     description: (a) => `Cálculo mental cronometrado: 60 cuentas en dos minutos, como en el método Quinzet ${a}.`,
+  },
+
+  // Cálculo global (método Quinzet)
+  {
+    id: 'mercadilloquinzet', icon: FaStore, title: 'El Mercadillo Quinzet', color: '#A0522D',
+    // La otra mitad del método: elegir la estrategia y aplicarla paso a paso.
+    // Es cálculo global, así que va en las mixtas y en los números.
+    categories: ['mixed_math', 'numeros'],
+    nivel: 'medio',
+    description: 'Cálculo global: elige la estrategia (doble, ×10, complemento, número redondo) y aplica sus pasos.',
   },
 
   // Conocimiento general

@@ -1,6 +1,6 @@
 # Edutika — juegos educativos para Primaria
 
-Web de juegos matemáticos, de lengua y de conocimiento general. **44 minijuegos**
+Web de juegos matemáticos, de lengua y de conocimiento general. **45 minijuegos**
 en español, pensados para niños de Primaria. Gratis y sin cuenta ni descargas.
 
 🌐 **[edutika.es](https://edutika.es)**
@@ -48,6 +48,7 @@ varias: los de matemáticas sirven para las cuatro operaciones, por ejemplo.
 | **Dinero en euros** | Suma monedas y billetes, calcula el cambio y combina piezas para pagar. |
 | **¿Qué Número Falta?** | La cuenta con un hueco: 8 + □ = 15. Tienes que producir el número, no reconocerlo. |
 | **Mi Huerta** | Simulación: siembras con la tabla de multiplicar y riegas con fracciones. El huerto sigue mañana. |
+| **El Mercadillo Quinzet** | Cálculo global: eliges la estrategia (doble, ×10, complemento, número redondo) y aplicas sus pasos. |
 
 ### 🎲 Álgebra y probabilidad
 
@@ -138,8 +139,8 @@ npm start          # http://localhost:3000
 - **Sin router.** No hay `react-router` ni URLs: la navegación es un `currentView` en el
   estado de `App.js` y un `switch` que decide el componente a pintar.
 - **Los juegos se cargan bajo demanda** (`React.lazy`): la landing pesa 94 KB comprimidos
-  y cada juego baja su trozo al abrirlo, en vez de bajar los 44 de golpe.
-- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 44 juegos y las
+  y cada juego baja su trozo al abrirlo, en vez de bajar los 45 de golpe.
+- **Un catálogo único** en [`src/config/games.js`](src/config/games.js): los 45 juegos y las
   17 tarjetas de la landing. Añadir un juego son dos ficheros, no cuatro.
 - **Nivel por juego**: cada juego declara en qué banda de Primaria se introduce su
   contenido (1º-2º, 3º-4º, 5º-6º). El selector filtra con pastillas "Hasta 2º / 4º / 6º"
@@ -149,7 +150,7 @@ npm start          # http://localhost:3000
   guarda en el navegador y se ve desde la portada.
 - **Ajustes del aula**: desde la portada, el educador puede apagar el minijuego de
   premio para que la sesión sea solo de práctica.
-- **Progreso**: la portada enseña cuántos de los 44 juegos has probado y cuáles.
+- **Progreso**: la portada enseña cuántos de los 45 juegos has probado y cuáles.
 - **Un generador compartido** para las cuentas de multiplicar
   ([`src/utils/problemGenerator.js`](src/utils/problemGenerator.js)), alimentado
   por la configuración de tablas y cifras que se elige antes de entrar. El selector de

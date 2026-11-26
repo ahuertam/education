@@ -20,6 +20,9 @@ import {
   OPERACIONES_HOJA, SEGUNDOS_HOJA, COLUMNAS,
 } from './data/quinzet';
 
+// Las opciones de una cuenta: la correcta y los fallos de siempre.
+const opcionesDeCuenta = (c) => opciones(c.answer, [c.a - c.b, c.a + c.b]);
+
 // --- Estilos --------------------------------------------------------------
 
 const Hojas = styled.div`
@@ -129,7 +132,7 @@ const HojaQuinzetGame = ({ onBack, operation, multiplicationConfig }) => {
     const nuevas = hoja(id, multiplicationConfig);
     setHojaId(id);
     setCuentas(nuevas);
-    setOpcionesCuenta(opciones(nuevas[0]));
+    setOpcionesCuenta(opcionesDeCuenta(nuevas[0]));
     setIndice(0);
     setResultados([]);
     setSegundos(SEGUNDOS_HOJA);
@@ -164,7 +167,7 @@ const HojaQuinzetGame = ({ onBack, operation, multiplicationConfig }) => {
     if (indice + 1 >= cuentas.length) {
       setTerminada(true);
     } else {
-      setOpcionesCuenta(opciones(cuentas[indice + 1]));
+      setOpcionesCuenta(opcionesDeCuenta(cuentas[indice + 1]));
       setIndice((i) => i + 1);
     }
   };
